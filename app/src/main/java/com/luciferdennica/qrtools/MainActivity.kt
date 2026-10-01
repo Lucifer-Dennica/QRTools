@@ -3,31 +3,22 @@ package com.luciferdennica.qrtools
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.luciferdennica.qrtools.data.prefs.SettingsPrefs
+import com.luciferdennica.qrtools.domain.model.ThemeMode
+import com.luciferdennica.qrtools.ui.nav.NavGraph
+import com.luciferdennica.qrtools.ui.theme.QRToolsTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val prefs = SettingsPrefs(applicationContext)
         setContent {
-            MaterialTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    Placeholder()
-                }
+            val theme by prefs.theme.collectAsState(initial = ThemeMode.SYSTEM)
+            QRToolsTheme(themeMode = theme) {
+                NavGraph(prefs = prefs)
             }
         }
-    }
-}
-
-@Composable
-private fun Placeholder() {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("QR Tools — каркас готов", style = MaterialTheme.typography.headlineSmall)
     }
 }
