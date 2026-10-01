@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">QR Tools</string>
+    <string name="home">Главная</string>
+    <string name="scanner">Сканер</string>
+    <string name="generator">Генератор</string>
+    <string name="history">История</string>
+    <string name="favorites">Избранное</string>
+    <string name="settings">Настройки</string>
+    <string name="about">О приложении</string>
+    <string name="back">Назад</string>
+
+    <string name="scan_qr">Сканировать код</string>
+    <string name="scan_qr_desc">Наведи камеру на QR-код или штрихкод</string>
+    <string name="create_qr">Создать QR</string>
+    <string name="create_qr_desc">Текст, ссылка, WiFi, контакт, SMS</string>
+    <string name="history_desc">Все отсканированные коды</string>
+    <string name="favorites_desc">Избранные коды</string>
+
+    <string name="theme_title">Тема оформления</string>
+    <string name="screen_in_dev">Экран в разработке</string>
 </resources>
