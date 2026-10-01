@@ -1,7 +1,9 @@
 package com.luciferdennica.qrtools.ui.screens.settings
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -19,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -60,9 +63,9 @@ fun SettingsScreen(nav: NavController, prefs: SettingsPrefs) {
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             ThemeMode.values().forEach { mode ->
-                androidx.compose.foundation.layout.Row(
+                Row(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxWidth()
                         .padding(vertical = 4.dp)
                         .selectable(
                             selected = current == mode,
@@ -70,7 +73,7 @@ fun SettingsScreen(nav: NavController, prefs: SettingsPrefs) {
                             role = Role.RadioButton
                         )
                         .padding(8.dp),
-                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(selected = current == mode, onClick = null)
                     Text(mode.title, modifier = Modifier.padding(start = 8.dp))
