@@ -5,7 +5,7 @@ import android.content.Context
 import com.yandex.mobile.ads.common.AdError
 import com.yandex.mobile.ads.common.AdRequestConfiguration
 import com.yandex.mobile.ads.common.AdRequestError
-import com.yandex.mobile.ads.common.AdImpressionData
+import com.yandex.mobile.ads.common.ImpressionData
 import com.yandex.mobile.ads.interstitial.InterstitialAd
 import com.yandex.mobile.ads.interstitial.InterstitialAdEventListener
 import com.yandex.mobile.ads.interstitial.InterstitialAdLoadListener
@@ -20,13 +20,16 @@ object AdsManager {
     fun preloadInterstitial(context: Context) {
         if (interstitialAd != null || loading) return
         loading = true
+
         val loader = InterstitialAdLoader(context)
         val config = AdRequestConfiguration.Builder(AdIds.INTERSTITIAL).build()
+
         loader.loadAd(config, object : InterstitialAdLoadListener {
             override fun onAdLoaded(ad: InterstitialAd) {
                 interstitialAd = ad
                 loading = false
             }
+
             override fun onAdFailedToLoad(error: AdRequestError) {
                 interstitialAd = null
                 loading = false
@@ -45,16 +48,20 @@ object AdsManager {
         }
         ad.setAdEventListener(object : InterstitialAdEventListener {
             override fun onAdShown() {}
+
             override fun onAdFailedToShow(adError: AdError) {
                 interstitialAd = null
                 onDismiss()
             }
+
             override fun onAdDismissed() {
                 interstitialAd = null
                 onDismiss()
             }
+
             override fun onAdClicked() {}
-            override fun onAdImpression(impressionData: AdImpressionData?) {}
+
+            override fun onAdImpression(impressionData: ImpressionData?) {}
         })
         ad.show(activity)
     }
