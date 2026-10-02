@@ -29,6 +29,8 @@
     <string name="permission_camera_title">Нужен доступ к камере</string>
     <string name="permission_camera_desc">Разрешите доступ, чтобы сканировать QR-коды и штрихкоды</string>
     <string name="permission_grant">Разрешить</string>
+    <string name="permission_storage_title">Нужен доступ к файлам</string>
+    <string name="permission_storage_desc">Разрешите доступ, чтобы сохранить QR-код в галерею</string>
 
     <string name="scan_hint">Наведите камеру на код</string>
     <string name="scan_result">Результат</string>
@@ -40,4 +42,36 @@
     <string name="action_scan_again">Сканировать ещё</string>
     <string name="action_done">Готово</string>
     <string name="copied">Скопировано</string>
+
+    <!-- Генератор -->
+    <string name="gen_type">Тип кода</string>
+    <string name="gen_text">Текст</string>
+    <string name="gen_url">Ссылка</string>
+    <string name="gen_wifi">WiFi</string>
+    <string name="gen_contact">Контакт</string>
+    <string name="gen_sms">SMS</string>
+
+    <string name="field_text">Введите текст</string>
+    <string name="field_url">Введите ссылку (https://…)</string>
+    <string name="field_wifi_ssid">Имя сети (SSID)</string>
+    <string name="field_wifi_password">Пароль</string>
+    <string name="field_wifi_security">Тип защиты</string>
+    <string name="wifi_wpa">WPA/WPA2</string>
+    <string name="wifi_wep">WEP</string>
+    <string name="wifi_none">Открытая</string>
+    <string name="field_contact_name">Имя</string>
+    <string name="field_contact_phone">Телефон</string>
+    <string name="field_contact_email">Email</string>
+    <string name="field_sms_phone">Номер телефона</string>
+    <string name="field_sms_message">Сообщение</string>
+
+    <string name="btn_generate">Сгенерировать</string>
+    <string name="btn_save_gallery">Сохранить в галерею</string>
+    <string name="btn_share_qr">Поделиться</string>
+    <string name="btn_reset">Очистить</string>
+
+    <string name="generated_title">Готовый QR-код</string>
+    <string name="saved_gallery">Сохранено в галерею</string>
+    <string name="save_failed">Не удалось сохранить</string>
+    <string name="fill_fields">Заполните поля</string>
 </resources>
