@@ -21,9 +21,23 @@
 
     <string name="history_empty">История пуста</string>
     <string name="favorites_empty">В избранном пусто</string>
-    <string name="add_test">Добавить тестовую запись</string>
     <string name="delete">Удалить</string>
     <string name="clear_all">Очистить всё</string>
     <string name="favorite">В избранное</string>
     <string name="unfavorite">Убрать из избранного</string>
+
+    <string name="permission_camera_title">Нужен доступ к камере</string>
+    <string name="permission_camera_desc">Разрешите доступ, чтобы сканировать QR-коды и штрихкоды</string>
+    <string name="permission_grant">Разрешить</string>
+
+    <string name="scan_hint">Наведите камеру на код</string>
+    <string name="scan_result">Результат</string>
+    <string name="action_open">Открыть</string>
+    <string name="action_copy">Копировать</string>
+    <string name="action_share">Поделиться</string>
+    <string name="action_save">В избранное</string>
+    <string name="action_unsave">Убрать из избранного</string>
+    <string name="action_scan_again">Сканировать ещё</string>
+    <string name="action_done">Готово</string>
+    <string name="copied">Скопировано</string>
 </resources>
