@@ -162,7 +162,7 @@ fun GeneratorScreen(nav: NavController) {
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .menuAnchor(androidx.compose.material3.MenuAnchorType.PrimaryNotEditable)
+                        .menuAnchor()
                 )
                 ExposedDropdownMenu(
                     expanded = expanded,
