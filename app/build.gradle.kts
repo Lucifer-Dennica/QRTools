@@ -69,14 +69,15 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
 
-    // CameraX
     implementation("androidx.camera:camera-core:1.4.0")
     implementation("androidx.camera:camera-camera2:1.4.0")
     implementation("androidx.camera:camera-lifecycle:1.4.0")
     implementation("androidx.camera:camera-view:1.4.0")
 
-    // ML Kit — распознавание QR + всех штрихкодов
     implementation("com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1")
+
+    // ZXing — генерация QR
+    implementation("com.google.zxing:core:3.5.3")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
 }
