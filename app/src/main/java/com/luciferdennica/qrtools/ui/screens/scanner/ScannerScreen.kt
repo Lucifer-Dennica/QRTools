@@ -1,12 +1,14 @@
 package com.luciferdennica.qrtools.ui.screens.scanner
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
-import android.os.Build
-import android.content.Context
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
@@ -16,8 +18,10 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,6 +29,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -81,6 +86,34 @@ fun ScannerScreen(nav: NavController, repo: HistoryRepository) {
         if (!hasPermission) permissionLauncher.launch(Manifest.permission.CAMERA)
     }
 
+    // Открытие галереи
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        QrCodeAnalyzer.decodeFromUri(
+            context = context,
+            uri = uri,
+            onResult = { barcode ->
+                val raw = barcode.rawValue
+                if (!raw.isNullOrBlank()) {
+                    scope.launch {
+                        val type = TypeDetector.detect(raw)
+                        val id = repo.add(raw, barcode.format.toString(), type)
+                        nav.navigate(Routes.result(id)) {
+                            popUpTo(Routes.SCANNER) { inclusive = true }
+                        }
+                    }
+                } else {
+                    Toast.makeText(context, context.getString(R.string.no_code_in_image), Toast.LENGTH_SHORT).show()
+                }
+            },
+            onError = {
+                Toast.makeText(context, context.getString(R.string.no_code_in_image), Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -108,19 +141,36 @@ fun ScannerScreen(nav: NavController, repo: HistoryRepository) {
                 }
             }
         } else {
-            CameraPreview(
-                modifier = Modifier.fillMaxSize().padding(padding),
-                onDetected = { content, format ->
-                    vibrate(context)
-                    scope.launch {
-                        val type = TypeDetector.detect(content)
-                        val id = repo.add(content, format, type)
-                        nav.navigate(Routes.result(id)) {
-                            popUpTo(Routes.SCANNER) { inclusive = true }
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                CameraPreview(
+                    modifier = Modifier.fillMaxSize(),
+                    onDetected = { content, format ->
+                        vibrate(context)
+                        scope.launch {
+                            val type = TypeDetector.detect(content)
+                            val id = repo.add(content, format, type)
+                            nav.navigate(Routes.result(id)) {
+                                popUpTo(Routes.SCANNER) { inclusive = true }
+                            }
                         }
                     }
+                )
+
+                // Кнопка "Из галереи"
+                Button(
+                    onClick = { galleryLauncher.launch("image/*") },
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .padding(24.dp)
+                ) {
+                    Icon(Icons.Default.Image, contentDescription = null, modifier = Modifier.size(20.dp))
+                    Text(
+                        "  " + stringResource(R.string.from_gallery),
+                        style = MaterialTheme.typography.titleSmall
+                    )
                 }
-            )
+            }
         }
     }
 }
@@ -130,7 +180,6 @@ private fun CameraPreview(
     modifier: Modifier = Modifier,
     onDetected: (String, String) -> Unit
 ) {
-    val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val executor = remember { Executors.newSingleThreadExecutor() }
     var handled by remember { mutableStateOf(false) }
@@ -178,7 +227,6 @@ private fun CameraPreview(
             }
         )
 
-        // Оверлей — затемнение + рамка
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -196,16 +244,15 @@ private fun CameraPreview(
             color = Color.White,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier
-                .align(Alignment.BottomCenter)
+                .align(Alignment.TopCenter)
                 .fillMaxWidth()
-                .padding(32.dp)
+                .padding(top = 40.dp),
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
     }
 
     DisposableEffect(Unit) {
-        onDispose {
-            executor.shutdown()
-        }
+        onDispose { executor.shutdown() }
     }
 }
 
