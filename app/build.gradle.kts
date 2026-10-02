@@ -78,8 +78,8 @@ dependencies {
 
     implementation("com.google.zxing:core:3.5.3")
 
-    // Яндекс РСЯ
-    implementation("com.yandex.android:mobileads:7.3.0")
+    // Яндекс РСЯ 8.5.0 (требуется линтером)
+    implementation("com.yandex.android:mobileads:8.5.0")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
 }
