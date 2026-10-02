@@ -43,7 +43,6 @@
     <string name="action_done">Готово</string>
     <string name="copied">Скопировано</string>
 
-    <!-- Генератор -->
     <string name="gen_type">Тип кода</string>
     <string name="gen_text">Текст</string>
     <string name="gen_url">Ссылка</string>
@@ -66,7 +65,7 @@
     <string name="field_sms_message">Сообщение</string>
 
     <string name="btn_generate">Сгенерировать</string>
-    <string name="btn_save_gallery">Сохранить в галерею</string>
+    <string name="btn_save_gallery">Сохранить</string>
     <string name="btn_share_qr">Поделиться</string>
     <string name="btn_reset">Очистить</string>
 
@@ -74,4 +73,11 @@
     <string name="saved_gallery">Сохранено в галерею</string>
     <string name="save_failed">Не удалось сохранить</string>
     <string name="fill_fields">Заполните поля</string>
+
+    <!-- Галерея -->
+    <string name="from_gallery">Из галереи</string>
+    <string name="no_code_in_image">В изображении не найден код</string>
+
+    <!-- Поиск -->
+    <string name="search_hint">Поиск по содержимому</string>
 </resources>
