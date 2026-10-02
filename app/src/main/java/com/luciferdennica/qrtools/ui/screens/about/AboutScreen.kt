@@ -2,6 +2,7 @@ package com.luciferdennica.qrtools.ui.screens.about
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,26 +12,38 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.luciferdennica.qrtools.R
+import com.luciferdennica.qrtools.util.IntentUtils
+
+private const val AUTHOR_EMAIL = "denis22142qwe@gmail.com"
+private const val AUTHOR_TELEGRAM = "Lucifer_Denicca_22142"
+private const val DONATE_URL = "https://www.donationalerts.com/r/lucifer_dennica_1999"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen(nav: NavController) {
+    val context = LocalContext.current
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -54,6 +67,7 @@ fun AboutScreen(nav: NavController) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            // ===== Название и версия =====
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -66,13 +80,14 @@ fun AboutScreen(nav: NavController) {
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text = "Версия 1.0.0",
+                        text = "${stringResource(R.string.about_version)}: 1.0.0",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
                 }
             }
 
+            // ===== Описание =====
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -87,19 +102,20 @@ fun AboutScreen(nav: NavController) {
                     Text(
                         text = "QR Tools — удобный сканер и генератор QR-кодов и штрихкодов. " +
                                 "Поддерживает все популярные форматы, чтение из галереи, " +
-                                "историю, избранное и экспорт данных.",
+                                "историю, избранное, экспорт данных и подключение к Wi-Fi по QR.",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
 
+            // ===== Автор =====
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(Modifier.padding(16.dp)) {
                     Text(
-                        text = "Автор",
+                        text = stringResource(R.string.about_author),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -111,7 +127,80 @@ fun AboutScreen(nav: NavController) {
                 }
             }
 
-            Spacer(Modifier.height(20.dp))
+            // ===== Поддержать проект =====
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Text(
+                        text = stringResource(R.string.about_support),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedButton(
+                        onClick = { IntentUtils.openUrlSafe(context, DONATE_URL) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            Icons.Default.Favorite,
+                            contentDescription = null,
+                            modifier = Modifier.padding(end = 6.dp)
+                        )
+                        Text("DonationAlerts")
+                    }
+                }
+            }
+
+            // ===== Контакты =====
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Text(
+                        text = stringResource(R.string.about_contacts),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedButton(
+                            onClick = {
+                                IntentUtils.openEmail(
+                                    context,
+                                    AUTHOR_EMAIL,
+                                    "QR Tools — обратная связь"
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(
+                                Icons.Default.Email,
+                                contentDescription = null,
+                                modifier = Modifier.padding(end = 6.dp)
+                            )
+                            Text(AUTHOR_EMAIL)
+                        }
+                        OutlinedButton(
+                            onClick = {
+                                IntentUtils.openUrlSafe(context, "https://t.me/$AUTHOR_TELEGRAM")
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(
+                                Icons.Default.Send,
+                                contentDescription = null,
+                                modifier = Modifier.padding(end = 6.dp)
+                            )
+                            Text("@$AUTHOR_TELEGRAM")
+                        }
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(12.dp))
             Text(
                 text = "© 2026 QR Tools. Все права защищены.",
                 style = MaterialTheme.typography.bodySmall,
