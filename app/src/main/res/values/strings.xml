@@ -18,4 +18,12 @@
 
     <string name="theme_title">Тема оформления</string>
     <string name="screen_in_dev">Экран в разработке</string>
+
+    <string name="history_empty">История пуста</string>
+    <string name="favorites_empty">В избранном пусто</string>
+    <string name="add_test">Добавить тестовую запись</string>
+    <string name="delete">Удалить</string>
+    <string name="clear_all">Очистить всё</string>
+    <string name="favorite">В избранное</string>
+    <string name="unfavorite">Убрать из избранного</string>
 </resources>
