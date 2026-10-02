@@ -2,7 +2,6 @@ package com.luciferdennica.qrtools.ui.screens.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.luciferdennica.qrtools.R
+import com.luciferdennica.qrtools.ui.components.BannerAd
 import com.luciferdennica.qrtools.ui.nav.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,38 +58,40 @@ fun HomeScreen(nav: NavController) {
             )
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            ActionCard(
-                icon = Icons.Default.QrCodeScanner,
-                title = stringResource(R.string.scan_qr),
-                subtitle = stringResource(R.string.scan_qr_desc),
-                onClick = { nav.navigate(Routes.SCANNER) }
-            )
-            ActionCard(
-                icon = Icons.Default.QrCode,
-                title = stringResource(R.string.create_qr),
-                subtitle = stringResource(R.string.create_qr_desc),
-                onClick = { nav.navigate(Routes.GENERATOR) }
-            )
-            ActionCard(
-                icon = Icons.Default.History,
-                title = stringResource(R.string.history),
-                subtitle = stringResource(R.string.history_desc),
-                onClick = { nav.navigate(Routes.HISTORY) }
-            )
-            ActionCard(
-                icon = Icons.Default.FavoriteBorder,
-                title = stringResource(R.string.favorites),
-                subtitle = stringResource(R.string.favorites_desc),
-                onClick = { nav.navigate(Routes.FAVORITES) }
-            )
+        Column(Modifier.fillMaxSize().padding(padding)) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                ActionCard(
+                    icon = Icons.Default.QrCodeScanner,
+                    title = stringResource(R.string.scan_qr),
+                    subtitle = stringResource(R.string.scan_qr_desc),
+                    onClick = { nav.navigate(Routes.SCANNER) }
+                )
+                ActionCard(
+                    icon = Icons.Default.QrCode,
+                    title = stringResource(R.string.create_qr),
+                    subtitle = stringResource(R.string.create_qr_desc),
+                    onClick = { nav.navigate(Routes.GENERATOR) }
+                )
+                ActionCard(
+                    icon = Icons.Default.History,
+                    title = stringResource(R.string.history),
+                    subtitle = stringResource(R.string.history_desc),
+                    onClick = { nav.navigate(Routes.HISTORY) }
+                )
+                ActionCard(
+                    icon = Icons.Default.FavoriteBorder,
+                    title = stringResource(R.string.favorites),
+                    subtitle = stringResource(R.string.favorites_desc),
+                    onClick = { nav.navigate(Routes.FAVORITES) }
+                )
+            }
+            BannerAd()
         }
     }
 }
