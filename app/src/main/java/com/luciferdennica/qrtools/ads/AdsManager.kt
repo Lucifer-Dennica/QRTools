@@ -8,7 +8,6 @@ import com.yandex.mobile.ads.common.AdRequestError
 import com.yandex.mobile.ads.common.ImpressionData
 import com.yandex.mobile.ads.interstitial.InterstitialAd
 import com.yandex.mobile.ads.interstitial.InterstitialAdEventListener
-import com.yandex.mobile.ads.interstitial.InterstitialAdLoadListener
 import com.yandex.mobile.ads.interstitial.InterstitialAdLoader
 
 object AdsManager {
@@ -16,28 +15,33 @@ object AdsManager {
     private var interstitialAd: InterstitialAd? = null
     private var loading = false
 
-    fun preloadInterstitial(context: Context) {
+    /**
+     * Предзагрузить межстраничную.
+     * Это suspend-функция, поэтому ее нужно вызывать из корутины.
+     */
+    suspend fun preloadInterstitial(context: Context) {
         if (interstitialAd != null || loading) return
         loading = true
 
-        val loader = InterstitialAdLoader(context).apply {
-            setAdLoadListener(object : InterstitialAdLoadListener {
-                override fun onAdLoaded(ad: InterstitialAd) {
-                    interstitialAd = ad
-                    loading = false
-                }
+        val loader = InterstitialAdLoader(context)
+        // В SDK 8.x AdRequest создается с adUnitId
+        val adRequest = AdRequest.Builder(AdIds.INTERSTITIAL).build()
 
-                override fun onAdFailedToLoad(error: AdRequestError) {
-                    interstitialAd = null
-                    loading = false
-                }
-            })
+        // loadAd теперь suspend-функция и возвращает результат
+        val result = loader.loadAd(adRequest)
+
+        result.onSuccess { ad ->
+            interstitialAd = ad
+        }.onFailure { error ->
+            // Обработка ошибки
+            interstitialAd = null
         }
-
-        val request = AdRequest.Builder(AdIds.INTERSTITIAL).build()
-        loader.loadAd(request)
+        loading = false
     }
 
+    /**
+     * Показать межстраничную. Если не загружена — сразу вызывает onDismiss.
+     */
     fun showInterstitial(activity: Activity, onDismiss: () -> Unit) {
         val ad = interstitialAd
         if (ad == null) {
@@ -46,19 +50,15 @@ object AdsManager {
         }
         ad.setAdEventListener(object : InterstitialAdEventListener {
             override fun onAdShown() {}
-
             override fun onAdFailedToShow(adError: AdError) {
                 interstitialAd = null
                 onDismiss()
             }
-
             override fun onAdDismissed() {
                 interstitialAd = null
                 onDismiss()
             }
-
             override fun onAdClicked() {}
-
             override fun onAdImpression(impressionData: ImpressionData?) {}
         })
         ad.show(activity)
