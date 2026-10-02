@@ -37,7 +37,7 @@ fun NavGraph(prefs: SettingsPrefs, historyRepo: HistoryRepository) {
         composable(Routes.SCANNER) { ScannerScreen(nav, historyRepo) }
         composable(Routes.GENERATOR) { GeneratorScreen(nav) }
         composable(Routes.HISTORY) { HistoryScreen(nav, historyRepo) }
-        composable(Routes.FAVORITES) { FavoritesScreen(nav) }
+        composable(Routes.FAVORITES) { FavoritesScreen(nav, historyRepo) }
         composable(Routes.SETTINGS) { SettingsScreen(nav, prefs) }
         composable(Routes.ABOUT) { AboutScreen(nav) }
         composable(
