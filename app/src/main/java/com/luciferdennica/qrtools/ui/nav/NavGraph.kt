@@ -34,7 +34,7 @@ fun NavGraph(prefs: SettingsPrefs, historyRepo: HistoryRepository) {
     val nav = rememberNavController()
     NavHost(navController = nav, startDestination = Routes.HOME) {
         composable(Routes.HOME) { HomeScreen(nav) }
-        composable(Routes.SCANNER) { ScannerScreen(nav, historyRepo) }
+        composable(Routes.SCANNER) { ScannerScreen(nav, historyRepo, prefs) }
         composable(Routes.GENERATOR) { GeneratorScreen(nav) }
         composable(Routes.HISTORY) { HistoryScreen(nav, historyRepo) }
         composable(Routes.FAVORITES) { FavoritesScreen(nav, historyRepo) }
