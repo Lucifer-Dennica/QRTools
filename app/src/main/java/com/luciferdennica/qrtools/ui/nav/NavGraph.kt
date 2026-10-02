@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.luciferdennica.qrtools.data.prefs.SettingsPrefs
+import com.luciferdennica.qrtools.data.repo.HistoryRepository
 import com.luciferdennica.qrtools.ui.screens.about.AboutScreen
 import com.luciferdennica.qrtools.ui.screens.favorites.FavoritesScreen
 import com.luciferdennica.qrtools.ui.screens.generator.GeneratorScreen
@@ -24,13 +25,13 @@ object Routes {
 }
 
 @Composable
-fun NavGraph(prefs: SettingsPrefs) {
+fun NavGraph(prefs: SettingsPrefs, historyRepo: HistoryRepository) {
     val nav = rememberNavController()
     NavHost(navController = nav, startDestination = Routes.HOME) {
         composable(Routes.HOME) { HomeScreen(nav) }
         composable(Routes.SCANNER) { ScannerScreen(nav) }
         composable(Routes.GENERATOR) { GeneratorScreen(nav) }
-        composable(Routes.HISTORY) { HistoryScreen(nav) }
+        composable(Routes.HISTORY) { HistoryScreen(nav, historyRepo) }
         composable(Routes.FAVORITES) { FavoritesScreen(nav) }
         composable(Routes.SETTINGS) { SettingsScreen(nav, prefs) }
         composable(Routes.ABOUT) { AboutScreen(nav) }
