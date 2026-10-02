@@ -3,7 +3,7 @@ package com.luciferdennica.qrtools.ads
 import android.app.Activity
 import android.content.Context
 import com.yandex.mobile.ads.common.AdError
-import com.yandex.mobile.ads.common.AdRequestConfiguration
+import com.yandex.mobile.ads.common.AdRequest
 import com.yandex.mobile.ads.common.AdRequestError
 import com.yandex.mobile.ads.common.ImpressionData
 import com.yandex.mobile.ads.interstitial.InterstitialAd
@@ -16,7 +16,6 @@ object AdsManager {
     private var interstitialAd: InterstitialAd? = null
     private var loading = false
 
-    /** Предзагрузить межстраничную (вызывать заранее, чтобы была готова к показу) */
     fun preloadInterstitial(context: Context) {
         if (interstitialAd != null || loading) return
         loading = true
@@ -35,13 +34,10 @@ object AdsManager {
             })
         }
 
-        val config = AdRequestConfiguration.Builder(AdIds.INTERSTITIAL).build()
-        loader.loadAd(config)
+        val request = AdRequest.Builder(AdIds.INTERSTITIAL).build()
+        loader.loadAd(request)
     }
 
-    /**
-     * Показать межстраничную. Если не загружена — сразу вызывает onDismiss.
-     */
     fun showInterstitial(activity: Activity, onDismiss: () -> Unit) {
         val ad = interstitialAd
         if (ad == null) {
