@@ -13,7 +13,6 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        // Класс MobileAds переименован в YandexAds
         YandexAds.initialize(this) { }
     }
 }
