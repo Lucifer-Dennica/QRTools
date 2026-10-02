@@ -19,6 +19,9 @@ interface ScanDao {
     @Query("SELECT * FROM scans WHERE content LIKE '%' || :query || '%' ORDER BY timestamp DESC")
     fun search(query: String): Flow<List<ScanEntity>>
 
+    @Query("SELECT * FROM scans WHERE id = :id LIMIT 1")
+    suspend fun getById(id: Long): ScanEntity?
+
     @Insert
     suspend fun insert(item: ScanEntity): Long
 
