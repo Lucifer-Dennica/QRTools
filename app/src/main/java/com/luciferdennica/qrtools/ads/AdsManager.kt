@@ -8,6 +8,7 @@ import com.yandex.mobile.ads.common.AdRequestError
 import com.yandex.mobile.ads.common.ImpressionData
 import com.yandex.mobile.ads.interstitial.InterstitialAd
 import com.yandex.mobile.ads.interstitial.InterstitialAdEventListener
+import com.yandex.mobile.ads.interstitial.InterstitialAdLoadListener
 import com.yandex.mobile.ads.interstitial.InterstitialAdLoader
 
 object AdsManager {
@@ -15,33 +16,26 @@ object AdsManager {
     private var interstitialAd: InterstitialAd? = null
     private var loading = false
 
-    /**
-     * Предзагрузить межстраничную.
-     * Это suspend-функция, поэтому ее нужно вызывать из корутины.
-     */
-    suspend fun preloadInterstitial(context: Context) {
+    fun preloadInterstitial(context: Context) {
         if (interstitialAd != null || loading) return
         loading = true
 
         val loader = InterstitialAdLoader(context)
-        // В SDK 8.x AdRequest создается с adUnitId
-        val adRequest = AdRequest.Builder(AdIds.INTERSTITIAL).build()
+        val request = AdRequest.Builder(AdIds.INTERSTITIAL).build()
 
-        // loadAd теперь suspend-функция и возвращает результат
-        val result = loader.loadAd(adRequest)
+        loader.loadAd(request, object : InterstitialAdLoadListener {
+            override fun onAdLoaded(ad: InterstitialAd) {
+                interstitialAd = ad
+                loading = false
+            }
 
-        result.onSuccess { ad ->
-            interstitialAd = ad
-        }.onFailure { error ->
-            // Обработка ошибки
-            interstitialAd = null
-        }
-        loading = false
+            override fun onAdFailedToLoad(error: AdRequestError) {
+                interstitialAd = null
+                loading = false
+            }
+        })
     }
 
-    /**
-     * Показать межстраничную. Если не загружена — сразу вызывает onDismiss.
-     */
     fun showInterstitial(activity: Activity, onDismiss: () -> Unit) {
         val ad = interstitialAd
         if (ad == null) {
