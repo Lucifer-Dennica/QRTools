@@ -4,6 +4,8 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.media.AudioManager
+import android.media.ToneGenerator
 import android.net.Uri
 import android.os.Build
 import android.os.VibrationEffect
@@ -149,8 +151,11 @@ fun ScannerScreen(
                 CameraPreview(
                     modifier = Modifier.fillMaxSize(),
                     onDetected = { content, format ->
-                        vibrate(context)
                         scope.launch {
+                            val soundOn = prefs.getSoundOnce()
+                            val vibroOn = prefs.getVibroOnce()
+                            if (vibroOn) vibrate(context)
+                            if (soundOn) playBeep()
                             val type = TypeDetector.detect(content)
                             val id = repo.add(content, format, type)
                             navigateAfterScan(nav, context, prefs, id)
@@ -172,7 +177,6 @@ fun ScannerScreen(
     }
 }
 
-/** Счётчик + показ межстраничной + навигация на результат */
 private suspend fun navigateAfterScan(
     nav: NavController,
     context: Context,
@@ -289,4 +293,14 @@ private fun vibrate(context: Context) {
         context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
     }
     vib?.vibrate(VibrationEffect.createOneShot(80, VibrationEffect.DEFAULT_AMPLITUDE))
+}
+
+private fun playBeep() {
+    runCatching {
+        val tone = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 80)
+        tone.startTone(ToneGenerator.TONE_PROP_BEEP, 120)
+        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+            tone.release()
+        }, 200)
+    }
 }
