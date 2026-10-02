@@ -14,10 +14,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val prefs = SettingsPrefs(applicationContext)
+        val repo = (application as App).historyRepo
+
         setContent {
             val theme by prefs.theme.collectAsState(initial = ThemeMode.SYSTEM)
             QRToolsTheme(themeMode = theme) {
-                NavGraph(prefs = prefs)
+                NavGraph(prefs = prefs, historyRepo = repo)
             }
         }
     }
