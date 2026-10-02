@@ -1,6 +1,8 @@
 package com.luciferdennica.qrtools.ui.nav
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -32,13 +34,15 @@ object Routes {
 @Composable
 fun NavGraph(prefs: SettingsPrefs, historyRepo: HistoryRepository) {
     val nav = rememberNavController()
+    val autoCopy by prefs.autoCopy.collectAsState(initial = false)
+
     NavHost(navController = nav, startDestination = Routes.HOME) {
         composable(Routes.HOME) { HomeScreen(nav) }
         composable(Routes.SCANNER) { ScannerScreen(nav, historyRepo, prefs) }
         composable(Routes.GENERATOR) { GeneratorScreen(nav) }
-        composable(Routes.HISTORY) { HistoryScreen(nav, historyRepo) }
+        composable(Routes.HISTORY) { HistoryScreen(nav, historyRepo, autoCopy) }
         composable(Routes.FAVORITES) { FavoritesScreen(nav, historyRepo) }
-        composable(Routes.SETTINGS) { SettingsScreen(nav, prefs) }
+        composable(Routes.SETTINGS) { SettingsScreen(nav, prefs, historyRepo) }
         composable(Routes.ABOUT) { AboutScreen(nav) }
         composable(
             route = "${Routes.RESULT}/{id}",
