@@ -21,12 +21,9 @@ object WifiConnector {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             runCatching {
                 val specifierBuilder = WifiNetworkSpecifier.Builder().setSsid(data.ssid)
-                if (data.security.uppercase() != "NOPASS" && data.password.isNotEmpty()) {
-                    if (data.security.uppercase() == "WEP") {
-                        specifierBuilder.setWepKey(data.password)
-                    } else {
-                        specifierBuilder.setWpa2Passphrase(data.password)
-                    }
+                val sec = data.security.uppercase()
+                if (sec != "NOPASS" && data.password.isNotEmpty() && sec != "WEP") {
+                    specifierBuilder.setWpa2Passphrase(data.password)
                 }
                 val specifier = specifierBuilder.build()
 
@@ -47,7 +44,6 @@ object WifiConnector {
                 cm.requestNetwork(request, cb, 30_000)
             }.onFailure { onResult(false) }
         } else {
-            // Android 9- — открыть настройки WiFi
             runCatching {
                 context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS).apply {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
