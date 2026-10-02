@@ -2,7 +2,6 @@ package com.luciferdennica.qrtools.ui.screens.about
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,8 +34,8 @@ import androidx.navigation.NavController
 import com.luciferdennica.qrtools.R
 import com.luciferdennica.qrtools.util.IntentUtils
 
-private const val AUTHOR_EMAIL = "denis22142qwe@gmail.com"
-private const val AUTHOR_TELEGRAM = "Lucifer_Denicca_22142"
+private const val SUPPORT_EMAIL = "denis22142qwe@gmail.com"
+private const val SUPPORT_TELEGRAM = "Lucifer_Denicca_22142"
 private const val DONATE_URL = "https://www.donationalerts.com/r/lucifer_dennica_1999"
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,7 +79,7 @@ fun AboutScreen(nav: NavController) {
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text = "${stringResource(R.string.about_version)}: 1.0.0",
+                        text = "Версия: 1.0.0",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
@@ -108,20 +107,20 @@ fun AboutScreen(nav: NavController) {
                 }
             }
 
-            // ===== Автор =====
+            // ===== Разработка =====
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(Modifier.padding(16.dp)) {
                     Text(
-                        text = stringResource(R.string.about_author),
+                        text = "Разработка",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        text = "Lucifer-Dennica",
+                        text = "QR Tools Team",
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
@@ -170,7 +169,7 @@ fun AboutScreen(nav: NavController) {
                             onClick = {
                                 IntentUtils.openEmail(
                                     context,
-                                    AUTHOR_EMAIL,
+                                    SUPPORT_EMAIL,
                                     "QR Tools — обратная связь"
                                 )
                             },
@@ -181,11 +180,11 @@ fun AboutScreen(nav: NavController) {
                                 contentDescription = null,
                                 modifier = Modifier.padding(end = 6.dp)
                             )
-                            Text(AUTHOR_EMAIL)
+                            Text(SUPPORT_EMAIL)
                         }
                         OutlinedButton(
                             onClick = {
-                                IntentUtils.openUrlSafe(context, "https://t.me/$AUTHOR_TELEGRAM")
+                                IntentUtils.openUrlSafe(context, "https://t.me/$SUPPORT_TELEGRAM")
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -194,7 +193,7 @@ fun AboutScreen(nav: NavController) {
                                 contentDescription = null,
                                 modifier = Modifier.padding(end = 6.dp)
                             )
-                            Text("@$AUTHOR_TELEGRAM")
+                            Text("@$SUPPORT_TELEGRAM")
                         }
                     }
                 }
