@@ -15,6 +15,10 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -48,8 +52,15 @@ import com.luciferdennica.qrtools.R
 import com.luciferdennica.qrtools.data.prefs.SettingsPrefs
 import com.luciferdennica.qrtools.data.repo.HistoryRepository
 import com.luciferdennica.qrtools.domain.model.ThemeMode
+import com.luciferdennica.qrtools.ui.nav.Routes
 import com.luciferdennica.qrtools.util.CsvExporter
+import com.luciferdennica.qrtools.util.IntentUtils
 import kotlinx.coroutines.launch
+
+// ====== ДАННЫЕ АВТОРА ======
+private const val AUTHOR_EMAIL = "denis22142qwe@gmail.com"
+private const val AUTHOR_TELEGRAM = "Lucifer_Denicca_22142"
+private const val DONATE_URL = "https://www.donationalerts.com/r/lucifer_dennica_1999"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -198,6 +209,127 @@ fun SettingsScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(stringResource(R.string.settings_clear_history))
+                    }
+                }
+            }
+
+            // ===== ПОДДЕРЖАТЬ АВТОРА =====
+            SectionTitle(stringResource(R.string.settings_support))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.settings_support_desc),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                    OutlinedButton(
+                        onClick = {
+                            val ok = IntentUtils.openUrlSafe(context, DONATE_URL)
+                            if (ok) {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.donate_success),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.link_error),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            Icons.Default.Favorite,
+                            contentDescription = null,
+                            modifier = Modifier.padding(end = 6.dp)
+                        )
+                        Text(stringResource(R.string.settings_donate))
+                    }
+                }
+            }
+
+            // ===== ОБРАТНАЯ СВЯЗЬ =====
+            SectionTitle(stringResource(R.string.settings_feedback))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            IntentUtils.openEmail(
+                                context,
+                                AUTHOR_EMAIL,
+                                "QR Tools — обратная связь"
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            Icons.Default.Email,
+                            contentDescription = null,
+                            modifier = Modifier.padding(end = 6.dp)
+                        )
+                        Text(stringResource(R.string.settings_email))
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            IntentUtils.openUrlSafe(context, "https://t.me/$AUTHOR_TELEGRAM")
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            Icons.Default.Send,
+                            contentDescription = null,
+                            modifier = Modifier.padding(end = 6.dp)
+                        )
+                        Text(stringResource(R.string.settings_telegram))
+                    }
+                }
+            }
+
+            // ===== О ПРИЛОЖЕНИИ =====
+            SectionTitle(stringResource(R.string.settings_about))
+            Card(
+                onClick = { nav.navigate(Routes.ABOUT) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Default.Info,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(Modifier.padding(start = 12.dp))
+                    Column {
+                        Text(
+                            text = stringResource(R.string.settings_about),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Text(
+                            text = stringResource(R.string.settings_about_desc),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        )
                     }
                 }
             }
