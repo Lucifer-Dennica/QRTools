@@ -76,8 +76,10 @@ dependencies {
 
     implementation("com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1")
 
-    // ZXing — генерация QR
     implementation("com.google.zxing:core:3.5.3")
+
+    // Яндекс РСЯ
+    implementation("com.yandex.android:mobileads:7.3.0")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
 }
