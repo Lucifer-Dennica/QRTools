@@ -16,21 +16,15 @@
     <string name="history_desc">Все отсканированные коды</string>
     <string name="favorites_desc">Избранные коды</string>
 
-    <string name="theme_title">Тема оформления</string>
-    <string name="screen_in_dev">Экран в разработке</string>
-
     <string name="history_empty">История пуста</string>
     <string name="favorites_empty">В избранном пусто</string>
     <string name="delete">Удалить</string>
-    <string name="clear_all">Очистить всё</string>
     <string name="favorite">В избранное</string>
     <string name="unfavorite">Убрать из избранного</string>
 
     <string name="permission_camera_title">Нужен доступ к камере</string>
     <string name="permission_camera_desc">Разрешите доступ, чтобы сканировать QR-коды и штрихкоды</string>
     <string name="permission_grant">Разрешить</string>
-    <string name="permission_storage_title">Нужен доступ к файлам</string>
-    <string name="permission_storage_desc">Разрешите доступ, чтобы сохранить QR-код в галерею</string>
 
     <string name="scan_hint">Наведите камеру на код</string>
     <string name="scan_result">Результат</string>
@@ -40,7 +34,6 @@
     <string name="action_save">В избранное</string>
     <string name="action_unsave">Убрать из избранного</string>
     <string name="action_scan_again">Сканировать ещё</string>
-    <string name="action_done">Готово</string>
     <string name="copied">Скопировано</string>
     <string name="show_raw">Показать исходные данные</string>
     <string name="hide_raw">Скрыть исходные данные</string>
@@ -98,9 +91,26 @@
     <string name="contact_email">Email</string>
     <string name="contact_call">Позвонить</string>
     <string name="contact_save">Добавить в контакты</string>
-
-    <!-- SMS/Email/Телефон -->
     <string name="action_send_sms">Отправить SMS</string>
     <string name="action_send_email">Написать письмо</string>
     <string name="action_call">Позвонить</string>
+
+    <!-- Настройки -->
+    <string name="settings_theme">Тема оформления</string>
+    <string name="settings_behavior">Поведение</string>
+    <string name="settings_sound">Звук при сканировании</string>
+    <string name="settings_vibro">Вибрация при сканировании</string>
+    <string name="settings_auto_copy">Автокопирование в буфер</string>
+    <string name="settings_history">История</string>
+    <string name="settings_clear_history">Очистить всю историю</string>
+    <string name="settings_export_csv">Экспорт в CSV (Excel)</string>
+    <string name="clear_history_title">Очистить историю?</string>
+    <string name="clear_history_desc">Все записи будут удалены безвозвратно</string>
+    <string name="clear_history_confirm">Очистить</string>
+    <string name="cancel">Отмена</string>
+    <string name="history_cleared">История очищена</string>
+    <string name="csv_exported">Файл сохранён в Загрузки</string>
+    <string name="csv_export_failed">Не удалось сохранить файл</string>
+    <string name="csv_no_data">Нет данных для экспорта</string>
+    <string name="csv_share">Поделиться</string>
 </resources>
