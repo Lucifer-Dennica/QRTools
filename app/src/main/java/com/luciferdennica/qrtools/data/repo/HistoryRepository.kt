@@ -10,13 +10,18 @@ class HistoryRepository(private val dao: ScanDao) {
     fun getAll(): Flow<List<ScanEntity>> = dao.getAll()
     fun getFavorites(): Flow<List<ScanEntity>> = dao.getFavorites()
     fun search(query: String): Flow<List<ScanEntity>> = dao.search(query)
+    suspend fun getById(id: Long): ScanEntity? = dao.getById(id)
 
-    suspend fun add(content: String, format: String, type: ScanType) {
-        dao.insert(ScanEntity(content = content, format = format, type = type.name))
+    suspend fun add(content: String, format: String, type: ScanType): Long {
+        return dao.insert(ScanEntity(content = content, format = format, type = type.name))
     }
 
     suspend fun toggleFavorite(item: ScanEntity) {
         dao.setFavorite(item.id, !item.isFavorite)
+    }
+
+    suspend fun setFavorite(id: Long, fav: Boolean) {
+        dao.setFavorite(id, fav)
     }
 
     suspend fun delete(item: ScanEntity) = dao.delete(item)
