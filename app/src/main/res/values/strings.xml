@@ -42,6 +42,8 @@
     <string name="action_scan_again">Сканировать ещё</string>
     <string name="action_done">Готово</string>
     <string name="copied">Скопировано</string>
+    <string name="show_raw">Показать исходные данные</string>
+    <string name="hide_raw">Скрыть исходные данные</string>
 
     <string name="gen_type">Тип кода</string>
     <string name="gen_text">Текст</string>
@@ -74,10 +76,31 @@
     <string name="save_failed">Не удалось сохранить</string>
     <string name="fill_fields">Заполните поля</string>
 
-    <!-- Галерея -->
     <string name="from_gallery">Из галереи</string>
     <string name="no_code_in_image">В изображении не найден код</string>
-
-    <!-- Поиск -->
     <string name="search_hint">Поиск по содержимому</string>
+
+    <!-- WiFi -->
+    <string name="wifi_network">Сеть</string>
+    <string name="wifi_password">Пароль</string>
+    <string name="wifi_security">Защита</string>
+    <string name="wifi_hidden">Скрытая сеть</string>
+    <string name="wifi_hidden_yes">Да</string>
+    <string name="wifi_hidden_no">Нет</string>
+    <string name="wifi_connect">Подключиться к Wi-Fi</string>
+    <string name="wifi_connecting">Подключение…</string>
+    <string name="wifi_connect_failed">Не удалось подключиться</string>
+    <string name="wifi_no_password">Без пароля</string>
+
+    <!-- Контакт -->
+    <string name="contact_name">Имя</string>
+    <string name="contact_phone">Телефон</string>
+    <string name="contact_email">Email</string>
+    <string name="contact_call">Позвонить</string>
+    <string name="contact_save">Добавить в контакты</string>
+
+    <!-- SMS/Email/Телефон -->
+    <string name="action_send_sms">Отправить SMS</string>
+    <string name="action_send_email">Написать письмо</string>
+    <string name="action_call">Позвонить</string>
 </resources>
