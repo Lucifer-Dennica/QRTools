@@ -21,17 +21,13 @@ fun BannerAd(modifier: Modifier = Modifier) {
             val adWidthDp = (adWidthPixels / ctx.resources.displayMetrics.density).toInt()
 
             BannerAdView(ctx).apply {
-                // setAdUnitId() удален, ID передается в AdRequest
-                // BannerAdSize.stickySize -> BannerAdSize.sticky
                 setAdSize(BannerAdSize.sticky(ctx, adWidthDp))
                 setBannerAdEventListener(object : BannerAdEventListener {
                     override fun onAdLoaded() {}
                     override fun onAdFailedToLoad(error: AdRequestError) {}
                     override fun onAdClicked() {}
-                    // onLeftApplication и onReturnedToApplication удалены в SDK 8
                     override fun onImpression(impressionData: ImpressionData?) {}
                 })
-                // AdRequest создается с adUnitId
                 loadAd(AdRequest.Builder(AdIds.BANNER).build())
             }
         }
