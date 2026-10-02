@@ -8,9 +8,9 @@ import com.luciferdennica.qrtools.ads.AdIds
 import com.yandex.mobile.ads.banner.BannerAdEventListener
 import com.yandex.mobile.ads.banner.BannerAdSize
 import com.yandex.mobile.ads.banner.BannerAdView
-import com.yandex.mobile.ads.common.AdImpressionData
 import com.yandex.mobile.ads.common.AdRequest
 import com.yandex.mobile.ads.common.AdRequestError
+import com.yandex.mobile.ads.common.ImpressionData
 
 @Composable
 fun BannerAd(modifier: Modifier = Modifier) {
@@ -20,13 +20,13 @@ fun BannerAd(modifier: Modifier = Modifier) {
             BannerAdView(ctx).apply {
                 setAdUnitId(AdIds.BANNER)
                 setAdSize(BannerAdSize.stickySize(ctx, 320))
-                setAdEventListener(object : BannerAdEventListener {
+                setBannerAdEventListener(object : BannerAdEventListener {
                     override fun onAdLoaded() {}
                     override fun onAdFailedToLoad(error: AdRequestError) {}
                     override fun onAdClicked() {}
                     override fun onLeftApplication() {}
                     override fun onReturnedToApplication() {}
-                    override fun onImpression(impressionData: AdImpressionData?) {}
+                    override fun onImpression(impressionData: ImpressionData?) {}
                 })
                 loadAd(AdRequest.Builder().build())
             }
