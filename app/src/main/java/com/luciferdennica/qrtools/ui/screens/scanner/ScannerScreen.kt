@@ -1,6 +1,7 @@
 package com.luciferdennica.qrtools.ui.screens.scanner
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -18,10 +19,8 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -58,6 +57,9 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import com.luciferdennica.qrtools.R
+import com.luciferdennica.qrtools.ads.AdIds
+import com.luciferdennica.qrtools.ads.AdsManager
+import com.luciferdennica.qrtools.data.prefs.SettingsPrefs
 import com.luciferdennica.qrtools.data.repo.HistoryRepository
 import com.luciferdennica.qrtools.scan.QrCodeAnalyzer
 import com.luciferdennica.qrtools.ui.nav.Routes
@@ -67,7 +69,11 @@ import java.util.concurrent.Executors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScannerScreen(nav: NavController, repo: HistoryRepository) {
+fun ScannerScreen(
+    nav: NavController,
+    repo: HistoryRepository,
+    prefs: SettingsPrefs
+) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
@@ -84,9 +90,9 @@ fun ScannerScreen(nav: NavController, repo: HistoryRepository) {
 
     LaunchedEffect(Unit) {
         if (!hasPermission) permissionLauncher.launch(Manifest.permission.CAMERA)
+        AdsManager.preloadInterstitial(context)
     }
 
-    // Открытие галереи
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -100,9 +106,7 @@ fun ScannerScreen(nav: NavController, repo: HistoryRepository) {
                     scope.launch {
                         val type = TypeDetector.detect(raw)
                         val id = repo.add(raw, barcode.format.toString(), type)
-                        nav.navigate(Routes.result(id)) {
-                            popUpTo(Routes.SCANNER) { inclusive = true }
-                        }
+                        navigateAfterScan(nav, context, prefs, id)
                     }
                 } else {
                     Toast.makeText(context, context.getString(R.string.no_code_in_image), Toast.LENGTH_SHORT).show()
@@ -149,14 +153,10 @@ fun ScannerScreen(nav: NavController, repo: HistoryRepository) {
                         scope.launch {
                             val type = TypeDetector.detect(content)
                             val id = repo.add(content, format, type)
-                            nav.navigate(Routes.result(id)) {
-                                popUpTo(Routes.SCANNER) { inclusive = true }
-                            }
+                            navigateAfterScan(nav, context, prefs, id)
                         }
                     }
                 )
-
-                // Кнопка "Из галереи"
                 Button(
                     onClick = { galleryLauncher.launch("image/*") },
                     modifier = Modifier
@@ -165,13 +165,37 @@ fun ScannerScreen(nav: NavController, repo: HistoryRepository) {
                         .padding(24.dp)
                 ) {
                     Icon(Icons.Default.Image, contentDescription = null, modifier = Modifier.size(20.dp))
-                    Text(
-                        "  " + stringResource(R.string.from_gallery),
-                        style = MaterialTheme.typography.titleSmall
-                    )
+                    Text("  " + stringResource(R.string.from_gallery), style = MaterialTheme.typography.titleSmall)
                 }
             }
         }
+    }
+}
+
+/** Счётчик + показ межстраничной + навигация на результат */
+private suspend fun navigateAfterScan(
+    nav: NavController,
+    context: Context,
+    prefs: SettingsPrefs,
+    id: Long
+) {
+    val count = prefs.incrementScanCounter()
+    val goNext = {
+        nav.navigate(Routes.result(id)) {
+            popUpTo(Routes.SCANNER) { inclusive = true }
+        }
+    }
+    if (count >= AdIds.SCAN_INTERVAL) {
+        prefs.resetScanCounter()
+        val activity = context as? Activity
+        if (activity != null) {
+            AdsManager.showInterstitial(activity) { goNext() }
+            AdsManager.preloadInterstitial(context)
+        } else {
+            goNext()
+        }
+    } else {
+        goNext()
     }
 }
 
