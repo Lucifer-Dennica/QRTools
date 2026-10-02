@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -78,7 +79,9 @@ fun ResultScreen(nav: NavController, repo: HistoryRepository, id: Long) {
     var item by remember { mutableStateOf<ScanEntity?>(null) }
     var showRaw by remember { mutableStateOf(false) }
 
-    LaunchedEffect(id) { item = repo.getById(id) }
+    LaunchedEffect(id) {
+        item = repo.getById(id)
+    }
 
     Scaffold(
         topBar = {
@@ -86,9 +89,14 @@ fun ResultScreen(nav: NavController, repo: HistoryRepository, id: Long) {
                 title = { Text(stringResource(R.string.scan_result)) },
                 navigationIcon = {
                     IconButton(onClick = {
-                        nav.navigate(Routes.HOME) { popUpTo(Routes.HOME) { inclusive = true } }
+                        nav.navigate(Routes.HOME) {
+                            popUpTo(Routes.HOME) { inclusive = true }
+                        }
                     }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
+                        )
                     }
                 }
             )
@@ -96,119 +104,155 @@ fun ResultScreen(nav: NavController, repo: HistoryRepository, id: Long) {
     ) { padding ->
         val data = item
         if (data == null) {
-            androidx.compose.foundation.layout.Box(Modifier.fillMaxSize().padding(padding)) {
+            Box(modifier = Modifier.fillMaxSize().padding(padding)) {
                 Placeholder("...")
             }
         } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ResultContent(
+                data = data,
+                showRaw = showRaw,
+                onToggleRaw = { showRaw = !showRaw },
+                onToggleFavorite = {
+                    scope.launch {
+                        repo.setFavorite(data.id, !data.isFavorite)
+                        item = repo.getById(data.id)
+                    }
+                },
+                onScanAgain = {
+                    nav.navigate(Routes.SCANNER) { popUpTo(Routes.HOME) }
+                },
+                context = context
+            )
+        }
+    }
+}
+
+@Composable
+private fun ResultContent(
+    data: ScanEntity,
+    showRaw: Boolean,
+    onToggleRaw: () -> Unit,
+    onToggleFavorite: () -> Unit,
+    onScanAgain: () -> Unit,
+    context: Context
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
+            .verticalScroll(rememberScrollState())
+            .padding(vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        val typeTitle = runCatching { ScanType.valueOf(data.type).title }.getOrDefault(data.type)
+        Text(
+            text = typeTitle,
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        when (data.type) {
+            ScanType.WIFI.name -> {
+                val wifi = WifiParser.parse(data.content)
+                if (wifi != null) WifiCard(wifi) else RawCard(data.content)
+            }
+            ScanType.CONTACT.name -> {
+                val contact = VCardParser.parse(data.content)
+                if (contact != null) ContactCard(contact) else RawCard(data.content)
+            }
+            else -> RawCard(data.content)
+        }
+
+        if (data.type == ScanType.URL.name ||
+            data.type == ScanType.EMAIL.name ||
+            data.type == ScanType.PHONE.name
+        ) {
+            Button(
+                onClick = { openByType(context, data) },
+                modifier = Modifier.fillMaxWidth()
             ) {
-                val typeTitle = runCatching { ScanType.valueOf(data.type).title }.getOrDefault(data.type)
-                Text(typeTitle, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                Icon(
+                    imageVector = Icons.Default.OpenInNew,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.size(8.dp))
+                Text(stringResource(R.string.action_open))
+            }
+        }
 
-                when (data.type) {
-                    ScanType.WIFI.name -> {
-                        val wifi = WifiParser.parse(data.content)
-                        if (wifi != null) WifiCard(wifi, data.content)
-                        else RawCard(data.content)
-                    }
-                    ScanType.CONTACT.name -> {
-                        val contact = VCardParser.parse(data.content)
-                        if (contact != null) ContactCard(contact, data.content)
-                        else RawCard(data.content)
-                    }
-                    else -> RawCard(data.content)
-                }
+        OutlinedButton(
+            onClick = {
+                ClipboardUtils.copy(context, data.content, context.getString(R.string.copied))
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                imageVector = Icons.Default.ContentCopy,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(Modifier.size(8.dp))
+            Text(stringResource(R.string.action_copy))
+        }
 
-                Spacer(Modifier.height(4.dp))
+        OutlinedButton(
+            onClick = { IntentUtils.shareText(context, data.content) },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                imageVector = Icons.Default.Share,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(Modifier.size(8.dp))
+            Text(stringResource(R.string.action_share))
+        }
 
-                // Открыть / подключиться
-                when (data.type) {
-                    ScanType.URL.name, ScanType.EMAIL.name, ScanType.PHONE.name -> {
-                        Button(
-                            onClick = { openByType(context, data) },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Icon(Icons.Default.OpenInNew, contentDescription = null, modifier = Modifier.size(20.dp))
-                            Spacer(Modifier.size(8.dp))
-                            Text(stringResource(R.string.action_open))
-                        }
-                    }
-                }
+        OutlinedButton(
+            onClick = onToggleFavorite,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                imageVector = if (data.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(Modifier.size(8.dp))
+            Text(stringResource(if (data.isFavorite) R.string.action_unsave else R.string.action_save))
+        }
 
-                OutlinedButton(
-                    onClick = { ClipboardUtils.copy(context, data.content, context.getString(R.string.copied)) },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(20.dp))
-                    Spacer(Modifier.size(8.dp))
-                    Text(stringResource(R.string.action_copy))
-                }
+        Button(
+            onClick = onScanAgain,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(Modifier.size(8.dp))
+            Text(stringResource(R.string.action_scan_again))
+        }
 
-                OutlinedButton(
-                    onClick = { IntentUtils.shareText(context, data.content) },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(20.dp))
-                    Spacer(Modifier.size(8.dp))
-                    Text(stringResource(R.string.action_share))
-                }
+        TextButton(
+            onClick = onToggleRaw,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(if (showRaw) R.string.hide_raw else R.string.show_raw))
+        }
 
-                OutlinedButton(
-                    onClick = {
-                        scope.launch {
-                            repo.setFavorite(data.id, !data.isFavorite)
-                            item = repo.getById(data.id)
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(
-                        imageVector = if (data.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(Modifier.size(8.dp))
-                    Text(stringResource(if (data.isFavorite) R.string.action_unsave else R.string.action_save))
-                }
-
-                Spacer(Modifier.height(4.dp))
-
-                Button(
-                    onClick = { nav.navigate(Routes.SCANNER) { popUpTo(Routes.HOME) } },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(20.dp))
-                    Spacer(Modifier.size(8.dp))
-                    Text(stringResource(R.string.action_scan_again))
-                }
-
-                // Показать/скрыть исходные данные
-                TextButton(
-                    onClick = { showRaw = !showRaw },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(if (showRaw) R.string.hide_raw else R.string.show_raw))
-                }
-
-                if (showRaw) {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-                    ) {
-                        Text(
-                            text = data.content,
-                            modifier = Modifier.padding(12.dp),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                        )
-                    }
-                }
+        if (showRaw) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Text(
+                    text = data.content,
+                    modifier = Modifier.padding(12.dp),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
             }
         }
     }
@@ -230,11 +274,10 @@ private fun RawCard(content: String) {
 }
 
 @Composable
-private fun WifiCard(data: WifiData, raw: String) {
+private fun WifiCard(data: WifiData) {
     val context = LocalContext.current
     var connecting by remember { mutableStateOf(false) }
 
-    // Запрос разрешения FINE_LOCATION для Android 10+ (некоторые устройства требуют)
     val permLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
@@ -242,7 +285,9 @@ private fun WifiCard(data: WifiData, raw: String) {
             connecting = true
             WifiConnector.connect(context, data) { ok ->
                 connecting = false
-                if (!ok) Toast.makeText(context, context.getString(R.string.wifi_connect_failed), Toast.LENGTH_SHORT).show()
+                if (!ok) {
+                    Toast.makeText(context, context.getString(R.string.wifi_connect_failed), Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -251,20 +296,28 @@ private fun WifiCard(data: WifiData, raw: String) {
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            InfoRow(stringResource(R.string.wifi_network), data.ssid)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            InfoRow(label = stringResource(R.string.wifi_network), value = data.ssid)
             HorizontalDivider()
             InfoRow(
-                stringResource(R.string.wifi_password),
-                data.password.ifEmpty { stringResource(R.string.wifi_no_password) }
+                label = stringResource(R.string.wifi_password),
+                value = data.password.ifEmpty { stringResource(R.string.wifi_no_password) }
             )
             HorizontalDivider()
-            InfoRow(stringResource(R.string.wifi_security), WifiParser.securityLabel(data.security))
+            InfoRow(
+                label = stringResource(R.string.wifi_security),
+                value = WifiParser.securityLabel(data.security)
+            )
             if (data.hidden) {
                 HorizontalDivider()
                 InfoRow(
-                    stringResource(R.string.wifi_hidden),
-                    stringResource(R.string.wifi_hidden_yes)
+                    label = stringResource(R.string.wifi_hidden),
+                    value = stringResource(R.string.wifi_hidden_yes)
                 )
             }
 
@@ -273,21 +326,34 @@ private fun WifiCard(data: WifiData, raw: String) {
             Button(
                 onClick = {
                     val need = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
-                            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-                            != PackageManager.PERMISSION_GRANTED
-                    if (need) permLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                    else {
+                            ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.ACCESS_FINE_LOCATION
+                            ) != PackageManager.PERMISSION_GRANTED
+                    if (need) {
+                        permLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    } else {
                         connecting = true
                         WifiConnector.connect(context, data) { ok ->
                             connecting = false
-                            if (!ok) Toast.makeText(context, context.getString(R.string.wifi_connect_failed), Toast.LENGTH_SHORT).show()
+                            if (!ok) {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.wifi_connect_failed),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
                     }
                 },
                 enabled = !connecting,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(Icons.Default.Wifi, contentDescription = null, modifier = Modifier.size(20.dp))
+                Icon(
+                    imageVector = Icons.Default.Wifi,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )
                 Spacer(Modifier.size(8.dp))
                 Text(stringResource(if (connecting) R.string.wifi_connecting else R.string.wifi_connect))
             }
@@ -296,29 +362,37 @@ private fun WifiCard(data: WifiData, raw: String) {
 }
 
 @Composable
-private fun ContactCard(data: ContactData, raw: String) {
+private fun ContactCard(data: ContactData) {
     val context = LocalContext.current
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
             if (data.name.isNotBlank()) {
-                InfoRow(stringResource(R.string.contact_name), data.name)
+                InfoRow(label = stringResource(R.string.contact_name), value = data.name)
             }
             if (data.phone.isNotBlank()) {
                 HorizontalDivider()
-                InfoRow(stringResource(R.string.contact_phone), data.phone)
+                InfoRow(label = stringResource(R.string.contact_phone), value = data.phone)
             }
             if (data.email.isNotBlank()) {
                 HorizontalDivider()
-                InfoRow(stringResource(R.string.contact_email), data.email)
+                InfoRow(label = stringResource(R.string.contact_email), value = data.email)
             }
 
             if (data.phone.isNotBlank() || data.email.isNotBlank()) {
                 Spacer(Modifier.height(6.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     if (data.phone.isNotBlank()) {
                         OutlinedButton(
                             onClick = { IntentUtils.openUrl(context, "tel:${data.phone}") },
