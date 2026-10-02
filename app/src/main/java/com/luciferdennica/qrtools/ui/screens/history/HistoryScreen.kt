@@ -3,6 +3,7 @@ package com.luciferdennica.qrtools.ui.screens.history
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,14 +12,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,7 +31,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -62,16 +60,6 @@ fun HistoryScreen(nav: NavController, repo: HistoryRepository) {
                     }
                 }
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = {
-                scope.launch {
-                    val test = "https://example.com/test-${System.currentTimeMillis()}"
-                    repo.add(test, "QR_CODE", ScanType.URL)
-                }
-            }) {
-                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_test))
-            }
         }
     ) { padding ->
         if (items.isEmpty()) {
@@ -81,12 +69,13 @@ fun HistoryScreen(nav: NavController, repo: HistoryRepository) {
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(padding),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
+                contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(items, key = { it.id }) { item ->
                     ScanRow(
                         item = item,
+                        onClick = { nav.navigate("result/${item.id}") },
                         onToggleFavorite = { scope.launch { repo.toggleFavorite(item) } },
                         onDelete = { scope.launch { repo.delete(item) } }
                     )
@@ -99,6 +88,7 @@ fun HistoryScreen(nav: NavController, repo: HistoryRepository) {
 @Composable
 private fun ScanRow(
     item: ScanEntity,
+    onClick: () -> Unit,
     onToggleFavorite: () -> Unit,
     onDelete: () -> Unit
 ) {
@@ -106,6 +96,7 @@ private fun ScanRow(
     val typeTitle = runCatching { ScanType.valueOf(item.type).title }.getOrDefault(item.type)
 
     Card(
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
