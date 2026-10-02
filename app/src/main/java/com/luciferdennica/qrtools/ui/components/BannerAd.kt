@@ -1,5 +1,6 @@
 package com.luciferdennica.qrtools.ui.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -17,9 +18,12 @@ fun BannerAd(modifier: Modifier = Modifier) {
     AndroidView(
         modifier = modifier.fillMaxWidth(),
         factory = { ctx ->
+            val adWidthPixels = ctx.resources.displayMetrics.widthPixels
+            val adWidthDp = (adWidthPixels / ctx.resources.displayMetrics.density).toInt()
+
             BannerAdView(ctx).apply {
                 setAdUnitId(AdIds.BANNER)
-                setAdSize(BannerAdSize.stickySize(ctx, 320))
+                setAdSize(BannerAdSize.stickySize(ctx, adWidthDp))
                 setBannerAdEventListener(object : BannerAdEventListener {
                     override fun onAdLoaded() {}
                     override fun onAdFailedToLoad(error: AdRequestError) {}
@@ -28,7 +32,7 @@ fun BannerAd(modifier: Modifier = Modifier) {
                     override fun onReturnedToApplication() {}
                     override fun onImpression(impressionData: ImpressionData?) {}
                 })
-                loadAd(AdRequest.Builder().build())
+                loadAd(AdRequest.Builder(AdIds.BANNER).build())
             }
         }
     )
