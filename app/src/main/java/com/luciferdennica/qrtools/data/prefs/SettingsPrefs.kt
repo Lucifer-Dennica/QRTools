@@ -40,9 +40,9 @@ class SettingsPrefs(private val context: Context) {
     suspend fun setVibro(value: Boolean) = context.dataStore.edit { it[KEY_VIBRO] = value }
 
     suspend fun getVibroOnce(): Boolean = vibro.first()
+    suspend fun getSoundOnce(): Boolean = sound.first()
     suspend fun getAutoCopyOnce(): Boolean = autoCopy.first()
 
-    /** Увеличивает счётчик сканов и возвращает новое значение */
     suspend fun incrementScanCounter(): Int {
         var result = 0
         context.dataStore.edit { prefs ->
