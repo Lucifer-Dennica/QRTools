@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -34,6 +35,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -59,7 +61,6 @@ import com.luciferdennica.qrtools.qr.QrTypeBuilders
 import com.luciferdennica.qrtools.util.ClipboardUtils
 import com.luciferdennica.qrtools.util.GalleryUtils
 import com.luciferdennica.qrtools.util.IntentUtils
-import android.widget.Toast
 
 private enum class GenType(val labelRes: Int) {
     TEXT(R.string.gen_text),
@@ -161,7 +162,7 @@ fun GeneratorScreen(nav: NavController) {
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .menuAnchor()
+                        .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
                 )
                 ExposedDropdownMenu(
                     expanded = expanded,
@@ -225,19 +226,25 @@ fun GeneratorScreen(nav: NavController) {
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = wifiSecExpanded) },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .menuAnchor(androidx.compose.material3.MenuAnchorType.PrimaryNotEditable)
+                                .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
                         )
                         ExposedDropdownMenu(
                             expanded = wifiSecExpanded,
                             onDismissRequest = { wifiSecExpanded = false }
                         ) {
-                            listOf("WPA" to R.string.wifi_wpa, "WEP" to R.string.wifi_wep, "nopass" to R.string.wifi_none)
-                                .forEach { (val_, labelRes) ->
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(labelRes)) },
-                                        onClick = { wifiSec = val_; wifiSecExpanded = false }
-                                    )
-                                }
+                            listOf(
+                                "WPA" to R.string.wifi_wpa,
+                                "WEP" to R.string.wifi_wep,
+                                "nopass" to R.string.wifi_none
+                            ).forEach { (value, labelRes) ->
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(labelRes)) },
+                                    onClick = {
+                                        wifiSec = value
+                                        wifiSecExpanded = false
+                                    }
+                                )
+                            }
                         }
                     }
                 }
