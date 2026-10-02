@@ -1,5 +1,7 @@
 package com.luciferdennica.qrtools.scan
 
+import android.content.Context
+import android.net.Uri
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
@@ -31,5 +33,34 @@ class QrCodeAnalyzer(
                 barcodes.firstOrNull()?.let(onDetected)
             }
             .addOnCompleteListener { imageProxy.close() }
+    }
+
+    companion object {
+        /**
+         * Декодирует QR/штрихкод из картинки (URI из галереи).
+         * onResult(barcode) — если найдено.
+         * onError — если не найдено или ошибка.
+         */
+        fun decodeFromUri(
+            context: Context,
+            uri: Uri,
+            onResult: (Barcode) -> Unit,
+            onError: () -> Unit
+        ) {
+            val scanner = BarcodeScanning.getClient(
+                BarcodeScannerOptions.Builder()
+                    .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
+                    .build()
+            )
+            runCatching {
+                val image = InputImage.fromFilePath(context, uri)
+                scanner.process(image)
+                    .addOnSuccessListener { barcodes ->
+                        val first = barcodes.firstOrNull()
+                        if (first != null) onResult(first) else onError()
+                    }
+                    .addOnFailureListener { onError() }
+            }.onFailure { onError() }
+        }
     }
 }
