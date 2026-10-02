@@ -6,9 +6,19 @@ import android.net.Uri
 
 object IntentUtils {
 
+    /** Открывает ссылку. Возвращает true при успехе. */
+    fun openUrlSafe(context: Context, url: String): Boolean {
+        return runCatching {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+            true
+        }.getOrDefault(false)
+    }
+
+    /** Старая версия — без возврата результата (для совместимости). */
     fun openUrl(context: Context, url: String) {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        runCatching { context.startActivity(intent) }
+        openUrlSafe(context, url)
     }
 
     fun shareText(context: Context, text: String) {
