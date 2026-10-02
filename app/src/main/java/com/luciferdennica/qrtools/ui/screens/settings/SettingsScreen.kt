@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -58,8 +57,8 @@ import com.luciferdennica.qrtools.util.CsvExporter
 import com.luciferdennica.qrtools.util.IntentUtils
 import kotlinx.coroutines.launch
 
-private const val AUTHOR_EMAIL = "denis22142qwe@gmail.com"
-private const val AUTHOR_TELEGRAM = "Lucifer_Denicca_22142"
+private const val SUPPORT_EMAIL = "denis22142qwe@gmail.com"
+private const val SUPPORT_TELEGRAM = "Lucifer_Denicca_22142"
 private const val DONATE_URL = "https://www.donationalerts.com/r/lucifer_dennica_1999"
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -269,7 +268,7 @@ fun SettingsScreen(
                         onClick = {
                             IntentUtils.openEmail(
                                 context,
-                                AUTHOR_EMAIL,
+                                SUPPORT_EMAIL,
                                 "QR Tools — обратная связь"
                             )
                         },
@@ -285,7 +284,7 @@ fun SettingsScreen(
 
                     OutlinedButton(
                         onClick = {
-                            IntentUtils.openUrlSafe(context, "https://t.me/$AUTHOR_TELEGRAM")
+                            IntentUtils.openUrlSafe(context, "https://t.me/$SUPPORT_TELEGRAM")
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
