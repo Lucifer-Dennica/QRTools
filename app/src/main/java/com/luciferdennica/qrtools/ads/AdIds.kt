@@ -5,8 +5,8 @@ object AdIds {
     const val BANNER = "R-M-20160851-1"
 
     /** Межстраничная — пока демо. Потом заменишь на свой ID */
-    const val INTERSTITIAL = "demo-interstitial-yandex"
+    const val INTERSTITIAL = "R-M-20160851-2"
 
     /** Показывать межстраничную каждые N сканов */
-    const val SCAN_INTERVAL = 3
+    const val SCAN_INTERVAL = 15
 }
