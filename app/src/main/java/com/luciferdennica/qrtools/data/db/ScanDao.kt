@@ -13,6 +13,9 @@ interface ScanDao {
     @Query("SELECT * FROM scans ORDER BY timestamp DESC")
     fun getAll(): Flow<List<ScanEntity>>
 
+    @Query("SELECT * FROM scans ORDER BY timestamp DESC")
+    suspend fun getAllOnce(): List<ScanEntity>
+
     @Query("SELECT * FROM scans WHERE isFavorite = 1 ORDER BY timestamp DESC")
     fun getFavorites(): Flow<List<ScanEntity>>
 
