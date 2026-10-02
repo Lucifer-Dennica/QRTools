@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -22,13 +20,17 @@ import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.RadioButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -45,7 +47,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.luciferdennica.qrtools.R
@@ -57,7 +58,6 @@ import com.luciferdennica.qrtools.util.CsvExporter
 import com.luciferdennica.qrtools.util.IntentUtils
 import kotlinx.coroutines.launch
 
-// ====== ДАННЫЕ АВТОРА ======
 private const val AUTHOR_EMAIL = "denis22142qwe@gmail.com"
 private const val AUTHOR_TELEGRAM = "Lucifer_Denicca_22142"
 private const val DONATE_URL = "https://www.donationalerts.com/r/lucifer_dennica_1999"
@@ -78,6 +78,7 @@ fun SettingsScreen(
     val autoCopy by prefs.autoCopy.collectAsState(initial = false)
 
     var showClearDialog by remember { mutableStateOf(false) }
+    var themeExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -102,39 +103,42 @@ fun SettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // ===== ТЕМА =====
+            // ===== ТЕМА (выпадающий список) =====
             SectionTitle(stringResource(R.string.settings_theme))
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                        .selectableGroup()
-                ) {
-                    ThemeMode.values().forEach { mode ->
-                        Row(
+                Column(Modifier.fillMaxWidth().padding(12.dp)) {
+                    ExposedDropdownMenuBox(
+                        expanded = themeExpanded,
+                        onExpandedChange = { themeExpanded = it }
+                    ) {
+                        OutlinedTextField(
+                            value = currentTheme.title,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text(stringResource(R.string.settings_theme)) },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = themeExpanded)
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .selectable(
-                                    selected = currentTheme == mode,
-                                    onClick = { scope.launch { prefs.setTheme(mode) } },
-                                    role = Role.RadioButton
-                                )
-                                .padding(horizontal = 8.dp, vertical = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                                .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
+                        )
+                        ExposedDropdownMenu(
+                            expanded = themeExpanded,
+                            onDismissRequest = { themeExpanded = false }
                         ) {
-                            RadioButton(
-                                selected = currentTheme == mode,
-                                onClick = null
-                            )
-                            Text(
-                                text = mode.title,
-                                modifier = Modifier.padding(start = 8.dp),
-                                style = MaterialTheme.typography.bodyLarge
-                            )
+                            ThemeMode.values().forEach { mode ->
+                                DropdownMenuItem(
+                                    text = { Text(mode.title) },
+                                    onClick = {
+                                        scope.launch { prefs.setTheme(mode) }
+                                        themeExpanded = false
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -231,19 +235,13 @@ fun SettingsScreen(
                     OutlinedButton(
                         onClick = {
                             val ok = IntentUtils.openUrlSafe(context, DONATE_URL)
-                            if (ok) {
-                                Toast.makeText(
-                                    context,
-                                    context.getString(R.string.donate_success),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    context.getString(R.string.link_error),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
+                            Toast.makeText(
+                                context,
+                                context.getString(
+                                    if (ok) R.string.donate_success else R.string.link_error
+                                ),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
