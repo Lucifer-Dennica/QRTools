@@ -113,4 +113,20 @@
     <string name="csv_export_failed">Не удалось сохранить файл</string>
     <string name="csv_no_data">Нет данных для экспорта</string>
     <string name="csv_share">Поделиться</string>
+    
+    <!-- Донат и обратная связь -->
+    <string name="settings_support">Поддержать автора</string>
+    <string name="settings_support_desc">Любой размер на развитие проекта</string>
+    <string name="settings_feedback">Обратная связь</string>
+    <string name="settings_email">Написать на Email</string>
+    <string name="settings_telegram">Написать в Telegram</string>
+    <string name="settings_donate">Поддержать через DonationAlerts</string>
+    <string name="settings_about">О приложении</string>
+    <string name="settings_about_desc">Версия, автор, контакты</string>
+    <string name="donate_success">Спасибо за поддержку!</string>
+    <string name="link_error">Не удалось открыть ссылку</string>
+    <string name="about_contacts">Контакты</string>
+    <string name="about_support">Поддержать проект</string>
+    <string name="about_version">Версия</string>
+    <string name="about_author">Автор</string>
 </resources>
