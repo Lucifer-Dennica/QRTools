@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 class HistoryRepository(private val dao: ScanDao) {
 
     fun getAll(): Flow<List<ScanEntity>> = dao.getAll()
+    suspend fun getAllOnce(): List<ScanEntity> = dao.getAllOnce()
     fun getFavorites(): Flow<List<ScanEntity>> = dao.getFavorites()
     fun search(query: String): Flow<List<ScanEntity>> = dao.search(query)
     suspend fun getById(id: Long): ScanEntity? = dao.getById(id)
