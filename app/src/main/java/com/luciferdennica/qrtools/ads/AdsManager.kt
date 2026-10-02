@@ -21,20 +21,22 @@ object AdsManager {
         if (interstitialAd != null || loading) return
         loading = true
 
-        val loader = InterstitialAdLoader(context)
+        val loader = InterstitialAdLoader(context).apply {
+            setAdLoadListener(object : InterstitialAdLoadListener {
+                override fun onAdLoaded(ad: InterstitialAd) {
+                    interstitialAd = ad
+                    loading = false
+                }
+
+                override fun onAdFailedToLoad(error: AdRequestError) {
+                    interstitialAd = null
+                    loading = false
+                }
+            })
+        }
+
         val config = AdRequestConfiguration.Builder(AdIds.INTERSTITIAL).build()
-
-        loader.loadAd(config, object : InterstitialAdLoadListener {
-            override fun onAdLoaded(ad: InterstitialAd) {
-                interstitialAd = ad
-                loading = false
-            }
-
-            override fun onAdFailedToLoad(error: AdRequestError) {
-                interstitialAd = null
-                loading = false
-            }
-        })
+        loader.loadAd(config)
     }
 
     /**
