@@ -1,6 +1,9 @@
 package com.luciferdennica.qrtools.ui.screens.settings
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,7 +11,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -44,7 +49,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -53,7 +61,9 @@ import com.luciferdennica.qrtools.data.prefs.SettingsPrefs
 import com.luciferdennica.qrtools.data.repo.HistoryRepository
 import com.luciferdennica.qrtools.domain.model.ThemeMode
 import com.luciferdennica.qrtools.ui.nav.Routes
+import com.luciferdennica.qrtools.util.AppIcon
 import com.luciferdennica.qrtools.util.CsvExporter
+import com.luciferdennica.qrtools.util.IconManager
 import com.luciferdennica.qrtools.util.IntentUtils
 import kotlinx.coroutines.launch
 
@@ -75,6 +85,7 @@ fun SettingsScreen(
     val sound by prefs.sound.collectAsState(initial = true)
     val vibro by prefs.vibro.collectAsState(initial = true)
     val autoCopy by prefs.autoCopy.collectAsState(initial = false)
+    val currentIcon by prefs.appIcon.collectAsState(initial = AppIcon.BLUE)
 
     var showClearDialog by remember { mutableStateOf(false) }
     var themeExpanded by remember { mutableStateOf(false) }
@@ -102,7 +113,7 @@ fun SettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // ===== ТЕМА (выпадающий список) =====
+            // ===== ТЕМА =====
             SectionTitle(stringResource(R.string.settings_theme))
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -138,6 +149,50 @@ fun SettingsScreen(
                                     }
                                 )
                             }
+                        }
+                    }
+                }
+            }
+
+            // ===== ИКОНКА =====
+            SectionTitle(stringResource(R.string.settings_icon))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconOption(AppIcon.BLUE, R.drawable.ic_launcher, currentIcon) {
+                        scope.launch {
+                            prefs.setAppIcon(AppIcon.BLUE)
+                            IconManager.setIcon(context, AppIcon.BLUE)
+                            Toast.makeText(context, context.getString(R.string.icon_changed), Toast.LENGTH_LONG).show()
+                        }
+                    }
+                    IconOption(AppIcon.DARK, R.drawable.ic_launcher_dark, currentIcon) {
+                        scope.launch {
+                            prefs.setAppIcon(AppIcon.DARK)
+                            IconManager.setIcon(context, AppIcon.DARK)
+                            Toast.makeText(context, context.getString(R.string.icon_changed), Toast.LENGTH_LONG).show()
+                        }
+                    }
+                    IconOption(AppIcon.GREEN, R.drawable.ic_launcher_green, currentIcon) {
+                        scope.launch {
+                            prefs.setAppIcon(AppIcon.GREEN)
+                            IconManager.setIcon(context, AppIcon.GREEN)
+                            Toast.makeText(context, context.getString(R.string.icon_changed), Toast.LENGTH_LONG).show()
+                        }
+                    }
+                    IconOption(AppIcon.PURPLE, R.drawable.ic_launcher_purple, currentIcon) {
+                        scope.launch {
+                            prefs.setAppIcon(AppIcon.PURPLE)
+                            IconManager.setIcon(context, AppIcon.PURPLE)
+                            Toast.makeText(context, context.getString(R.string.icon_changed), Toast.LENGTH_LONG).show()
                         }
                     }
                 }
@@ -266,11 +321,7 @@ fun SettingsScreen(
                 ) {
                     OutlinedButton(
                         onClick = {
-                            IntentUtils.openEmail(
-                                context,
-                                SUPPORT_EMAIL,
-                                "QR Tools — обратная связь"
-                            )
+                            IntentUtils.openEmail(context, SUPPORT_EMAIL, "QR Tools — обратная связь")
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -389,5 +440,44 @@ private fun SettingSwitch(
             style = MaterialTheme.typography.bodyLarge
         )
         Switch(checked = checked, onCheckedChange = onCheckedChange)
+    }
+}
+
+@Composable
+private fun IconOption(
+    icon: AppIcon,
+    drawableRes: Int,
+    current: AppIcon,
+    onClick: () -> Unit
+) {
+    val selected = current == icon
+    val borderColor = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .clip(CircleShape)
+            .clickable { onClick() }
+            .padding(4.dp)
+    ) {
+        Image(
+            painter = painterResource(drawableRes),
+            contentDescription = null,
+            modifier = Modifier
+                .size(64.dp)
+                .clip(CircleShape)
+                .border(3.dp, borderColor, CircleShape)
+        )
+        Text(
+            text = when (icon) {
+                AppIcon.BLUE -> stringResource(R.string.icon_blue)
+                AppIcon.DARK -> stringResource(R.string.icon_dark)
+                AppIcon.GREEN -> stringResource(R.string.icon_green)
+                AppIcon.PURPLE -> stringResource(R.string.icon_purple)
+            },
+            style = MaterialTheme.typography.bodySmall,
+            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(top = 4.dp)
+        )
     }
 }
