@@ -73,7 +73,6 @@
     <string name="no_code_in_image">В изображении не найден код</string>
     <string name="search_hint">Поиск по содержимому</string>
 
-    <!-- WiFi -->
     <string name="wifi_network">Сеть</string>
     <string name="wifi_password">Пароль</string>
     <string name="wifi_security">Защита</string>
@@ -85,7 +84,6 @@
     <string name="wifi_connect_failed">Не удалось подключиться</string>
     <string name="wifi_no_password">Без пароля</string>
 
-    <!-- Контакт -->
     <string name="contact_name">Имя</string>
     <string name="contact_phone">Телефон</string>
     <string name="contact_email">Email</string>
@@ -95,7 +93,6 @@
     <string name="action_send_email">Написать письмо</string>
     <string name="action_call">Позвонить</string>
 
-    <!-- Настройки -->
     <string name="settings_theme">Тема оформления</string>
     <string name="settings_behavior">Поведение</string>
     <string name="settings_sound">Звук при сканировании</string>
@@ -113,8 +110,7 @@
     <string name="csv_export_failed">Не удалось сохранить файл</string>
     <string name="csv_no_data">Нет данных для экспорта</string>
     <string name="csv_share">Поделиться</string>
-    
-    <!-- Донат и обратная связь -->
+
     <string name="settings_support">Поддержать автора</string>
     <string name="settings_support_desc">Любой размер на развитие проекта</string>
     <string name="settings_feedback">Обратная связь</string>
@@ -129,4 +125,12 @@
     <string name="about_support">Поддержать проект</string>
     <string name="about_version">Версия</string>
     <string name="about_author">Автор</string>
+
+    <!-- Иконка приложения -->
+    <string name="settings_icon">Иконка приложения</string>
+    <string name="icon_blue">Синяя</string>
+    <string name="icon_dark">Тёмная</string>
+    <string name="icon_green">Изумруд</string>
+    <string name="icon_purple">Аметист</string>
+    <string name="icon_changed">Иконка изменена. Если не обновилась — перезапустите лаунчер.</string>
 </resources>
