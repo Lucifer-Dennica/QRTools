@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.luciferdennica.qrtools.domain.model.ThemeMode
+import com.luciferdennica.qrtools.util.AppIcon
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -23,6 +24,7 @@ class SettingsPrefs(private val context: Context) {
         private val KEY_SOUND = booleanPreferencesKey("sound")
         private val KEY_VIBRO = booleanPreferencesKey("vibro")
         private val KEY_SCAN_COUNTER = intPreferencesKey("scan_counter")
+        private val KEY_ICON = stringPreferencesKey("app_icon")
     }
 
     val theme: Flow<ThemeMode> = context.dataStore.data.map {
@@ -34,10 +36,15 @@ class SettingsPrefs(private val context: Context) {
     val sound: Flow<Boolean> = context.dataStore.data.map { it[KEY_SOUND] ?: true }
     val vibro: Flow<Boolean> = context.dataStore.data.map { it[KEY_VIBRO] ?: true }
 
+    val appIcon: Flow<AppIcon> = context.dataStore.data.map {
+        AppIcon.fromKey(it[KEY_ICON] ?: AppIcon.BLUE.key)
+    }
+
     suspend fun setTheme(mode: ThemeMode) = context.dataStore.edit { it[KEY_THEME] = mode.name }
     suspend fun setAutoCopy(value: Boolean) = context.dataStore.edit { it[KEY_AUTO_COPY] = value }
     suspend fun setSound(value: Boolean) = context.dataStore.edit { it[KEY_SOUND] = value }
     suspend fun setVibro(value: Boolean) = context.dataStore.edit { it[KEY_VIBRO] = value }
+    suspend fun setAppIcon(icon: AppIcon) = context.dataStore.edit { it[KEY_ICON] = icon.key }
 
     suspend fun getVibroOnce(): Boolean = vibro.first()
     suspend fun getSoundOnce(): Boolean = sound.first()
