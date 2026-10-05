@@ -75,11 +75,11 @@ dependencies {
     implementation("androidx.camera:camera-view:1.4.0")
 
     implementation("com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1")
-
     implementation("com.google.zxing:core:3.5.3")
-
-    // Яндекс РСЯ 8.5.0 (требуется линтером)
     implementation("com.yandex.android:mobileads:8.5.0")
+
+    // Coil — загрузка изображений (для Open Food Facts)
+    implementation("io.coil-kt:coil-compose:2.7.0")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
 }
