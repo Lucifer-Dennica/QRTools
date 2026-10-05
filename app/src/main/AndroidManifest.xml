@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
@@ -24,13 +25,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.QRTools">
 
-        <!-- Главная активити без launcher-фильтра -->
         <activity
             android:name=".MainActivity"
             android:exported="false"
             android:theme="@style/Theme.QRTools" />
 
-        <!-- Псевдоним для синей иконки (по умолчанию) -->
         <activity-alias
             android:name=".IconBlue"
             android:enabled="true"
@@ -45,7 +44,6 @@
             </intent-filter>
         </activity-alias>
 
-        <!-- Псевдоним для тёмной иконки -->
         <activity-alias
             android:name=".IconDark"
             android:enabled="false"
@@ -60,7 +58,6 @@
             </intent-filter>
         </activity-alias>
 
-        <!-- Псевдоним для изумрудной иконки -->
         <activity-alias
             android:name=".IconGreen"
             android:enabled="false"
@@ -75,7 +72,6 @@
             </intent-filter>
         </activity-alias>
 
-        <!-- Псевдоним для аметистовой иконки -->
         <activity-alias
             android:name=".IconPurple"
             android:enabled="false"
