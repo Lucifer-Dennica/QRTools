@@ -1,5 +1,5 @@
 <resources>
-        
+       
         <!-- Группировка истории -->
     <string name="history_today">Сегодня</string>
     <string name="history_yesterday">Вчера</string>
@@ -139,6 +139,7 @@
     <string name="csv_export_failed">Не удалось сохранить файл</string>
     <string name="csv_no_data">Нет данных для экспорта</string>
     <string name="csv_share">Поделиться</string>
+    <string name="qr_pick_contact">Загрузить из контактов</string>
 
     <string name="settings_support">Поддержать автора</string>
     <string name="settings_support_desc">Любой размер на развитие проекта</string>
