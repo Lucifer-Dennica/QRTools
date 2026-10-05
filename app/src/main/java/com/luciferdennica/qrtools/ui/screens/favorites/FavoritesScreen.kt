@@ -54,6 +54,7 @@ import com.luciferdennica.qrtools.data.db.ScanEntity
 import com.luciferdennica.qrtools.data.repo.HistoryRepository
 import com.luciferdennica.qrtools.domain.model.ScanType
 import com.luciferdennica.qrtools.ui.components.Placeholder
+import com.luciferdennica.qrtools.util.ScanDisplay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -105,6 +106,7 @@ private fun FavRow(item: ScanEntity, onClick: () -> Unit, onRemove: () -> Unit) 
     val typeTitle = runCatching { ScanType.valueOf(item.type).title }.getOrDefault(item.type)
     val accent = colorForType(item.type)
     val icon = iconForType(item.type)
+    val displayTitle = ScanDisplay.shortTitle(item.content, item.type)
 
     Card(
         onClick = onClick,
@@ -134,7 +136,7 @@ private fun FavRow(item: ScanEntity, onClick: () -> Unit, onRemove: () -> Unit) 
 
             Column(Modifier.weight(1f)) {
                 Text(
-                    text = item.content,
+                    text = displayTitle,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
