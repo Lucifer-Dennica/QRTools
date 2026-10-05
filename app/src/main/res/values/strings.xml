@@ -1,4 +1,18 @@
 <resources>
+
+        <!-- Open Food Facts -->
+    <string name="off_title">Информация о продукте</string>
+    <string name="off_loading">Загрузка информации…</string>
+    <string name="off_not_found">Продукт не найден в базе</string>
+    <string name="off_no_internet">Нет подключения к интернету</string>
+    <string name="off_brand">Бренд</string>
+    <string name="off_quantity">Объём</string>
+    <string name="off_categories">Категории</string>
+    <string name="off_show_details">Открыть в Open Food Facts</string>
+
+    <!-- Разрешение на контакты -->
+    <string name="permission_contacts_title">Нужен доступ к контактам</string>
+    <string name="permission_contacts_desc">Разрешите доступ, чтобы загружать контакты в генератор</string>
        
         <!-- Группировка истории -->
     <string name="history_today">Сегодня</string>
