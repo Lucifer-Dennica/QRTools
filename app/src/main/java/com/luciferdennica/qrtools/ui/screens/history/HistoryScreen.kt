@@ -64,13 +64,13 @@ import com.luciferdennica.qrtools.data.repo.HistoryRepository
 import com.luciferdennica.qrtools.domain.model.ScanType
 import com.luciferdennica.qrtools.ui.components.Placeholder
 import com.luciferdennica.qrtools.util.ClipboardUtils
+import com.luciferdennica.qrtools.util.ScanDisplay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-/** Элемент списка: либо заголовок дня, либо запись */
 private sealed class HistoryItem {
     data class Header(val title: String) : HistoryItem()
     data class Scan(val entity: ScanEntity) : HistoryItem()
@@ -87,7 +87,6 @@ fun HistoryScreen(nav: NavController, repo: HistoryRepository, autoCopy: Boolean
     val items by (if (query.isBlank()) repo.getAll() else repo.search(query))
         .collectAsState(initial = emptyList())
 
-    // Группировка по дням
     val listItems = remember(items) { buildGroupedList(items) }
 
     Scaffold(
@@ -103,7 +102,6 @@ fun HistoryScreen(nav: NavController, repo: HistoryRepository, autoCopy: Boolean
         }
     ) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
-            // Поле поиска
             OutlinedTextField(
                 value = query,
                 onValueChange = { query = it },
@@ -159,10 +157,6 @@ fun HistoryScreen(nav: NavController, repo: HistoryRepository, autoCopy: Boolean
     }
 }
 
-// ========================================================
-// КОМПОНЕНТЫ
-// ========================================================
-
 @Composable
 private fun DayHeader(title: String) {
     Text(
@@ -186,6 +180,9 @@ private fun ScanRow(
     val accent = colorForType(item.type)
     val icon = iconForType(item.type)
 
+    // КРАСИВЫЙ ЗАГОЛОВОК вместо сырой строки
+    val displayTitle = ScanDisplay.shortTitle(item.content, item.type)
+
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
@@ -195,7 +192,6 @@ private fun ScanRow(
             modifier = Modifier.fillMaxWidth().padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Цветная иконка типа
             Box(
                 modifier = Modifier
                     .size(44.dp)
@@ -215,7 +211,7 @@ private fun ScanRow(
 
             Column(Modifier.weight(1f)) {
                 Text(
-                    text = item.content,
+                    text = displayTitle,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -243,17 +239,11 @@ private fun ScanRow(
     }
 }
 
-// ========================================================
-// ГРУППИРОВКА ПО ДНЯМ
-// ========================================================
-
 private fun buildGroupedList(items: List<ScanEntity>): List<HistoryItem> {
     if (items.isEmpty()) return emptyList()
 
     val todayFormat = SimpleDateFormat("dd MMMM", Locale.getDefault())
-    val calendar = Calendar.getInstance()
 
-    // Начало сегодняшнего дня
     val todayStart = Calendar.getInstance().apply {
         set(Calendar.HOUR_OF_DAY, 0)
         set(Calendar.MINUTE, 0)
@@ -261,7 +251,6 @@ private fun buildGroupedList(items: List<ScanEntity>): List<HistoryItem> {
         set(Calendar.MILLISECOND, 0)
     }.timeInMillis
 
-    // Начало вчерашнего дня
     val yesterdayStart = todayStart - 24L * 60 * 60 * 1000
 
     val result = mutableListOf<HistoryItem>()
@@ -281,10 +270,6 @@ private fun buildGroupedList(items: List<ScanEntity>): List<HistoryItem> {
     }
     return result
 }
-
-// ========================================================
-// ИКОНКА И ЦВЕТ ПО ТИПУ
-// ========================================================
 
 private fun iconForType(type: String): ImageVector = when (type) {
     ScanType.URL.name -> Icons.Default.Link
