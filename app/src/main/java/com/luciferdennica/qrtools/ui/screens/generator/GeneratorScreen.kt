@@ -2,6 +2,7 @@ package com.luciferdennica.qrtools.ui.screens.generator
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -118,7 +119,7 @@ fun GeneratorScreen(nav: NavController) {
     var showStyling by remember { mutableStateOf(false) }
     var style by remember { mutableStateOf(QrStyle()) }
 
-    // Выбор логотипа
+    // Логотип
     val logoLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -130,16 +131,32 @@ fun GeneratorScreen(nav: NavController) {
         }
     }
 
-    // Выбор контакта из телефонной книжки
+    // Выбор контакта через StartActivityForResult (надёжнее, чем PickContact)
     val contactLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickContact()
-    ) { uri: Uri? ->
-        if (uri != null) {
-            readContact(context, uri)?.let { (name, phone, email) ->
-                contactName = name
-                contactPhone = phone
-                contactEmail = email
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            result.data?.data?.let { uri ->
+                readContact(context, uri)?.let { (name, phone, email) ->
+                    contactName = name
+                    contactPhone = phone
+                    contactEmail = email
+                    if (name.isBlank() && phone.isBlank() && email.isBlank()) {
+                        Toast.makeText(context, "Не удалось прочитать контакт", Toast.LENGTH_SHORT).show()
+                    }
+                } ?: Toast.makeText(context, "Не удалось прочитать контакт", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    // Разрешение на контакты
+    val contactsPermLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            openContactPicker(context, contactLauncher)
+        } else {
+            Toast.makeText(context, "Без разрешения нельзя выбрать контакт", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -204,7 +221,6 @@ fun GeneratorScreen(nav: NavController) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // ТИП
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = it }
@@ -237,7 +253,6 @@ fun GeneratorScreen(nav: NavController) {
                 }
             }
 
-            // ПОЛЯ
             when (type) {
                 GenType.TEXT -> OutlinedTextField(
                     value = textField, onValueChange = { textField = it },
@@ -300,9 +315,17 @@ fun GeneratorScreen(nav: NavController) {
                     }
                 }
                 GenType.CONTACT -> {
-                    // НОВАЯ КНОПКА — из телефонной книжки
                     OutlinedButton(
-                        onClick = { contactLauncher.launch(null) },
+                        onClick = {
+                            val granted = ContextCompat.checkSelfPermission(
+                                context, Manifest.permission.READ_CONTACTS
+                            ) == PackageManager.PERMISSION_GRANTED
+                            if (granted) {
+                                openContactPicker(context, contactLauncher)
+                            } else {
+                                contactsPermLauncher.launch(Manifest.permission.READ_CONTACTS)
+                            }
+                        },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Icon(
@@ -345,7 +368,6 @@ fun GeneratorScreen(nav: NavController) {
                 }
             }
 
-            // СТИЛИЗАЦИЯ (переключатель)
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -383,7 +405,6 @@ fun GeneratorScreen(nav: NavController) {
                 )
             }
 
-            // СОЗДАТЬ
             Button(
                 onClick = {
                     val content = when (type) {
@@ -405,7 +426,6 @@ fun GeneratorScreen(nav: NavController) {
                 Text(stringResource(R.string.btn_generate))
             }
 
-            // ПРЕВЬЮ
             qrBitmap?.let { bmp ->
                 Spacer(Modifier.height(8.dp))
                 Text(
@@ -457,7 +477,6 @@ fun GeneratorScreen(nav: NavController) {
 
                 OutlinedButton(
                     onClick = {
-                        // Пытаемся скопировать картинку. Если не получилось — молча копируем текст
                         val ok = ClipboardUtils.copyImage(context, bmp)
                         if (ok) {
                             Toast.makeText(context, "QR скопирован", Toast.LENGTH_SHORT).show()
@@ -718,6 +737,14 @@ private fun ColorPaletteRow(
 // ХЕЛПЕРЫ
 // ========================================================
 
+private fun openContactPicker(
+    context: Context,
+    launcher: androidx.activity.result.ActivityResultLauncher<Intent>
+) {
+    val intent = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
+    launcher.launch(intent)
+}
+
 private fun loadBitmap(context: Context, uri: Uri): Bitmap? {
     return runCatching {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -733,12 +760,13 @@ private fun loadBitmap(context: Context, uri: Uri): Bitmap? {
     }.getOrNull()
 }
 
-/** Читает контакт: возвращает Triple(имя, телефон, email). */
+/** Читает контакт по URI: возвращает Triple(имя, телефон, email). */
 private fun readContact(context: Context, uri: Uri): Triple<String, String, String>? {
     return runCatching {
         var name = ""
         var phone = ""
         var email = ""
+        var contactId: String? = null
 
         context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
             if (cursor.moveToFirst()) {
@@ -746,38 +774,39 @@ private fun readContact(context: Context, uri: Uri): Triple<String, String, Stri
                 if (nameIdx >= 0) name = cursor.getString(nameIdx) ?: ""
 
                 val idIdx = cursor.getColumnIndex(ContactsContract.Contacts._ID)
-                val id = if (idIdx >= 0) cursor.getString(idIdx) else null
+                if (idIdx >= 0) contactId = cursor.getString(idIdx)
+            }
+        }
 
-                if (id != null) {
-                    // Телефон
-                    context.contentResolver.query(
-                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                        null,
-                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                        arrayOf(id),
-                        null
-                    )?.use { phoneCursor ->
-                        if (phoneCursor.moveToFirst()) {
-                            val idx = phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
-                            if (idx >= 0) phone = phoneCursor.getString(idx) ?: ""
-                        }
-                    }
-                    // Email
-                    context.contentResolver.query(
-                        ContactsContract.CommonDataKinds.Email.CONTENT_URI,
-                        null,
-                        ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?",
-                        arrayOf(id),
-                        null
-                    )?.use { emailCursor ->
-                        if (emailCursor.moveToFirst()) {
-                            val idx = emailCursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS)
-                            if (idx >= 0) email = emailCursor.getString(idx) ?: ""
-                        }
-                    }
+        if (contactId != null) {
+            // Телефон
+            context.contentResolver.query(
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                null,
+                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                arrayOf(contactId),
+                null
+            )?.use { phoneCursor ->
+                if (phoneCursor.moveToFirst()) {
+                    val idx = phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                    if (idx >= 0) phone = phoneCursor.getString(idx) ?: ""
+                }
+            }
+            // Email
+            context.contentResolver.query(
+                ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+                null,
+                ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?",
+                arrayOf(contactId),
+                null
+            )?.use { emailCursor ->
+                if (emailCursor.moveToFirst()) {
+                    val idx = emailCursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS)
+                    if (idx >= 0) email = emailCursor.getString(idx) ?: ""
                 }
             }
         }
+
         Triple(name, phone, email)
     }.getOrNull()
 }
