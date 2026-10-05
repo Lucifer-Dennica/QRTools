@@ -116,20 +116,17 @@ fun GeneratorScreen(nav: NavController) {
     var showStyling by remember { mutableStateOf(false) }
     var style by remember { mutableStateOf(QrStyle()) }
 
-    // Логотип
     val logoLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) {
             loadBitmap(context, uri)?.let { bmp ->
                 style = style.copy(logo = bmp)
-                // Перегенерировать, если QR уже есть
                 if (qrContent.isNotBlank()) qrBitmap = QrGenerator.generate(qrContent, style = style)
             }
         }
     }
 
-    // Разрешение на запись (Android 9-)
     val storagePermLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
@@ -318,7 +315,7 @@ fun GeneratorScreen(nav: NavController) {
                 }
             }
 
-            // ===== ПЕРЕКЛЮЧАТЕЛЬ СТИЛИЗАЦИИ =====
+            // ===== СТИЛИЗАЦИЯ =====
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -345,7 +342,6 @@ fun GeneratorScreen(nav: NavController) {
                 }
             }
 
-            // ===== СТИЛИЗАЦИЯ =====
             if (showStyling) {
                 StylingSection(
                     style = style,
@@ -357,7 +353,7 @@ fun GeneratorScreen(nav: NavController) {
                 )
             }
 
-            // ===== КНОПКА СОЗДАТЬ =====
+            // ===== СОЗДАТЬ =====
             Button(
                 onClick = {
                     val content = when (type) {
@@ -418,7 +414,21 @@ fun GeneratorScreen(nav: NavController) {
                         Text(stringResource(R.string.btn_save_gallery))
                     }
                     OutlinedButton(
-                        onClick = { IntentUtils.shareText(context, qrContent) },
+                        onClick = {
+                            // ИСПРАВЛЕНО: делимся картинкой QR, а не текстом
+                            val ok = IntentUtils.shareImage(
+                                context,
+                                bmp,
+                                "qrtools_${System.currentTimeMillis()}.png"
+                            )
+                            if (!ok) {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.save_failed),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        },
                         modifier = Modifier.weight(1f)
                     ) {
                         Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -461,7 +471,7 @@ private fun StylingSection(
                 .padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            // ===== ПРЕСЕТЫ =====
+            // Пресеты
             Text(
                 text = stringResource(R.string.qr_presets),
                 style = MaterialTheme.typography.labelLarge,
@@ -483,7 +493,7 @@ private fun StylingSection(
                 }
             }
 
-            // ===== ЦВЕТ ТОЧЕК =====
+            // Цвет точек
             Text(
                 text = stringResource(R.string.qr_dot_color),
                 style = MaterialTheme.typography.labelLarge,
@@ -493,16 +503,11 @@ private fun StylingSection(
                 palette = QrStyle.DOT_PALETTE,
                 selectedColor = style.dotColor,
                 onSelect = { main, partner ->
-                    onStyleChange(
-                        style.copy(
-                            dotColor = main,
-                            dotColor2 = partner
-                        )
-                    )
+                    onStyleChange(style.copy(dotColor = main, dotColor2 = partner))
                 }
             )
 
-            // ===== ЦВЕТ ФОНА =====
+            // Цвет фона
             Text(
                 text = stringResource(R.string.qr_bg_color),
                 style = MaterialTheme.typography.labelLarge,
@@ -512,16 +517,11 @@ private fun StylingSection(
                 palette = QrStyle.BG_PALETTE,
                 selectedColor = style.bgColor,
                 onSelect = { main, partner ->
-                    onStyleChange(
-                        style.copy(
-                            bgColor = main,
-                            bgColor2 = partner
-                        )
-                    )
+                    onStyleChange(style.copy(bgColor = main, bgColor2 = partner))
                 }
             )
 
-            // ===== ГРАДИЕНТЫ =====
+            // Градиенты
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -551,7 +551,7 @@ private fun StylingSection(
                 )
             }
 
-            // ===== ФОРМА ТОЧЕК =====
+            // Форма точек
             Text(
                 text = stringResource(R.string.qr_dot_shape),
                 style = MaterialTheme.typography.labelLarge,
@@ -572,7 +572,7 @@ private fun StylingSection(
                 }
             }
 
-            // ===== ЛОГОТИП =====
+            // Логотип
             Text(
                 text = stringResource(R.string.qr_logo),
                 style = MaterialTheme.typography.labelLarge,
@@ -592,15 +592,12 @@ private fun StylingSection(
                     Text(stringResource(R.string.qr_logo_upload))
                 }
                 if (style.logo != null) {
-                    TextButton(
-                        onClick = { onStyleChange(style.copy(logo = null)) }
-                    ) {
+                    TextButton(onClick = { onStyleChange(style.copy(logo = null)) }) {
                         Text(stringResource(R.string.qr_logo_remove))
                     }
                 }
             }
 
-            // Превью логотипа
             style.logo?.let { logo ->
                 Box(
                     modifier = Modifier.fillMaxWidth(),
@@ -618,10 +615,6 @@ private fun StylingSection(
         }
     }
 }
-
-// ========================================================
-// КОМПОНЕНТЫ
-// ========================================================
 
 @Composable
 private fun PresetChip(
@@ -643,9 +636,7 @@ private fun PresetChip(
                 .clip(RoundedCornerShape(12.dp))
                 .background(
                     if (preset.bgGradient)
-                        androidx.compose.ui.graphics.Brush.linearGradient(
-                            listOf(preset.bgColor, preset.bgColor2)
-                        )
+                        androidx.compose.ui.graphics.Brush.linearGradient(listOf(preset.bgColor, preset.bgColor2))
                     else
                         androidx.compose.ui.graphics.SolidColor(preset.bgColor)
                 )
@@ -658,9 +649,7 @@ private fun PresetChip(
                     .clip(RoundedCornerShape(4.dp))
                     .background(
                         if (preset.dotGradient)
-                            androidx.compose.ui.graphics.Brush.linearGradient(
-                                listOf(preset.dotColor, preset.dotColor2)
-                            )
+                            androidx.compose.ui.graphics.Brush.linearGradient(listOf(preset.dotColor, preset.dotColor2))
                         else
                             androidx.compose.ui.graphics.SolidColor(preset.dotColor)
                     )
@@ -704,10 +693,6 @@ private fun ColorPaletteRow(
         }
     }
 }
-
-// ========================================================
-// ЗАГРУЗКА ЛОГОТИПА
-// ========================================================
 
 private fun loadBitmap(context: Context, uri: Uri): Bitmap? {
     return runCatching {
