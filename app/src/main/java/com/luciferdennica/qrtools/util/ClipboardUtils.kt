@@ -17,12 +17,8 @@ object ClipboardUtils {
         Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
     }
 
-    /**
-     * Копирует изображение в буфер обмена.
-     * На Android 13+ (API 33) поддерживается системно.
-     * На более старых версиях копируется URI-ссылка через FileProvider.
-     */
-    fun copyImage(context: Context, bitmap: Bitmap, toastMessage: String = "QR скопирован"): Boolean {
+    /** Пытается скопировать картинку. Если не получилось — молча возвращает false. */
+    fun copyImage(context: Context, bitmap: Bitmap): Boolean {
         return runCatching {
             val dir = File(context.cacheDir, "clipboard").apply { if (!exists()) mkdirs() }
             val file = File(dir, "qr_${System.currentTimeMillis()}.png")
@@ -37,11 +33,7 @@ object ClipboardUtils {
             val clip = ClipData.newUri(context.contentResolver, "QR", uri)
             val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             cm.setPrimaryClip(clip)
-            Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
             true
-        }.getOrElse {
-            Toast.makeText(context, "Не удалось скопировать", Toast.LENGTH_SHORT).show()
-            false
-        }
+        }.getOrDefault(false)
     }
 }
