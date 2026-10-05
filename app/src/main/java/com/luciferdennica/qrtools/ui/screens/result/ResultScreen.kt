@@ -2,7 +2,9 @@ package com.luciferdennica.qrtools.ui.screens.result
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -18,19 +20,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -50,12 +54,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.luciferdennica.qrtools.R
 import com.luciferdennica.qrtools.data.db.ScanEntity
 import com.luciferdennica.qrtools.data.repo.HistoryRepository
@@ -65,6 +72,8 @@ import com.luciferdennica.qrtools.ui.nav.Routes
 import com.luciferdennica.qrtools.util.ClipboardUtils
 import com.luciferdennica.qrtools.util.ContactData
 import com.luciferdennica.qrtools.util.IntentUtils
+import com.luciferdennica.qrtools.util.OffProduct
+import com.luciferdennica.qrtools.util.OpenFoodFacts
 import com.luciferdennica.qrtools.util.VCardParser
 import com.luciferdennica.qrtools.util.WifiConnector
 import com.luciferdennica.qrtools.util.WifiData
@@ -79,9 +88,7 @@ fun ResultScreen(nav: NavController, repo: HistoryRepository, id: Long) {
     var item by remember { mutableStateOf<ScanEntity?>(null) }
     var showRaw by remember { mutableStateOf(false) }
 
-    LaunchedEffect(id) {
-        item = repo.getById(id)
-    }
+    LaunchedEffect(id) { item = repo.getById(id) }
 
     Scaffold(
         topBar = {
@@ -151,18 +158,25 @@ private fun ResultContent(
             color = MaterialTheme.colorScheme.primary
         )
 
-        when (data.type) {
-            ScanType.WIFI.name -> {
+        // Специальные карточки по типу
+        when {
+            data.type == ScanType.WIFI.name -> {
                 val wifi = WifiParser.parse(data.content)
                 if (wifi != null) WifiCard(wifi) else RawCard(data.content)
             }
-            ScanType.CONTACT.name -> {
+            data.type == ScanType.CONTACT.name -> {
                 val contact = VCardParser.parse(data.content)
                 if (contact != null) ContactCard(contact) else RawCard(data.content)
+            }
+            // Open Food Facts для штрихкодов
+            OpenFoodFacts.isFoodBarcode(data.format, data.content) -> {
+                RawCard(data.content)
+                OpenFoodFactsCard(data.content)
             }
             else -> RawCard(data.content)
         }
 
+        // Кнопка «Открыть» для ссылок/телефонов/email
         if (data.type == ScanType.URL.name ||
             data.type == ScanType.EMAIL.name ||
             data.type == ScanType.PHONE.name
@@ -172,7 +186,7 @@ private fun ResultContent(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.OpenInNew,
+                    imageVector = Icons.Default.OpenInNew,
                     contentDescription = null,
                     modifier = Modifier.size(20.dp)
                 )
@@ -258,6 +272,10 @@ private fun ResultContent(
     }
 }
 
+// ========================================================
+// КАРТОЧКИ
+// ========================================================
+
 @Composable
 private fun RawCard(content: String) {
     Card(
@@ -274,6 +292,103 @@ private fun RawCard(content: String) {
 }
 
 @Composable
+private fun OpenFoodFactsCard(barcode: String) {
+    val context = LocalContext.current
+    var loading by remember { mutableStateOf(true) }
+    var product by remember { mutableStateOf<OffProduct?>(null) }
+    var error by remember { mutableStateOf(false) }
+
+    LaunchedEffect(barcode) {
+        loading = true
+        error = false
+        val result = OpenFoodFacts.fetch(barcode)
+        product = result
+        error = result == null
+        loading = false
+    }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.off_title),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+
+            when {
+                loading -> Row(verticalAlignment = Alignment.CenterVertically) {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                    Spacer(Modifier.size(12.dp))
+                    Text(stringResource(R.string.off_loading))
+                }
+
+                error -> Text(
+                    text = stringResource(R.string.off_not_found),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+
+                product != null -> {
+                    val p = product!!
+                    if (!p.imageUrl.isNullOrBlank()) {
+                        AsyncImage(
+                            model = p.imageUrl,
+                            contentDescription = null,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(180.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                        )
+                    }
+
+                    if (p.name.isNotBlank()) {
+                        Text(
+                            text = p.name,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    if (p.brand.isNotBlank()) {
+                        HorizontalDivider()
+                        InfoRow(label = stringResource(R.string.off_brand), value = p.brand)
+                    }
+                    if (p.quantity.isNotBlank()) {
+                        HorizontalDivider()
+                        InfoRow(label = stringResource(R.string.off_quantity), value = p.quantity)
+                    }
+                    if (p.categories.isNotBlank()) {
+                        HorizontalDivider()
+                        InfoRow(
+                            label = stringResource(R.string.off_categories),
+                            value = p.categories.split(",").take(3).joinToString(", ").trim()
+                        )
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            IntentUtils.openUrlSafe(
+                                context,
+                                "https://world.openfoodfacts.org/product/$barcode"
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.off_show_details))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun WifiCard(data: WifiData) {
     val context = LocalContext.current
     var connecting by remember { mutableStateOf(false) }
@@ -286,7 +401,11 @@ private fun WifiCard(data: WifiData) {
             WifiConnector.connect(context, data) { ok ->
                 connecting = false
                 if (!ok) {
-                    Toast.makeText(context, context.getString(R.string.wifi_connect_failed), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.wifi_connect_failed),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
