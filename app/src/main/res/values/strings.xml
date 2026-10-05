@@ -1,4 +1,15 @@
 <resources>
+        
+        <!-- Группировка истории -->
+    <string name="history_today">Сегодня</string>
+    <string name="history_yesterday">Вчера</string>
+
+    <!-- Подзаголовки карточек -->
+    <string name="home_scan_sub">QR и штрихкоды</string>
+    <string name="home_create_sub">5 типов кодов</string>
+    <string name="home_history_sub">Все сканирования</string>
+    <string name="home_favorites_sub">Важные коды</string>
+        
         <!-- Стилизация QR -->
     <string name="qr_styling">Стилизация QR</string>
     <string name="qr_presets">Пресеты</string>
