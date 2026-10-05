@@ -1,4 +1,22 @@
 <resources>
+        <!-- Стилизация QR -->
+    <string name="qr_styling">Стилизация QR</string>
+    <string name="qr_presets">Пресеты</string>
+    <string name="qr_dot_color">Цвет точек</string>
+    <string name="qr_bg_color">Цвет фона</string>
+    <string name="qr_gradient_dots">Градиент точек</string>
+    <string name="qr_gradient_bg">Градиент фона</string>
+    <string name="qr_dot_shape">Форма точек</string>
+    <string name="qr_logo">Логотип в центре</string>
+    <string name="qr_logo_upload">Загрузить логотип</string>
+    <string name="qr_logo_remove">Удалить логотип</string>
+    <string name="qr_contrast_warning">Слабый контраст. QR-код может не сканироваться</string>
+    <string name="shape_square">Квадрат</string>
+    <string name="shape_rounded">Скруглённый</string>
+    <string name="shape_circle">Круг</string>
+    <string name="qr_show_styling">Показать стилизацию</string>
+    <string name="qr_hide_styling">Скрыть стилизацию</string>
+    
     <string name="app_name">QR Tools</string>
     <string name="home">Главная</string>
     <string name="scanner">Сканер</string>
