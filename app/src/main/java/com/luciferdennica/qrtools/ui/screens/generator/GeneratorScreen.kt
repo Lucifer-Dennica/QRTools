@@ -438,9 +438,15 @@ fun GeneratorScreen(nav: NavController) {
                 }
 
                 OutlinedButton(
-                    onClick = { ClipboardUtils.copy(context, qrContent) },
+                    onClick = {
+                        val ok = ClipboardUtils.copyImage(context, bmp)
+                        if (!ok) {
+                        // Fallback — копируем текст, если картинка не скопировалась
+                        ClipboardUtils.copy(context, qrContent)
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth()
-                ) {
+                    ) {
                     Icon(Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.size(6.dp))
                     Text(stringResource(R.string.action_copy))
