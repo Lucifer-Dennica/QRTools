@@ -16,12 +16,11 @@ object QrGenerator {
 
     fun generate(
         content: String,
-        size: Int = 900,
+        size: Int = 1400,
         style: QrStyle = QrStyle()
     ): Bitmap? {
         if (content.isBlank()) return null
         return runCatching {
-            // Если есть логотип — максимальная коррекция
             val errorLevel = if (style.logo != null) ErrorCorrectionLevel.H else ErrorCorrectionLevel.M
 
             val hints = mapOf(
@@ -34,7 +33,7 @@ object QrGenerator {
             val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
             val canvas = Canvas(bmp)
 
-            // 1. ФОН
+            // ФОН
             if (style.bgGradient) {
                 val shader = LinearGradient(
                     0f, 0f, size.toFloat(), size.toFloat(),
@@ -47,7 +46,7 @@ object QrGenerator {
                 canvas.drawColor(style.bgColor.toArgb())
             }
 
-            // 2. ТОЧКИ
+            // ТОЧКИ
             val cellSize = size.toFloat() / matrix.width
             val dotPaint = Paint().apply { isAntiAlias = true }
 
@@ -66,24 +65,31 @@ object QrGenerator {
 
                         val left = x * cellSize
                         val top = y * cellSize
+                        val right = left + cellSize
+                        val bottom = top + cellSize
+
                         when (style.dotShape) {
-                            DotShape.SQUARE -> canvas.drawRect(
-                                left, top, left + cellSize, top + cellSize, dotPaint
-                            )
+                            DotShape.SQUARE -> canvas.drawRect(left, top, right, bottom, dotPaint)
+
+                            // Более выраженное скругление (0.5 вместо 0.3)
                             DotShape.ROUNDED -> canvas.drawRoundRect(
-                                RectF(left, top, left + cellSize, top + cellSize),
-                                cellSize * 0.3f, cellSize * 0.3f, dotPaint
+                                RectF(left, top, right, bottom),
+                                cellSize * 0.5f, cellSize * 0.5f, dotPaint
                             )
+
+                            // Круг чуть меньше ячейки, чтобы был зазор между точками
                             DotShape.CIRCLE -> canvas.drawCircle(
-                                left + cellSize / 2f, top + cellSize / 2f,
-                                cellSize / 2f, dotPaint
+                                left + cellSize / 2f,
+                                top + cellSize / 2f,
+                                cellSize * 0.45f,  // 0.45 вместо 0.5 — точки разделены
+                                dotPaint
                             )
                         }
                     }
                 }
             }
 
-            // 3. ЛОГОТИП
+            // ЛОГОТИП
             style.logo?.let { logo ->
                 val logoSize = (size * 0.22f).toInt()
                 val pad = logoSize * 0.14f
