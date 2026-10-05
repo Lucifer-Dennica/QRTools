@@ -66,9 +66,7 @@ import com.luciferdennica.qrtools.data.repo.HistoryRepository
 import com.luciferdennica.qrtools.scan.QrCodeAnalyzer
 import com.luciferdennica.qrtools.ui.nav.Routes
 import com.luciferdennica.qrtools.util.TypeDetector
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -108,11 +106,7 @@ fun ScannerScreen(
                 val raw = barcode.rawValue
                 if (!raw.isNullOrBlank()) {
                     scope.launch {
-                        val soundOn = prefs.getSoundOnce()
-                        val vibroOn = prefs.getVibroOnce()
-                        if (vibroOn) vibrate(context)
-                        if (soundOn) playBeep()
-                        val type = TypeDetector.detect(raw)
+                        val type = TypeDetector.detect(raw, barcode.format.toString())
                         val id = repo.add(raw, barcode.format.toString(), type)
                         navigateAfterScan(nav, context, prefs, id)
                     }
@@ -157,14 +151,13 @@ fun ScannerScreen(
                 CameraPreview(
                     modifier = Modifier.fillMaxSize(),
                     onDetected = { content, format ->
-                        // Вибрация и звук — СРАЗУ, на главном потоке, до корутины
                         val vibroOn = prefs.vibro.valueOrNull() ?: true
                         val soundOn = prefs.sound.valueOrNull() ?: true
                         if (vibroOn) vibrate(context)
                         if (soundOn) playBeep()
 
                         scope.launch {
-                            val type = TypeDetector.detect(content)
+                            val type = TypeDetector.detect(content, format)
                             val id = repo.add(content, format, type)
                             navigateAfterScan(nav, context, prefs, id)
                         }
@@ -296,9 +289,6 @@ private fun CameraPreview(
     }
 }
 
-/**
- * Надёжная вибрация: работает на всех версиях Android и всех устройствах.
- */
 private fun vibrate(context: Context) {
     try {
         val vibrator: Vibrator? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -312,14 +302,12 @@ private fun vibrate(context: Context) {
         if (vibrator == null || !vibrator.hasVibrator()) return
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Явная амплитуда 255 = максимум, длительность 100ms
             vibrator.vibrate(VibrationEffect.createOneShot(100L, 255))
         } else {
             @Suppress("DEPRECATION")
             vibrator.vibrate(100L)
         }
     } catch (_: Exception) {
-        // Игнорируем — вибрация не критична
     }
 }
 
