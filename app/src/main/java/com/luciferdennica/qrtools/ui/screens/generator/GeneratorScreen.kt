@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
+import android.provider.ContactsContract
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -36,6 +37,7 @@ import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
@@ -116,6 +118,7 @@ fun GeneratorScreen(nav: NavController) {
     var showStyling by remember { mutableStateOf(false) }
     var style by remember { mutableStateOf(QrStyle()) }
 
+    // Выбор логотипа
     val logoLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -123,6 +126,19 @@ fun GeneratorScreen(nav: NavController) {
             loadBitmap(context, uri)?.let { bmp ->
                 style = style.copy(logo = bmp)
                 if (qrContent.isNotBlank()) qrBitmap = QrGenerator.generate(qrContent, style = style)
+            }
+        }
+    }
+
+    // Выбор контакта из телефонной книжки
+    val contactLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickContact()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            readContact(context, uri)?.let { (name, phone, email) ->
+                contactName = name
+                contactPhone = phone
+                contactEmail = email
             }
         }
     }
@@ -188,7 +204,7 @@ fun GeneratorScreen(nav: NavController) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // ===== ТИП =====
+            // ТИП
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = it }
@@ -221,7 +237,7 @@ fun GeneratorScreen(nav: NavController) {
                 }
             }
 
-            // ===== ПОЛЯ =====
+            // ПОЛЯ
             when (type) {
                 GenType.TEXT -> OutlinedTextField(
                     value = textField, onValueChange = { textField = it },
@@ -284,6 +300,20 @@ fun GeneratorScreen(nav: NavController) {
                     }
                 }
                 GenType.CONTACT -> {
+                    // НОВАЯ КНОПКА — из телефонной книжки
+                    OutlinedButton(
+                        onClick = { contactLauncher.launch(null) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            Icons.Default.Person,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(Modifier.size(6.dp))
+                        Text(stringResource(R.string.qr_pick_contact))
+                    }
+
                     OutlinedTextField(
                         value = contactName, onValueChange = { contactName = it },
                         label = { Text(stringResource(R.string.field_contact_name)) },
@@ -315,7 +345,7 @@ fun GeneratorScreen(nav: NavController) {
                 }
             }
 
-            // ===== СТИЛИЗАЦИЯ =====
+            // СТИЛИЗАЦИЯ (переключатель)
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -353,7 +383,7 @@ fun GeneratorScreen(nav: NavController) {
                 )
             }
 
-            // ===== СОЗДАТЬ =====
+            // СОЗДАТЬ
             Button(
                 onClick = {
                     val content = when (type) {
@@ -375,7 +405,7 @@ fun GeneratorScreen(nav: NavController) {
                 Text(stringResource(R.string.btn_generate))
             }
 
-            // ===== ПРЕВЬЮ =====
+            // ПРЕВЬЮ
             qrBitmap?.let { bmp ->
                 Spacer(Modifier.height(8.dp))
                 Text(
@@ -415,19 +445,7 @@ fun GeneratorScreen(nav: NavController) {
                     }
                     OutlinedButton(
                         onClick = {
-                            // ИСПРАВЛЕНО: делимся картинкой QR, а не текстом
-                            val ok = IntentUtils.shareImage(
-                                context,
-                                bmp,
-                                "qrtools_${System.currentTimeMillis()}.png"
-                            )
-                            if (!ok) {
-                                Toast.makeText(
-                                    context,
-                                    context.getString(R.string.save_failed),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
+                            IntentUtils.shareImage(context, bmp, "qrtools_${System.currentTimeMillis()}.png")
                         },
                         modifier = Modifier.weight(1f)
                     ) {
@@ -439,14 +457,16 @@ fun GeneratorScreen(nav: NavController) {
 
                 OutlinedButton(
                     onClick = {
+                        // Пытаемся скопировать картинку. Если не получилось — молча копируем текст
                         val ok = ClipboardUtils.copyImage(context, bmp)
-                        if (!ok) {
-                        // Fallback — копируем текст, если картинка не скопировалась
-                        ClipboardUtils.copy(context, qrContent)
+                        if (ok) {
+                            Toast.makeText(context, "QR скопирован", Toast.LENGTH_SHORT).show()
+                        } else {
+                            ClipboardUtils.copy(context, qrContent)
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
-                    ) {
+                ) {
                     Icon(Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.size(6.dp))
                     Text(stringResource(R.string.action_copy))
@@ -457,7 +477,7 @@ fun GeneratorScreen(nav: NavController) {
 }
 
 // ========================================================
-// БЛОК СТИЛИЗАЦИИ
+// СТИЛИЗАЦИЯ
 // ========================================================
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -477,7 +497,6 @@ private fun StylingSection(
                 .padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            // Пресеты
             Text(
                 text = stringResource(R.string.qr_presets),
                 style = MaterialTheme.typography.labelLarge,
@@ -499,7 +518,6 @@ private fun StylingSection(
                 }
             }
 
-            // Цвет точек
             Text(
                 text = stringResource(R.string.qr_dot_color),
                 style = MaterialTheme.typography.labelLarge,
@@ -513,7 +531,6 @@ private fun StylingSection(
                 }
             )
 
-            // Цвет фона
             Text(
                 text = stringResource(R.string.qr_bg_color),
                 style = MaterialTheme.typography.labelLarge,
@@ -527,7 +544,6 @@ private fun StylingSection(
                 }
             )
 
-            // Градиенты
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -557,7 +573,6 @@ private fun StylingSection(
                 )
             }
 
-            // Форма точек
             Text(
                 text = stringResource(R.string.qr_dot_shape),
                 style = MaterialTheme.typography.labelLarge,
@@ -578,7 +593,6 @@ private fun StylingSection(
                 }
             }
 
-            // Логотип
             Text(
                 text = stringResource(R.string.qr_logo),
                 style = MaterialTheme.typography.labelLarge,
@@ -700,6 +714,10 @@ private fun ColorPaletteRow(
     }
 }
 
+// ========================================================
+// ХЕЛПЕРЫ
+// ========================================================
+
 private fun loadBitmap(context: Context, uri: Uri): Bitmap? {
     return runCatching {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -712,5 +730,54 @@ private fun loadBitmap(context: Context, uri: Uri): Bitmap? {
             @Suppress("DEPRECATION")
             MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
         }
+    }.getOrNull()
+}
+
+/** Читает контакт: возвращает Triple(имя, телефон, email). */
+private fun readContact(context: Context, uri: Uri): Triple<String, String, String>? {
+    return runCatching {
+        var name = ""
+        var phone = ""
+        var email = ""
+
+        context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val nameIdx = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
+                if (nameIdx >= 0) name = cursor.getString(nameIdx) ?: ""
+
+                val idIdx = cursor.getColumnIndex(ContactsContract.Contacts._ID)
+                val id = if (idIdx >= 0) cursor.getString(idIdx) else null
+
+                if (id != null) {
+                    // Телефон
+                    context.contentResolver.query(
+                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                        null,
+                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                        arrayOf(id),
+                        null
+                    )?.use { phoneCursor ->
+                        if (phoneCursor.moveToFirst()) {
+                            val idx = phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                            if (idx >= 0) phone = phoneCursor.getString(idx) ?: ""
+                        }
+                    }
+                    // Email
+                    context.contentResolver.query(
+                        ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+                        null,
+                        ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?",
+                        arrayOf(id),
+                        null
+                    )?.use { emailCursor ->
+                        if (emailCursor.moveToFirst()) {
+                            val idx = emailCursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS)
+                            if (idx >= 0) email = emailCursor.getString(idx) ?: ""
+                        }
+                    }
+                }
+            }
+        }
+        Triple(name, phone, email)
     }.getOrNull()
 }
