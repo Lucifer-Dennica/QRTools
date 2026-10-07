@@ -159,7 +159,8 @@ fun ScannerScreen(
 
                         scope.launch {
                             val type = TypeDetector.detect(content, format)
-                            val id = repo.add(content, format, type)
+                            val saveHistory = prefs.getSaveHistoryOnce()   // ← ДОБАВИТЬ
+                            val id = repo.add(content, format, type, saveHistory)
                             navigateAfterScan(nav, context, prefs, id)
                         }
                     }
