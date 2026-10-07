@@ -87,7 +87,11 @@ fun HistoryScreen(nav: NavController, repo: HistoryRepository, autoCopy: Boolean
     val items by (if (query.isBlank()) repo.getAll() else repo.search(query))
         .collectAsState(initial = emptyList())
 
-    val listItems = remember(items) { buildGroupedList(items) }
+    val todayLabel = stringResource(R.string.history_today)
+    val yesterdayLabel = stringResource(R.string.history_yesterday)
+    val listItems = remember(items, todayLabel, yesterdayLabel) {
+        buildGroupedList(items, todayLabel, yesterdayLabel)
+    }
 
     Scaffold(
         topBar = {
@@ -176,11 +180,11 @@ private fun ScanRow(
     onDelete: () -> Unit
 ) {
     val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-    val typeTitle = runCatching { ScanType.valueOf(item.type).title }.getOrDefault(item.type)
+    val typeTitle = runCatching {
+        stringResource(ScanType.valueOf(item.type).titleRes)
+    }.getOrDefault(item.type)
     val accent = colorForType(item.type)
     val icon = iconForType(item.type)
-
-    // КРАСИВЫЙ ЗАГОЛОВОК вместо сырой строки
     val displayTitle = ScanDisplay.shortTitle(item.content, item.type)
 
     Card(
@@ -239,10 +243,14 @@ private fun ScanRow(
     }
 }
 
-private fun buildGroupedList(items: List<ScanEntity>): List<HistoryItem> {
+private fun buildGroupedList(
+    items: List<ScanEntity>,
+    todayLabel: String,
+    yesterdayLabel: String
+): List<HistoryItem> {
     if (items.isEmpty()) return emptyList()
 
-    val todayFormat = SimpleDateFormat("dd MMMM", Locale.getDefault())
+    val dateFormat = SimpleDateFormat("dd MMMM", Locale.getDefault())
 
     val todayStart = Calendar.getInstance().apply {
         set(Calendar.HOUR_OF_DAY, 0)
@@ -258,9 +266,9 @@ private fun buildGroupedList(items: List<ScanEntity>): List<HistoryItem> {
 
     items.forEach { item ->
         val header = when {
-            item.timestamp >= todayStart -> "Сегодня"
-            item.timestamp >= yesterdayStart -> "Вчера"
-            else -> todayFormat.format(Date(item.timestamp))
+            item.timestamp >= todayStart -> todayLabel
+            item.timestamp >= yesterdayStart -> yesterdayLabel
+            else -> dateFormat.format(Date(item.timestamp))
         }
         if (header != lastHeader) {
             result.add(HistoryItem.Header(header))
