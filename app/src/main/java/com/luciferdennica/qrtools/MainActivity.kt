@@ -10,6 +10,7 @@ import com.luciferdennica.qrtools.domain.model.ThemeMode
 import com.luciferdennica.qrtools.ui.nav.NavGraph
 import com.luciferdennica.qrtools.ui.theme.QRToolsTheme
 import com.luciferdennica.qrtools.util.LocaleHelper
+import com.luciferdennica.qrtools.widget.QrWidgetProvider
 
 class MainActivity : ComponentActivity() {
 
@@ -21,6 +22,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val app = application as App
 
+        if (intent?.action == QrWidgetProvider.ACTION_OPEN_SCANNER) {
+            app.openScannerOnStart = true
+        }
+
         setContent {
             val theme by app.prefs.theme.collectAsState(initial = ThemeMode.SYSTEM)
             QRToolsTheme(themeMode = theme) {
@@ -29,7 +34,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    /** Вызывается из настроек после смены языка */
     fun restart() {
         recreate()
     }
