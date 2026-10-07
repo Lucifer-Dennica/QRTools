@@ -1,6 +1,5 @@
 package com.luciferdennica.qrtools.ui.screens.settings
 
-import android.app.Activity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +16,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Swipe
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -84,7 +84,7 @@ fun SettingsScreen(nav: NavController) {
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Язык
+                // Язык с флажками
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -111,21 +111,22 @@ fun SettingsScreen(nav: NavController) {
                                 onDismissRequest = { langExpanded = false }
                             ) {
                                 listOf(
-                                    "system" to R.string.lang_system,
-                                    "ru" to R.string.lang_russian,
-                                    "en" to R.string.lang_english,
-                                    "zh" to R.string.lang_chinese,
-                                    "es" to R.string.lang_spanish,
-                                    "de" to R.string.lang_german,
-                                    "fr" to R.string.lang_french
-                                ).forEach { (code, labelRes) ->
+                                    "system" to "⚙️ ${stringResource(R.string.lang_system)}",
+                                    "ru" to "🇷🇺 ${stringResource(R.string.lang_russian)}",
+                                    "en" to "🇬🇧 ${stringResource(R.string.lang_english)}",
+                                    "zh" to "🇨🇳 ${stringResource(R.string.lang_chinese)}",
+                                    "es" to "🇪🇸 ${stringResource(R.string.lang_spanish)}",
+                                    "de" to "🇩🇪 ${stringResource(R.string.lang_german)}",
+                                    "fr" to "🇫🇷 ${stringResource(R.string.lang_french)}"
+                                ).forEach { (code, label) ->
                                     DropdownMenuItem(
-                                        text = { Text(stringResource(labelRes)) },
+                                        text = { Text(label) },
                                         onClick = {
-                                            currentLang = code
                                             langExpanded = false
+                                            currentLang = code
                                             LocaleHelper.setLang(context, code)
-                                            (context as? Activity)?.recreate()
+                                            // Аккуратный перезапуск через Intent
+                                            LocaleHelper.restartActivity(context)
                                         }
                                     )
                                 }
@@ -146,6 +147,13 @@ fun SettingsScreen(nav: NavController) {
                     title = stringResource(R.string.settings_behavior),
                     subtitle = stringResource(R.string.settings_behavior_desc),
                     onClick = { nav.navigate(Routes.SETTINGS_BEHAVIOR) }
+                )
+
+                NavCard(
+                    icon = Icons.Default.Swipe,
+                    title = stringResource(R.string.settings_swipes),
+                    subtitle = stringResource(R.string.settings_swipes_desc),
+                    onClick = { nav.navigate(Routes.SETTINGS_SWIPES) }
                 )
 
                 NavCard(
@@ -225,11 +233,11 @@ private fun NavCard(
 
 @Composable
 private fun langLabel(code: String): String = when (code) {
-    "ru" -> stringResource(R.string.lang_russian)
-    "en" -> stringResource(R.string.lang_english)
-    "zh" -> stringResource(R.string.lang_chinese)
-    "es" -> stringResource(R.string.lang_spanish)
-    "de" -> stringResource(R.string.lang_german)
-    "fr" -> stringResource(R.string.lang_french)
-    else -> stringResource(R.string.lang_system)
+    "ru" -> "🇷🇺 ${stringResource(R.string.lang_russian)}"
+    "en" -> "🇬🇧 ${stringResource(R.string.lang_english)}"
+    "zh" -> "🇨🇳 ${stringResource(R.string.lang_chinese)}"
+    "es" -> "🇪🇸 ${stringResource(R.string.lang_spanish)}"
+    "de" -> "🇩🇪 ${stringResource(R.string.lang_german)}"
+    "fr" -> "🇫🇷 ${stringResource(R.string.lang_french)}"
+    else -> "⚙️ ${stringResource(R.string.lang_system)}"
 }
