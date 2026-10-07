@@ -25,6 +25,13 @@ class HistoryRepository(private val dao: ScanDao) {
         dao.setFavorite(id, fav)
     }
 
+    suspend fun setNote(id: Long, note: String) {
+        dao.setNote(id, note)
+    }
+
     suspend fun delete(item: ScanEntity) = dao.delete(item)
+
+    suspend fun deleteByIds(ids: List<Long>) = dao.deleteByIds(ids)
+
     suspend fun clearAll() = dao.clearAll()
 }
