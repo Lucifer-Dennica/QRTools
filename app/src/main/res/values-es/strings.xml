@@ -118,7 +118,7 @@
     <string name="settings_donate">Donar vía DonationAlerts</string>
     <string name="settings_our_apps">Nuestras apps</string>
     <string name="settings_about">Acerca de</string>
-    <string name="settings_about_desc">Versión, autor, información</string>
+    
 
     <string name="lang_system">Sistema</string>
     <string name="lang_russian">Русский</string>
@@ -200,7 +200,6 @@
     <string name="settings_design_desc">Tema e icono de la app</string>
     <string name="settings_behavior_desc">Sonido, vibración y copia</string>
     <string name="settings_history_desc">Exportar y borrar historial</string>
-    <string name="settings_about_desc">Versión, autor, información</string>
 
     <string name="gen_vcard">Tarjeta de visita</string>
     <string name="field_vcard_firstname">Nombre</string>
