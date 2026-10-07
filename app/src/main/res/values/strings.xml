@@ -265,15 +265,15 @@
     <string name="import_confirm_title">Импортировать записи?</string>
     <string name="import_confirm_desc">Текущая история сохранится. Новые записи добавятся к ней.</string>
     <string name="import_confirm_yes">Импортировать</string>
-    <!-- Разрешение QR -->
+    
     <string name="settings_qr_resolution">Разрешение QR</string>
     <string name="resolution_hd">HD — 1080×1080</string>
     <string name="resolution_2k">2K — 2048×2048</string>
     <string name="resolution_4k">4K — 3840×3840</string>
-    <!-- Скан из буфера -->
+    
     <string name="from_clipboard">Из буфера</string>
     <string name="clipboard_no_image">В буфере нет картинки</string>
-    <!-- Шаблоны QR -->
+    
     <string name="qr_templates">Мои шаблоны</string>
     <string name="qr_template_save">Сохранить как шаблон</string>
     <string name="qr_template_name_hint">Название шаблона</string>
@@ -289,4 +289,17 @@
     <string name="batch_create_done">Готово: %1$d из %2$d</string>
     <string name="batch_create_nothing">Не удалось создать ни одного QR</string>
     <string name="batch_create_open_folder">Открыть папку</string>
+
+    <string name="settings_swipes">Свайпы</string>
+    <string name="settings_swipes_desc">Жесты на главном экране</string>
+    <string name="swipe_left">Свайп влево</string>
+    <string name="swipe_right">Свайп вправо</string>
+    <string name="swipe_up">Свайп вверх</string>
+    <string name="swipe_down">Свайп вниз</string>
+    <string name="swipe_off">Отключено</string>
+    <string name="swipe_scanner">Открыть сканер</string>
+    <string name="swipe_generator">Открыть генератор</string>
+    <string name="swipe_history">Открыть историю</string>
+    <string name="swipe_favorites">Открыть избранное</string>
+    <string name="swipe_settings">Открыть настройки</string>
 </resources>
