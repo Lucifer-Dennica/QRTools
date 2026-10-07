@@ -13,12 +13,12 @@ import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,7 +39,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.BookmarkAdd
 import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -47,6 +46,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -68,6 +68,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -92,6 +93,7 @@ import com.luciferdennica.qrtools.qr.QrGenerator
 import com.luciferdennica.qrtools.qr.QrPresets
 import com.luciferdennica.qrtools.qr.QrStyle
 import com.luciferdennica.qrtools.qr.QrTypeBuilders
+import com.luciferdennica.qrtools.ui.nav.Routes
 import com.luciferdennica.qrtools.util.ClipboardUtils
 import com.luciferdennica.qrtools.util.GalleryUtils
 import com.luciferdennica.qrtools.util.IntentUtils
@@ -167,7 +169,12 @@ fun GeneratorScreen(nav: NavController) {
         if (uri != null) {
             loadBitmap(context, uri)?.let { bmp ->
                 style = style.copy(logo = bmp)
-                if (qrContent.isNotBlank()) regenerateIfPossible(context, prefs, scope, qrContent, style) { qrBitmap = it }
+                if (qrContent.isNotBlank()) {
+                    scope.launch {
+                        val res = prefs.getQrResolutionOnce()
+                        qrBitmap = QrGenerator.generate(qrContent, res.size, style)
+                    }
+                }
             }
         }
     }
@@ -232,9 +239,12 @@ fun GeneratorScreen(nav: NavController) {
         }
     }
 
-    fun regenerateIfPossibleLocal() {
+    fun regenerateIfPossible() {
         if (qrContent.isNotBlank()) {
-            regenerateIfPossible(context, prefs, scope, qrContent, style) { qrBitmap = it }
+            scope.launch {
+                val res = prefs.getQrResolutionOnce()
+                qrBitmap = QrGenerator.generate(qrContent, res.size, style)
+            }
         }
     }
 
@@ -484,7 +494,7 @@ fun GeneratorScreen(nav: NavController) {
                     templates = templates,
                     onStyleChange = { newStyle ->
                         style = newStyle
-                        regenerateIfPossibleLocal()
+                        regenerateIfPossible()
                     },
                     onLogoUpload = { logoLauncher.launch("image/*") },
                     onSaveTemplate = {
@@ -500,7 +510,7 @@ fun GeneratorScreen(nav: NavController) {
                             dotGradient = template.dotGradient,
                             bgGradient = template.bgGradient
                         )
-                        regenerateIfPossibleLocal()
+                        regenerateIfPossible()
                     },
                     onDeleteTemplate = { template ->
                         templateToDelete = template
@@ -508,6 +518,7 @@ fun GeneratorScreen(nav: NavController) {
                 )
             }
 
+            // Кнопка «Сгенерировать»
             Button(
                 onClick = {
                     val content = when (type) {
@@ -532,7 +543,6 @@ fun GeneratorScreen(nav: NavController) {
                                 GenType.SMS -> prefs.setLastSmsPhone(smsPhone)
                                 else -> {}
                             }
-                            // Берём размер из настроек!
                             val res = prefs.getQrResolutionOnce()
                             qrContent = content
                             qrBitmap = QrGenerator.generate(content, res.size, style)
@@ -542,6 +552,20 @@ fun GeneratorScreen(nav: NavController) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.btn_generate))
+            }
+
+            // Пакетное создание из CSV
+            OutlinedButton(
+                onClick = { nav.navigate(Routes.BATCH_GENERATOR) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    Icons.Default.Upload,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(Modifier.size(6.dp))
+                Text(stringResource(R.string.batch_create))
             }
 
             qrBitmap?.let { bmp ->
@@ -712,30 +736,9 @@ fun GeneratorScreen(nav: NavController) {
     }
 }
 
-private fun regenerateIfPossible(
-    context: Context,
-    prefs: App,
-    scope: kotlinx.coroutines.CoroutineScope,
-    content: String,
-    style: QrStyle,
-    onResult: (Bitmap?) -> Unit
-) {
-    // not used (kept for API compat)
-}
-
-private fun regenerateIfPossible(
-    context: Context,
-    prefs: com.luciferdennica.qrtools.data.prefs.SettingsPrefs,
-    scope: kotlinx.coroutines.CoroutineScope,
-    content: String,
-    style: QrStyle,
-    onResult: (Bitmap?) -> Unit
-) {
-    scope.launch {
-        val res = prefs.getQrResolutionOnce()
-        onResult(QrGenerator.generate(content, res.size, style))
-    }
-}
+// ========================================================
+// Стилизация
+// ========================================================
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -1044,6 +1047,10 @@ private fun ColorPaletteRow(
         }
     }
 }
+
+// ========================================================
+// Хелперы
+// ========================================================
 
 private fun openContactPicker(
     context: Context,
