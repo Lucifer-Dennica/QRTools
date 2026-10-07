@@ -60,9 +60,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -76,13 +78,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import com.luciferdennica.qrtools.App
 import com.luciferdennica.qrtools.R
 import com.luciferdennica.qrtools.qr.QrGenerator
+import com.luciferdennica.qrtools.qr.QrPresets
 import com.luciferdennica.qrtools.qr.QrStyle
 import com.luciferdennica.qrtools.qr.QrTypeBuilders
 import com.luciferdennica.qrtools.util.ClipboardUtils
 import com.luciferdennica.qrtools.util.GalleryUtils
 import com.luciferdennica.qrtools.util.IntentUtils
+import kotlinx.coroutines.launch
 
 private enum class GenType(val labelRes: Int) {
     TEXT(R.string.gen_text),
@@ -96,6 +101,9 @@ private enum class GenType(val labelRes: Int) {
 @Composable
 fun GeneratorScreen(nav: NavController) {
     val context = LocalContext.current
+    val app = context.applicationContext as App
+    val prefs = app.prefs
+    val scope = rememberCoroutineScope()
 
     var type by remember { mutableStateOf(GenType.TEXT) }
     var expanded by remember { mutableStateOf(false) }
@@ -116,6 +124,17 @@ fun GeneratorScreen(nav: NavController) {
     var qrContent by remember { mutableStateOf("") }
     var showStyling by remember { mutableStateOf(false) }
     var style by remember { mutableStateOf(QrStyle()) }
+
+    // Загрузка последних введённых данных
+    LaunchedEffect(Unit) {
+        val (ssid, pass, sec) = prefs.getLastWifi()
+        wifiSsid = ssid
+        wifiPass = pass
+        wifiSec = sec
+        urlField = prefs.getLastUrl()
+        textField = prefs.getLastText()
+        smsPhone = prefs.getLastSmsPhone()
+    }
 
     val logoLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -424,6 +443,16 @@ fun GeneratorScreen(nav: NavController) {
                     if (content.isBlank()) {
                         Toast.makeText(context, context.getString(R.string.fill_fields), Toast.LENGTH_SHORT).show()
                     } else {
+                        // Сохраняем последние данные
+                        scope.launch {
+                            when (type) {
+                                GenType.TEXT -> prefs.setLastText(textField)
+                                GenType.URL -> prefs.setLastUrl(urlField)
+                                GenType.WIFI -> prefs.setLastWifi(wifiSsid, wifiPass, wifiSec)
+                                GenType.SMS -> prefs.setLastSmsPhone(smsPhone)
+                                GenType.CONTACT -> {}
+                            }
+                        }
                         qrContent = content
                         qrBitmap = QrGenerator.generate(content, style = style)
                     }
@@ -533,12 +562,12 @@ private fun StylingSection(
                     .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                QrStyle.PRESETS.forEach { (name, preset) ->
+                QrPresets.ALL.forEach { preset ->
                     PresetChip(
-                        name = name,
-                        preset = preset,
-                        selected = style == preset,
-                        onClick = { onStyleChange(preset) }
+                        titleRes = preset.titleRes,
+                        preset = preset.style,
+                        selected = style == preset.style,
+                        onClick = { onStyleChange(preset.style) }
                     )
                 }
             }
@@ -643,7 +672,7 @@ private fun StylingSection(
 
 @Composable
 private fun PresetChip(
-    name: String,
+    titleRes: Int,
     preset: QrStyle,
     selected: Boolean,
     onClick: () -> Unit
@@ -681,7 +710,7 @@ private fun PresetChip(
             )
         }
         Text(
-            text = name,
+            text = stringResource(titleRes),
             style = MaterialTheme.typography.labelSmall,
             modifier = Modifier.padding(top = 4.dp)
         )
