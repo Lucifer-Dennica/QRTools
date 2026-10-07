@@ -17,6 +17,9 @@ import com.luciferdennica.qrtools.ui.screens.history.HistoryScreen
 import com.luciferdennica.qrtools.ui.screens.home.HomeScreen
 import com.luciferdennica.qrtools.ui.screens.result.ResultScreen
 import com.luciferdennica.qrtools.ui.screens.scanner.ScannerScreen
+import com.luciferdennica.qrtools.ui.screens.settings.BehaviorSettingsScreen
+import com.luciferdennica.qrtools.ui.screens.settings.DesignSettingsScreen
+import com.luciferdennica.qrtools.ui.screens.settings.HistorySettingsScreen
 import com.luciferdennica.qrtools.ui.screens.settings.SettingsScreen
 
 object Routes {
@@ -26,6 +29,9 @@ object Routes {
     const val HISTORY = "history"
     const val FAVORITES = "favorites"
     const val SETTINGS = "settings"
+    const val SETTINGS_DESIGN = "settings/design"
+    const val SETTINGS_BEHAVIOR = "settings/behavior"
+    const val SETTINGS_HISTORY = "settings/history"
     const val ABOUT = "about"
     const val RESULT = "result"
     fun result(id: Long) = "$RESULT/$id"
@@ -42,7 +48,12 @@ fun NavGraph(prefs: SettingsPrefs, historyRepo: HistoryRepository) {
         composable(Routes.GENERATOR) { GeneratorScreen(nav) }
         composable(Routes.HISTORY) { HistoryScreen(nav, historyRepo, autoCopy) }
         composable(Routes.FAVORITES) { FavoritesScreen(nav, historyRepo) }
-        composable(Routes.SETTINGS) { SettingsScreen(nav, prefs, historyRepo) }
+
+        composable(Routes.SETTINGS) { SettingsScreen(nav) }
+        composable(Routes.SETTINGS_DESIGN) { DesignSettingsScreen(nav, prefs) }
+        composable(Routes.SETTINGS_BEHAVIOR) { BehaviorSettingsScreen(nav, prefs) }
+        composable(Routes.SETTINGS_HISTORY) { HistorySettingsScreen(nav, prefs, historyRepo) }
+
         composable(Routes.ABOUT) { AboutScreen(nav) }
         composable(
             route = "${Routes.RESULT}/{id}",
