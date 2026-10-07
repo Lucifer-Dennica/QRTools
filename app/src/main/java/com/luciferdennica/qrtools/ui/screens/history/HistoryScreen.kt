@@ -30,7 +30,6 @@ import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Notes
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Search
@@ -193,7 +192,6 @@ fun HistoryScreen(nav: NavController, repo: HistoryRepository, autoCopy: Boolean
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 )
 
-                // Фильтр по типу
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -271,7 +269,6 @@ fun HistoryScreen(nav: NavController, repo: HistoryRepository, autoCopy: Boolean
                                     }
                                 },
                                 onToggleFavorite = { scope.launch { repo.toggleFavorite(item.entity) } },
-                                onTogglePinned = { scope.launch { repo.togglePinned(item.entity) } },
                                 onDelete = { scope.launch { repo.delete(item.entity) } }
                             )
                         }
@@ -327,7 +324,6 @@ private fun ScanRow(
     onToggleSelect: () -> Unit,
     onClick: () -> Unit,
     onToggleFavorite: () -> Unit,
-    onTogglePinned: () -> Unit,
     onDelete: () -> Unit
 ) {
     val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
@@ -375,24 +371,13 @@ private fun ScanRow(
             }
 
             Column(Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (item.isPinned) {
-                        Icon(
-                            imageVector = Icons.Default.PushPin,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Spacer(Modifier.size(4.dp))
-                    }
-                    Text(
-                        text = displayTitle,
-                        style = MaterialTheme.typography.bodyMedium,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
+                Text(
+                    text = displayTitle,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
                 if (item.note.isNotBlank()) {
                     Text(
                         text = "📝 ${item.note}",
@@ -413,14 +398,6 @@ private fun ScanRow(
             }
 
             if (!selectionMode) {
-                IconButton(onClick = onTogglePinned) {
-                    Icon(
-                        imageVector = Icons.Default.PushPin,
-                        contentDescription = stringResource(if (item.isPinned) R.string.unpin else R.string.pin),
-                        tint = if (item.isPinned) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
-                    )
-                }
                 IconButton(onClick = onToggleFavorite) {
                     Icon(
                         imageVector = if (item.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
@@ -458,9 +435,7 @@ private fun buildGroupedList(
     var lastHeader: String? = null
 
     items.forEach { item ->
-        // Закреплённые показываем без группировки по дням
         val header = when {
-            item.isPinned -> "📌"
             item.timestamp >= todayStart -> todayLabel
             item.timestamp >= yesterdayStart -> yesterdayLabel
             else -> dateFormat.format(Date(item.timestamp))
