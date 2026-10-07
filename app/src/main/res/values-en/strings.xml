@@ -1,0 +1,196 @@
+<resources>
+    <string name="app_name">QR Tools</string>
+    <string name="home">Home</string>
+    <string name="scanner">Scanner</string>
+    <string name="generator">Generator</string>
+    <string name="history">History</string>
+    <string name="favorites">Favorites</string>
+    <string name="settings">Settings</string>
+    <string name="about">About</string>
+    <string name="back">Back</string>
+
+    <string name="scan_qr">Scan code</string>
+    <string name="scan_qr_desc">Point camera at QR or barcode</string>
+    <string name="create_qr">Create QR</string>
+    <string name="create_qr_desc">Text, link, WiFi, contact, SMS</string>
+    <string name="history_desc">All scanned codes</string>
+    <string name="favorites_desc">Saved codes</string>
+
+    <string name="history_empty">History is empty</string>
+    <string name="favorites_empty">No favorites yet</string>
+    <string name="delete">Delete</string>
+    <string name="favorite">Add to favorites</string>
+    <string name="unfavorite">Remove from favorites</string>
+
+    <string name="home_scan_sub">QR &amp; barcodes</string>
+    <string name="home_create_sub">5 code types</string>
+    <string name="home_history_sub">All scans</string>
+    <string name="home_favorites_sub">Important codes</string>
+
+    <string name="permission_camera_title">Camera access needed</string>
+    <string name="permission_camera_desc">Allow camera access to scan QR codes and barcodes</string>
+    <string name="permission_grant">Allow</string>
+    <string name="permission_contacts_title">Contacts access needed</string>
+    <string name="permission_contacts_desc">Allow contacts access to load contacts into generator</string>
+    <string name="permission_contacts_denied">Cannot pick contact without permission</string>
+
+    <string name="scan_hint">Point camera at code</string>
+    <string name="scan_result">Result</string>
+    <string name="action_open">Open</string>
+    <string name="action_copy">Copy</string>
+    <string name="action_share">Share</string>
+    <string name="action_save">Add to favorites</string>
+    <string name="action_unsave">Remove from favorites</string>
+    <string name="action_scan_again">Scan again</string>
+    <string name="copied">Copied</string>
+    <string name="qr_copied">QR copied</string>
+    <string name="show_raw">Show raw data</string>
+    <string name="hide_raw">Hide raw data</string>
+
+    <string name="gen_type">Code type</string>
+    <string name="gen_text">Text</string>
+    <string name="gen_url">Link</string>
+    <string name="gen_wifi">WiFi</string>
+    <string name="gen_contact">Contact</string>
+    <string name="gen_sms">SMS</string>
+
+    <string name="field_text">Enter text</string>
+    <string name="field_url">Enter URL (https://…)</string>
+    <string name="field_wifi_ssid">Network name (SSID)</string>
+    <string name="field_wifi_password">Password</string>
+    <string name="field_wifi_security">Security type</string>
+    <string name="wifi_wpa">WPA/WPA2</string>
+    <string name="wifi_wep">WEP</string>
+    <string name="wifi_none">Open</string>
+    <string name="field_contact_name">Name</string>
+    <string name="field_contact_phone">Phone</string>
+    <string name="field_contact_email">Email</string>
+    <string name="field_sms_phone">Phone number</string>
+    <string name="field_sms_message">Message</string>
+    <string name="qr_pick_contact">Load from contacts</string>
+    <string name="contact_read_failed">Failed to read contact</string>
+
+    <string name="btn_generate">Generate</string>
+    <string name="btn_save_gallery">Save</string>
+    <string name="btn_share_qr">Share</string>
+
+    <string name="generated_title">Generated QR</string>
+    <string name="saved_gallery">Saved to gallery</string>
+    <string name="save_failed">Failed to save</string>
+    <string name="fill_fields">Fill in the fields</string>
+
+    <string name="from_gallery">From gallery</string>
+    <string name="no_code_in_image">No code found in image</string>
+    <string name="search_hint">Search by content</string>
+
+    <string name="wifi_network">Network</string>
+    <string name="wifi_password">Password</string>
+    <string name="wifi_security">Security</string>
+    <string name="wifi_hidden">Hidden network</string>
+    <string name="wifi_hidden_yes">Yes</string>
+    <string name="wifi_hidden_no">No</string>
+    <string name="wifi_connect">Connect to Wi-Fi</string>
+    <string name="wifi_connecting">Connecting…</string>
+    <string name="wifi_connect_failed">Failed to connect</string>
+    <string name="wifi_no_password">No password</string>
+    <string name="wifi_open">Open</string>
+
+    <string name="contact_name">Name</string>
+    <string name="contact_phone">Phone</string>
+    <string name="contact_email">Email</string>
+    <string name="contact_call">Call</string>
+    <string name="action_send_email">Send email</string>
+
+    <string name="settings_language">Language</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_icon">App icon</string>
+    <string name="settings_behavior">Behavior</string>
+    <string name="settings_sound">Sound on scan</string>
+    <string name="settings_vibro">Vibration on scan</string>
+    <string name="settings_auto_copy">Auto-copy to clipboard</string>
+    <string name="settings_history">History</string>
+    <string name="settings_clear_history">Clear all history</string>
+    <string name="settings_export_csv">Export to CSV (Excel)</string>
+    <string name="settings_support">Support author</string>
+    <string name="settings_support_desc">Any amount for project development</string>
+    <string name="settings_feedback">Feedback</string>
+    <string name="settings_email">Send Email</string>
+    <string name="settings_telegram">Message on Telegram</string>
+    <string name="settings_donate">Donate via DonationAlerts</string>
+    <string name="settings_our_apps">Our apps</string>
+    <string name="settings_about">About</string>
+    <string name="settings_about_desc">Version, author, contacts</string>
+
+    <string name="lang_system">System</string>
+    <string name="lang_russian">Русский</string>
+    <string name="lang_english">English</string>
+    <string name="lang_chinese">中文</string>
+
+    <string name="clear_history_title">Clear history?</string>
+    <string name="clear_history_desc">All records will be permanently deleted</string>
+    <string name="clear_history_confirm">Clear</string>
+    <string name="cancel">Cancel</string>
+    <string name="history_cleared">History cleared</string>
+    <string name="csv_exported">File saved to Downloads</string>
+    <string name="csv_export_failed">Failed to save file</string>
+    <string name="csv_no_data">No data to export</string>
+
+    <string name="donate_success">Thanks for your support!</string>
+    <string name="link_error">Failed to open link</string>
+    <string name="about_contacts">Contacts</string>
+    <string name="about_support">Support project</string>
+    <string name="about_donate_button">DonationAlerts</string>
+    <string name="about_version_full">Version: 1.0.0</string>
+    <string name="about_app_title">About</string>
+    <string name="about_app_desc">QR Tools — fast and easy scanner and generator of QR codes and barcodes. Supports all popular formats, gallery scanning, history, favorites, data export and Wi-Fi connection via QR.</string>
+    <string name="about_development">Development</string>
+    <string name="about_our_apps">Our apps</string>
+    <string name="about_our_apps_desc">All developer projects in one place</string>
+    <string name="about_our_apps_button">Open catalog</string>
+    <string name="about_copyright">© 2026 QR Tools. All rights reserved.</string>
+
+    <string name="history_today">Today</string>
+    <string name="history_yesterday">Yesterday</string>
+
+    <string name="icon_blue">Blue</string>
+    <string name="icon_dark">Dark</string>
+    <string name="icon_green">Emerald</string>
+    <string name="icon_purple">Amethyst</string>
+    <string name="icon_changed">Icon changed. If it doesn\'t update — restart the launcher.</string>
+
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_ocean">Ocean</string>
+    <string name="theme_forest">Forest</string>
+    <string name="theme_amethyst">Amethyst</string>
+
+    <string name="type_text">Text</string>
+    <string name="type_url">Link</string>
+    <string name="type_wifi">WiFi</string>
+    <string name="type_contact">Contact</string>
+    <string name="type_sms">SMS</string>
+    <string name="type_email">Email</string>
+    <string name="type_phone">Phone</string>
+    <string name="type_barcode">Barcode</string>
+    <string name="type_other">Other</string>
+
+    <string name="qr_styling">QR styling</string>
+    <string name="qr_presets">Presets</string>
+    <string name="qr_dot_color">Dot color</string>
+    <string name="qr_bg_color">Background color</string>
+    <string name="qr_gradient_dots">Dot gradient</string>
+    <string name="qr_gradient_bg">Background gradient</string>
+    <string name="qr_logo">Center logo</string>
+    <string name="qr_logo_upload">Upload logo</string>
+    <string name="qr_logo_remove">Remove logo</string>
+
+    <string name="off_title">Product info</string>
+    <string name="off_loading">Loading info…</string>
+    <string name="off_not_found">Product not found in database</string>
+    <string name="off_no_internet">No internet connection</string>
+    <string name="off_brand">Brand</string>
+    <string name="off_quantity">Quantity</string>
+    <string name="off_categories">Categories</string>
+    <string name="off_show_details">Open in Open Food Facts</string>
+</resources>
