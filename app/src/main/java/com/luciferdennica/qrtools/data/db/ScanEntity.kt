@@ -10,5 +10,6 @@ data class ScanEntity(
     val format: String,
     val type: String,
     val isFavorite: Boolean = false,
+    val note: String = "",
     val timestamp: Long = System.currentTimeMillis()
 )
