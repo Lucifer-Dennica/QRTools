@@ -94,7 +94,8 @@ private enum class GenType(val labelRes: Int) {
     URL(R.string.gen_url),
     WIFI(R.string.gen_wifi),
     CONTACT(R.string.gen_contact),
-    SMS(R.string.gen_sms)
+    SMS(R.string.gen_sms),
+    VCARD(R.string.gen_vcard)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -120,12 +121,21 @@ fun GeneratorScreen(nav: NavController) {
     var smsPhone by remember { mutableStateOf("") }
     var smsMessage by remember { mutableStateOf("") }
 
+    var vcFirstName by remember { mutableStateOf("") }
+    var vcLastName by remember { mutableStateOf("") }
+    var vcCompany by remember { mutableStateOf("") }
+    var vcPosition by remember { mutableStateOf("") }
+    var vcPhone by remember { mutableStateOf("") }
+    var vcEmail by remember { mutableStateOf("") }
+    var vcWebsite by remember { mutableStateOf("") }
+    var vcAddress by remember { mutableStateOf("") }
+    var vcNote by remember { mutableStateOf("") }
+
     var qrBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var qrContent by remember { mutableStateOf("") }
     var showStyling by remember { mutableStateOf(false) }
     var style by remember { mutableStateOf(QrStyle()) }
 
-    // Загрузка последних введённых данных
     LaunchedEffect(Unit) {
         val (ssid, pass, sec) = prefs.getLastWifi()
         wifiSsid = ssid
@@ -156,18 +166,7 @@ fun GeneratorScreen(nav: NavController) {
                     contactName = name
                     contactPhone = phone
                     contactEmail = email
-                    if (name.isBlank() && phone.isBlank() && email.isBlank()) {
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.contact_read_failed),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                } ?: Toast.makeText(
-                    context,
-                    context.getString(R.string.contact_read_failed),
-                    Toast.LENGTH_SHORT
-                ).show()
+                }
             }
         }
     }
@@ -354,15 +353,10 @@ fun GeneratorScreen(nav: NavController) {
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Icon(
-                            Icons.Default.Person,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
+                        Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.size(6.dp))
                         Text(stringResource(R.string.qr_pick_contact))
                     }
-
                     OutlinedTextField(
                         value = contactName, onValueChange = { contactName = it },
                         label = { Text(stringResource(R.string.field_contact_name)) },
@@ -388,6 +382,54 @@ fun GeneratorScreen(nav: NavController) {
                     OutlinedTextField(
                         value = smsMessage, onValueChange = { smsMessage = it },
                         label = { Text(stringResource(R.string.field_sms_message)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        minLines = 2
+                    )
+                }
+                GenType.VCARD -> {
+                    OutlinedTextField(
+                        value = vcFirstName, onValueChange = { vcFirstName = it },
+                        label = { Text(stringResource(R.string.field_vcard_firstname)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = vcLastName, onValueChange = { vcLastName = it },
+                        label = { Text(stringResource(R.string.field_vcard_lastname)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = vcCompany, onValueChange = { vcCompany = it },
+                        label = { Text(stringResource(R.string.field_vcard_company)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = vcPosition, onValueChange = { vcPosition = it },
+                        label = { Text(stringResource(R.string.field_vcard_position)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = vcPhone, onValueChange = { vcPhone = it },
+                        label = { Text(stringResource(R.string.field_vcard_phone)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = vcEmail, onValueChange = { vcEmail = it },
+                        label = { Text(stringResource(R.string.field_vcard_email)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = vcWebsite, onValueChange = { vcWebsite = it },
+                        label = { Text(stringResource(R.string.field_vcard_website)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = vcAddress, onValueChange = { vcAddress = it },
+                        label = { Text(stringResource(R.string.field_vcard_address)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = vcNote, onValueChange = { vcNote = it },
+                        label = { Text(stringResource(R.string.field_vcard_note)) },
                         modifier = Modifier.fillMaxWidth(),
                         minLines = 2
                     )
@@ -439,18 +481,21 @@ fun GeneratorScreen(nav: NavController) {
                         GenType.WIFI -> if (wifiSsid.isBlank()) "" else QrTypeBuilders.wifi(wifiSsid, wifiPass, wifiSec)
                         GenType.CONTACT -> if (contactName.isBlank()) "" else QrTypeBuilders.contact(contactName, contactPhone, contactEmail)
                         GenType.SMS -> if (smsPhone.isBlank()) "" else QrTypeBuilders.sms(smsPhone, smsMessage)
+                        GenType.VCARD -> if (vcFirstName.isBlank() && vcLastName.isBlank()) "" else QrTypeBuilders.businessCard(
+                            vcFirstName, vcLastName, vcCompany, vcPosition,
+                            vcPhone, vcEmail, vcWebsite, vcAddress, vcNote
+                        )
                     }
                     if (content.isBlank()) {
                         Toast.makeText(context, context.getString(R.string.fill_fields), Toast.LENGTH_SHORT).show()
                     } else {
-                        // Сохраняем последние данные
                         scope.launch {
                             when (type) {
                                 GenType.TEXT -> prefs.setLastText(textField)
                                 GenType.URL -> prefs.setLastUrl(urlField)
                                 GenType.WIFI -> prefs.setLastWifi(wifiSsid, wifiPass, wifiSec)
                                 GenType.SMS -> prefs.setLastSmsPhone(smsPhone)
-                                GenType.CONTACT -> {}
+                                else -> {}
                             }
                         }
                         qrContent = content
@@ -474,9 +519,7 @@ fun GeneratorScreen(nav: NavController) {
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Box(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
+                        Modifier.fillMaxWidth().padding(16.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
@@ -531,10 +574,6 @@ fun GeneratorScreen(nav: NavController) {
     }
 }
 
-// ========================================================
-// СТИЛИЗАЦИЯ
-// ========================================================
-
 @Composable
 private fun StylingSection(
     style: QrStyle,
@@ -546,9 +585,7 @@ private fun StylingSection(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
+            modifier = Modifier.fillMaxWidth().padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             Text(
@@ -604,8 +641,7 @@ private fun StylingSection(
             ) {
                 Text(
                     text = stringResource(R.string.qr_gradient_dots),
-                    modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.bodyMedium
+                    modifier = Modifier.weight(1f)
                 )
                 Switch(
                     checked = style.dotGradient,
@@ -618,8 +654,7 @@ private fun StylingSection(
             ) {
                 Text(
                     text = stringResource(R.string.qr_gradient_bg),
-                    modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.bodyMedium
+                    modifier = Modifier.weight(1f)
                 )
                 Switch(
                     checked = style.bgGradient,
@@ -660,9 +695,7 @@ private fun StylingSection(
                     Image(
                         bitmap = logo.asImageBitmap(),
                         contentDescription = null,
-                        modifier = Modifier
-                            .size(64.dp)
-                            .clip(RoundedCornerShape(12.dp))
+                        modifier = Modifier.size(64.dp).clip(RoundedCornerShape(12.dp))
                     )
                 }
             }
@@ -680,9 +713,7 @@ private fun PresetChip(
     val borderColor = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .clickable { onClick() }
-            .padding(2.dp)
+        modifier = Modifier.clickable { onClick() }.padding(2.dp)
     ) {
         Box(
             modifier = Modifier
@@ -724,9 +755,7 @@ private fun ColorPaletteRow(
     onSelect: (Color, Color) -> Unit
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .horizontalScroll(rememberScrollState()),
+        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         palette.forEach { (main, partner) ->
@@ -747,10 +776,6 @@ private fun ColorPaletteRow(
         }
     }
 }
-
-// ========================================================
-// ХЕЛПЕРЫ
-// ========================================================
 
 private fun openContactPicker(
     context: Context,
@@ -786,7 +811,6 @@ private fun readContact(context: Context, uri: Uri): Triple<String, String, Stri
             if (cursor.moveToFirst()) {
                 val nameIdx = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
                 if (nameIdx >= 0) name = cursor.getString(nameIdx) ?: ""
-
                 val idIdx = cursor.getColumnIndex(ContactsContract.Contacts._ID)
                 if (idIdx >= 0) contactId = cursor.getString(idIdx)
             }
@@ -799,10 +823,10 @@ private fun readContact(context: Context, uri: Uri): Triple<String, String, Stri
                 ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
                 arrayOf(contactId),
                 null
-            )?.use { phoneCursor ->
-                if (phoneCursor.moveToFirst()) {
-                    val idx = phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
-                    if (idx >= 0) phone = phoneCursor.getString(idx) ?: ""
+            )?.use { c ->
+                if (c.moveToFirst()) {
+                    val idx = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                    if (idx >= 0) phone = c.getString(idx) ?: ""
                 }
             }
             context.contentResolver.query(
@@ -811,14 +835,13 @@ private fun readContact(context: Context, uri: Uri): Triple<String, String, Stri
                 ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?",
                 arrayOf(contactId),
                 null
-            )?.use { emailCursor ->
-                if (emailCursor.moveToFirst()) {
-                    val idx = emailCursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS)
-                    if (idx >= 0) email = emailCursor.getString(idx) ?: ""
+            )?.use { c ->
+                if (c.moveToFirst()) {
+                    val idx = c.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS)
+                    if (idx >= 0) email = c.getString(idx) ?: ""
                 }
             }
         }
-
         Triple(name, phone, email)
     }.getOrNull()
 }
