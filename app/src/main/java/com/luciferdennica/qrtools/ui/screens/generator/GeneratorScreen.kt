@@ -157,7 +157,7 @@ fun GeneratorScreen(nav: NavController) {
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) {
-            openContactPicker(contactLauncher)
+            openContactPicker(context, contactLauncher)
         } else {
             Toast.makeText(
                 context,
@@ -328,7 +328,7 @@ fun GeneratorScreen(nav: NavController) {
                                 context, Manifest.permission.READ_CONTACTS
                             ) == PackageManager.PERMISSION_GRANTED
                             if (granted) {
-                                openContactPicker(contactLauncher)
+                                openContactPicker(context, contactLauncher)
                             } else {
                                 contactsPermLauncher.launch(Manifest.permission.READ_CONTACTS)
                             }
@@ -375,7 +375,6 @@ fun GeneratorScreen(nav: NavController) {
                 }
             }
 
-            // Стилизация — переключатель
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -413,7 +412,6 @@ fun GeneratorScreen(nav: NavController) {
                 )
             }
 
-            // Кнопка «Сгенерировать»
             Button(
                 onClick = {
                     val content = when (type) {
@@ -435,7 +433,6 @@ fun GeneratorScreen(nav: NavController) {
                 Text(stringResource(R.string.btn_generate))
             }
 
-            // Превью
             qrBitmap?.let { bmp ->
                 Spacer(Modifier.height(8.dp))
                 Text(
@@ -506,7 +503,7 @@ fun GeneratorScreen(nav: NavController) {
 }
 
 // ========================================================
-// СТИЛИЗАЦИЯ (без формы точек)
+// СТИЛИЗАЦИЯ
 // ========================================================
 
 @Composable
