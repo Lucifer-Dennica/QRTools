@@ -48,7 +48,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -78,7 +77,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.luciferdennica.qrtools.R
-import com.luciferdennica.qrtools.qr.DotShape
 import com.luciferdennica.qrtools.qr.QrGenerator
 import com.luciferdennica.qrtools.qr.QrStyle
 import com.luciferdennica.qrtools.qr.QrTypeBuilders
@@ -119,7 +117,6 @@ fun GeneratorScreen(nav: NavController) {
     var showStyling by remember { mutableStateOf(false) }
     var style by remember { mutableStateOf(QrStyle()) }
 
-    // Логотип
     val logoLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -131,7 +128,6 @@ fun GeneratorScreen(nav: NavController) {
         }
     }
 
-    // Выбор контакта через StartActivityForResult (надёжнее, чем PickContact)
     val contactLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -142,21 +138,32 @@ fun GeneratorScreen(nav: NavController) {
                     contactPhone = phone
                     contactEmail = email
                     if (name.isBlank() && phone.isBlank() && email.isBlank()) {
-                        Toast.makeText(context, "Не удалось прочитать контакт", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.contact_read_failed),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
-                } ?: Toast.makeText(context, "Не удалось прочитать контакт", Toast.LENGTH_SHORT).show()
+                } ?: Toast.makeText(
+                    context,
+                    context.getString(R.string.contact_read_failed),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
 
-    // Разрешение на контакты
     val contactsPermLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) {
-            openContactPicker(context, contactLauncher)
+            openContactPicker(contactLauncher)
         } else {
-            Toast.makeText(context, "Без разрешения нельзя выбрать контакт", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                context,
+                context.getString(R.string.permission_contacts_denied),
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -321,7 +328,7 @@ fun GeneratorScreen(nav: NavController) {
                                 context, Manifest.permission.READ_CONTACTS
                             ) == PackageManager.PERMISSION_GRANTED
                             if (granted) {
-                                openContactPicker(context, contactLauncher)
+                                openContactPicker(contactLauncher)
                             } else {
                                 contactsPermLauncher.launch(Manifest.permission.READ_CONTACTS)
                             }
@@ -368,6 +375,7 @@ fun GeneratorScreen(nav: NavController) {
                 }
             }
 
+            // Стилизация — переключатель
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -405,6 +413,7 @@ fun GeneratorScreen(nav: NavController) {
                 )
             }
 
+            // Кнопка «Сгенерировать»
             Button(
                 onClick = {
                     val content = when (type) {
@@ -426,6 +435,7 @@ fun GeneratorScreen(nav: NavController) {
                 Text(stringResource(R.string.btn_generate))
             }
 
+            // Превью
             qrBitmap?.let { bmp ->
                 Spacer(Modifier.height(8.dp))
                 Text(
@@ -479,7 +489,7 @@ fun GeneratorScreen(nav: NavController) {
                     onClick = {
                         val ok = ClipboardUtils.copyImage(context, bmp)
                         if (ok) {
-                            Toast.makeText(context, "QR скопирован", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.qr_copied), Toast.LENGTH_SHORT).show()
                         } else {
                             ClipboardUtils.copy(context, qrContent)
                         }
@@ -496,10 +506,9 @@ fun GeneratorScreen(nav: NavController) {
 }
 
 // ========================================================
-// СТИЛИЗАЦИЯ
+// СТИЛИЗАЦИЯ (без формы точек)
 // ========================================================
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun StylingSection(
     style: QrStyle,
@@ -590,26 +599,6 @@ private fun StylingSection(
                     checked = style.bgGradient,
                     onCheckedChange = { onStyleChange(style.copy(bgGradient = it)) }
                 )
-            }
-
-            Text(
-                text = stringResource(R.string.qr_dot_shape),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                DotShape.values().forEach { shape ->
-                    FilterChip(
-                        selected = style.dotShape == shape,
-                        onClick = { onStyleChange(style.copy(dotShape = shape)) },
-                        label = { Text(stringResource(shape.titleRes)) }
-                    )
-                }
             }
 
             Text(
@@ -760,7 +749,6 @@ private fun loadBitmap(context: Context, uri: Uri): Bitmap? {
     }.getOrNull()
 }
 
-/** Читает контакт по URI: возвращает Triple(имя, телефон, email). */
 private fun readContact(context: Context, uri: Uri): Triple<String, String, String>? {
     return runCatching {
         var name = ""
@@ -779,7 +767,6 @@ private fun readContact(context: Context, uri: Uri): Triple<String, String, Stri
         }
 
         if (contactId != null) {
-            // Телефон
             context.contentResolver.query(
                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                 null,
@@ -792,7 +779,6 @@ private fun readContact(context: Context, uri: Uri): Triple<String, String, Stri
                     if (idx >= 0) phone = phoneCursor.getString(idx) ?: ""
                 }
             }
-            // Email
             context.contentResolver.query(
                 ContactsContract.CommonDataKinds.Email.CONTENT_URI,
                 null,
