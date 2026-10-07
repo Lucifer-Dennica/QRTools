@@ -119,7 +119,6 @@
     <string name="settings_donate">Donate via DonationAlerts</string>
     <string name="settings_our_apps">Our apps</string>
     <string name="settings_about">About</string>
-    <string name="settings_about_desc">Version, author, contacts</string>
 
     <string name="lang_system">System</string>
     <string name="lang_russian">Русский</string>
