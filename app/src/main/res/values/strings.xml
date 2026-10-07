@@ -278,4 +278,12 @@
     <string name="qr_template_deleted">Шаблон удалён</string>
     <string name="qr_template_delete">Удалить шаблон</string>
     <string name="qr_template_confirm_delete">Удалить шаблон «%1$s»?</string>
+
+    <string name="batch_create">Пакетно из CSV</string>
+    <string name="batch_create_hint">Один QR-код на строку. Первая строка — заголовок.</string>
+    <string name="batch_create_start">Создать QR</string>
+    <string name="batch_create_progress">Обработка %1$d из %2$d…</string>
+    <string name="batch_create_done">Готово: %1$d из %2$d</string>
+    <string name="batch_create_nothing">Не удалось создать ни одного QR</string>
+    <string name="batch_create_open_folder">Открыть папку</string>
 </resources>
