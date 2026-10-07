@@ -27,7 +27,6 @@ import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Wifi
@@ -127,12 +126,6 @@ fun ResultScreen(nav: NavController, repo: HistoryRepository, id: Long) {
                         item = repo.getById(data.id)
                     }
                 },
-                onTogglePinned = {
-                    scope.launch {
-                        repo.setPinned(data.id, !data.isPinned)
-                        item = repo.getById(data.id)
-                    }
-                },
                 onEditNote = { showNoteDialog = true },
                 onScanAgain = {
                     nav.navigate(Routes.SCANNER) { popUpTo(Routes.HOME) }
@@ -176,7 +169,6 @@ private fun ResultContent(
     showRaw: Boolean,
     onToggleRaw: () -> Unit,
     onToggleFavorite: () -> Unit,
-    onTogglePinned: () -> Unit,
     onEditNote: () -> Unit,
     onScanAgain: () -> Unit,
     context: Context
@@ -298,21 +290,6 @@ private fun ResultContent(
                     if (data.note.isBlank()) R.string.note_add else R.string.note_edit
                 )
             )
-        }
-
-        OutlinedButton(
-            onClick = onTogglePinned,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Icon(
-                imageVector = Icons.Default.PushPin,
-                contentDescription = null,
-                modifier = Modifier.size(20.dp),
-                tint = if (data.isPinned) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.onSurface
-            )
-            Spacer(Modifier.size(8.dp))
-            Text(stringResource(if (data.isPinned) R.string.unpin else R.string.pin))
         }
 
         OutlinedButton(
