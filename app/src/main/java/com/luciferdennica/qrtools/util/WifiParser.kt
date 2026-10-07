@@ -9,7 +9,6 @@ data class WifiData(
 
 object WifiParser {
 
-    /** Разбирает строку WIFI:T:WPA;S:MyNet;P:MyPass;H:false;; */
     fun parse(content: String): WifiData? {
         if (!content.startsWith("WIFI:", ignoreCase = true)) return null
         val body = content.substring(5).trimEnd(';')
@@ -52,10 +51,11 @@ object WifiParser {
         return WifiData(ssid, password, security, hidden)
     }
 
-    fun securityLabel(security: String): String = when (security.uppercase()) {
+    /** Возвращает отображаемое название типа защиты. openLabel — переведённая строка «Открытая». */
+    fun securityLabel(security: String, openLabel: String): String = when (security.uppercase()) {
         "WPA", "WPA2", "WPA3", "SAE" -> "WPA/WPA2"
         "WEP" -> "WEP"
-        "NOPASS", "" -> "Открытая"
+        "NOPASS", "" -> openLabel
         else -> security
     }
 }
