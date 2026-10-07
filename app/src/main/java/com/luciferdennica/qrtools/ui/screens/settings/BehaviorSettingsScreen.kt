@@ -42,6 +42,7 @@ fun BehaviorSettingsScreen(nav: NavController, prefs: SettingsPrefs) {
     val sound by prefs.sound.collectAsState(initial = true)
     val vibro by prefs.vibro.collectAsState(initial = true)
     val autoCopy by prefs.autoCopy.collectAsState(initial = false)
+    val saveHistory by prefs.saveHistory.collectAsState(initial = true)
 
     Scaffold(
         topBar = {
@@ -87,6 +88,12 @@ fun BehaviorSettingsScreen(nav: NavController, prefs: SettingsPrefs) {
                         title = stringResource(R.string.settings_auto_copy),
                         checked = autoCopy,
                         onCheckedChange = { scope.launch { prefs.setAutoCopy(it) } }
+                    )
+                    HorizontalDivider()
+                    SettingSwitch(
+                        title = stringResource(R.string.settings_save_history),
+                        checked = saveHistory,
+                        onCheckedChange = { scope.launch { prefs.setSaveHistory(it) } }
                     )
                 }
             }
