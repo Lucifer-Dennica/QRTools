@@ -1,10 +1,6 @@
 package com.luciferdennica.qrtools.ui.screens.settings
 
 import android.app.Activity
-import android.widget.Toast
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,85 +10,49 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Send
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.luciferdennica.qrtools.R
-import com.luciferdennica.qrtools.data.prefs.SettingsPrefs
-import com.luciferdennica.qrtools.data.repo.HistoryRepository
-import com.luciferdennica.qrtools.domain.model.ThemeMode
 import com.luciferdennica.qrtools.ui.nav.Routes
-import com.luciferdennica.qrtools.util.AppIcon
-import com.luciferdennica.qrtools.util.CsvExporter
-import com.luciferdennica.qrtools.util.IconManager
-import com.luciferdennica.qrtools.util.IntentUtils
 import com.luciferdennica.qrtools.util.LocaleHelper
-import kotlinx.coroutines.launch
-
-private const val APPS_URL = "https://lucifer-dennica.github.io/apps.html"
-private const val SUPPORT_EMAIL = "denis22142qwe@gmail.com"
-private const val SUPPORT_TELEGRAM = "Lucifer_Denicca_22142"
-private const val DONATE_URL = "https://www.donationalerts.com/r/lucifer_dennica_1999"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(
-    nav: NavController,
-    prefs: SettingsPrefs,
-    repo: HistoryRepository
-) {
+fun SettingsScreen(nav: NavController) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-
-    val currentTheme by prefs.theme.collectAsState(initial = ThemeMode.SYSTEM)
-    val sound by prefs.sound.collectAsState(initial = true)
-    val vibro by prefs.vibro.collectAsState(initial = true)
-    val autoCopy by prefs.autoCopy.collectAsState(initial = false)
-    val currentIcon by prefs.appIcon.collectAsState(initial = AppIcon.BLUE)
-
-    var showClearDialog by remember { mutableStateOf(false) }
-    var themeExpanded by remember { mutableStateOf(false) }
     var langExpanded by remember { mutableStateOf(false) }
     var currentLang by remember { mutableStateOf(LocaleHelper.getLang(context)) }
 
@@ -117,10 +77,9 @@ fun SettingsScreen(
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // ===== ЯЗЫК =====
-            SectionTitle(stringResource(R.string.settings_language))
+            // Язык
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -167,405 +126,79 @@ fun SettingsScreen(
                 }
             }
 
-            // ===== ТЕМА =====
-            SectionTitle(stringResource(R.string.settings_theme))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-            ) {
-                Column(Modifier.fillMaxWidth().padding(12.dp)) {
-                    ExposedDropdownMenuBox(
-                        expanded = themeExpanded,
-                        onExpandedChange = { themeExpanded = it }
-                    ) {
-                        OutlinedTextField(
-                            value = stringResource(currentTheme.titleRes),
-                            onValueChange = {},
-                            readOnly = true,
-                            label = { Text(stringResource(R.string.settings_theme)) },
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = themeExpanded)
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
-                        )
-                        ExposedDropdownMenu(
-                            expanded = themeExpanded,
-                            onDismissRequest = { themeExpanded = false }
-                        ) {
-                            ThemeMode.values().forEach { mode ->
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(mode.titleRes)) },
-                                    onClick = {
-                                        scope.launch { prefs.setTheme(mode) }
-                                        themeExpanded = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-            }
+            NavCard(
+                icon = Icons.Default.Palette,
+                title = stringResource(R.string.settings_design),
+                subtitle = stringResource(R.string.settings_design_desc),
+                onClick = { nav.navigate(Routes.SETTINGS_DESIGN) }
+            )
 
-            // ===== ПОВЕДЕНИЕ =====
-            SectionTitle(stringResource(R.string.settings_behavior))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-            ) {
-                Column(Modifier.fillMaxWidth().padding(8.dp)) {
-                    SettingSwitch(
-                        title = stringResource(R.string.settings_sound),
-                        checked = sound,
-                        onCheckedChange = { scope.launch { prefs.setSound(it) } }
-                    )
-                    HorizontalDivider()
-                    SettingSwitch(
-                        title = stringResource(R.string.settings_vibro),
-                        checked = vibro,
-                        onCheckedChange = { scope.launch { prefs.setVibro(it) } }
-                    )
-                    HorizontalDivider()
-                    SettingSwitch(
-                        title = stringResource(R.string.settings_auto_copy),
-                        checked = autoCopy,
-                        onCheckedChange = { scope.launch { prefs.setAutoCopy(it) } }
-                    )
-                }
-            }
+            NavCard(
+                icon = Icons.Default.Tune,
+                title = stringResource(R.string.settings_behavior),
+                subtitle = stringResource(R.string.settings_behavior_desc),
+                onClick = { nav.navigate(Routes.SETTINGS_BEHAVIOR) }
+            )
 
-            // ===== ИСТОРИЯ =====
-            SectionTitle(stringResource(R.string.settings_history))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth().padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = {
-                            scope.launch {
-                                val items = repo.getAllOnce()
-                                if (items.isEmpty()) {
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(R.string.csv_no_data),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                } else {
-                                    val ok = CsvExporter.exportAndShare(context, items)
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(
-                                            if (ok) R.string.csv_exported else R.string.csv_export_failed
-                                        ),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(stringResource(R.string.settings_export_csv))
-                    }
+            NavCard(
+                icon = Icons.Default.History,
+                title = stringResource(R.string.settings_history),
+                subtitle = stringResource(R.string.settings_history_desc),
+                onClick = { nav.navigate(Routes.SETTINGS_HISTORY) }
+            )
 
-                    OutlinedButton(
-                        onClick = { showClearDialog = true },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(stringResource(R.string.settings_clear_history))
-                    }
-                }
-            }
-
-            // ===== ИКОНКА ПРИЛОЖЕНИЯ (перемещена сюда) =====
-            SectionTitle(stringResource(R.string.settings_icon))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconOption(AppIcon.BLUE, R.drawable.ic_launcher, currentIcon) {
-                        scope.launch {
-                            prefs.setAppIcon(AppIcon.BLUE)
-                            IconManager.setIcon(context, AppIcon.BLUE)
-                            Toast.makeText(context, context.getString(R.string.icon_changed), Toast.LENGTH_LONG).show()
-                        }
-                    }
-                    IconOption(AppIcon.DARK, R.drawable.ic_launcher_dark, currentIcon) {
-                        scope.launch {
-                            prefs.setAppIcon(AppIcon.DARK)
-                            IconManager.setIcon(context, AppIcon.DARK)
-                            Toast.makeText(context, context.getString(R.string.icon_changed), Toast.LENGTH_LONG).show()
-                        }
-                    }
-                    IconOption(AppIcon.GREEN, R.drawable.ic_launcher_green, currentIcon) {
-                        scope.launch {
-                            prefs.setAppIcon(AppIcon.GREEN)
-                            IconManager.setIcon(context, AppIcon.GREEN)
-                            Toast.makeText(context, context.getString(R.string.icon_changed), Toast.LENGTH_LONG).show()
-                        }
-                    }
-                    IconOption(AppIcon.PURPLE, R.drawable.ic_launcher_purple, currentIcon) {
-                        scope.launch {
-                            prefs.setAppIcon(AppIcon.PURPLE)
-                            IconManager.setIcon(context, AppIcon.PURPLE)
-                            Toast.makeText(context, context.getString(R.string.icon_changed), Toast.LENGTH_LONG).show()
-                        }
-                    }
-                }
-            }
-
-            // ===== НАШИ ПРИЛОЖЕНИЯ =====
-            SectionTitle(stringResource(R.string.settings_our_apps))
-            Card(
-                onClick = { IntentUtils.openUrlSafe(context, APPS_URL) },
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        Icons.Default.Apps,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(Modifier.padding(start = 12.dp))
-                    Column {
-                        Text(
-                            text = stringResource(R.string.settings_our_apps),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                        Text(
-                            text = stringResource(R.string.about_our_apps_desc),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                        )
-                    }
-                }
-            }
-
-            // ===== ПОДДЕРЖАТЬ АВТОРА =====
-            SectionTitle(stringResource(R.string.settings_support))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth().padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.settings_support_desc),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                    )
-                    OutlinedButton(
-                        onClick = {
-                            val ok = IntentUtils.openUrlSafe(context, DONATE_URL)
-                            Toast.makeText(
-                                context,
-                                context.getString(
-                                    if (ok) R.string.donate_success else R.string.link_error
-                                ),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(
-                            Icons.Default.Favorite,
-                            contentDescription = null,
-                            modifier = Modifier.padding(end = 6.dp)
-                        )
-                        Text(stringResource(R.string.settings_donate))
-                    }
-                }
-            }
-
-            // ===== ОБРАТНАЯ СВЯЗЬ =====
-            SectionTitle(stringResource(R.string.settings_feedback))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth().padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = {
-                            IntentUtils.openEmail(context, SUPPORT_EMAIL, "QR Tools")
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(
-                            Icons.Default.Email,
-                            contentDescription = null,
-                            modifier = Modifier.padding(end = 6.dp)
-                        )
-                        Text(stringResource(R.string.settings_email))
-                    }
-
-                    OutlinedButton(
-                        onClick = {
-                            IntentUtils.openUrlSafe(context, "https://t.me/$SUPPORT_TELEGRAM")
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(
-                            Icons.Default.Send,
-                            contentDescription = null,
-                            modifier = Modifier.padding(end = 6.dp)
-                        )
-                        Text(stringResource(R.string.settings_telegram))
-                    }
-                }
-            }
-
-            // ===== О ПРИЛОЖЕНИИ =====
-            SectionTitle(stringResource(R.string.settings_about))
-            Card(
-                onClick = { nav.navigate(Routes.ABOUT) },
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        Icons.Default.Info,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(Modifier.padding(start = 12.dp))
-                    Column {
-                        Text(
-                            text = stringResource(R.string.settings_about),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                        Text(
-                            text = stringResource(R.string.settings_about_desc),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                        )
-                    }
-                }
-            }
+            NavCard(
+                icon = Icons.Default.Info,
+                title = stringResource(R.string.settings_about),
+                subtitle = stringResource(R.string.settings_about_desc),
+                onClick = { nav.navigate(Routes.ABOUT) }
+            )
         }
     }
-
-    if (showClearDialog) {
-        AlertDialog(
-            onDismissRequest = { showClearDialog = false },
-            title = { Text(stringResource(R.string.clear_history_title)) },
-            text = { Text(stringResource(R.string.clear_history_desc)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    scope.launch {
-                        repo.clearAll()
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.history_cleared),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    showClearDialog = false
-                }) {
-                    Text(stringResource(R.string.clear_history_confirm))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showClearDialog = false }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            }
-        )
-    }
 }
 
 @Composable
-private fun SectionTitle(text: String) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.titleSmall,
-        color = MaterialTheme.colorScheme.primary
-    )
-}
-
-@Composable
-private fun SettingSwitch(
+private fun NavCard(
+    icon: ImageVector,
     title: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = title,
-            modifier = Modifier.weight(1f),
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Switch(checked = checked, onCheckedChange = onCheckedChange)
-    }
-}
-
-@Composable
-private fun IconOption(
-    icon: AppIcon,
-    drawableRes: Int,
-    current: AppIcon,
+    subtitle: String,
     onClick: () -> Unit
 ) {
-    val selected = current == icon
-    val borderColor = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .clip(CircleShape)
-            .clickable { onClick() }
-            .padding(4.dp)
+    Card(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Image(
-            painter = painterResource(drawableRes),
-            contentDescription = null,
+        Row(
             modifier = Modifier
-                .size(56.dp)
-                .clip(CircleShape)
-                .border(3.dp, borderColor, CircleShape)
-        )
-        Text(
-            text = when (icon) {
-                AppIcon.BLUE -> stringResource(R.string.icon_blue)
-                AppIcon.DARK -> stringResource(R.string.icon_dark)
-                AppIcon.GREEN -> stringResource(R.string.icon_green)
-                AppIcon.PURPLE -> stringResource(R.string.icon_purple)
-            },
-            style = MaterialTheme.typography.labelSmall,
-            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(top = 4.dp)
-        )
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(28.dp)
+            )
+            Spacer(Modifier.size(16.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+            }
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+            )
+        }
     }
 }
 
