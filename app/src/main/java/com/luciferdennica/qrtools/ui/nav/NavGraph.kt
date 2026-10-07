@@ -1,13 +1,16 @@
 package com.luciferdennica.qrtools.ui.nav
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.luciferdennica.qrtools.App
 import com.luciferdennica.qrtools.data.prefs.SettingsPrefs
 import com.luciferdennica.qrtools.data.repo.HistoryRepository
 import com.luciferdennica.qrtools.ui.screens.about.AboutScreen
@@ -41,6 +44,16 @@ object Routes {
 fun NavGraph(prefs: SettingsPrefs, historyRepo: HistoryRepository) {
     val nav = rememberNavController()
     val autoCopy by prefs.autoCopy.collectAsState(initial = false)
+    val context = LocalContext.current
+    val app = context.applicationContext as App
+
+    // Если пришли из виджета — сразу открываем сканер
+    LaunchedEffect(Unit) {
+        if (app.openScannerOnStart) {
+            app.openScannerOnStart = false
+            nav.navigate(Routes.SCANNER)
+        }
+    }
 
     NavHost(navController = nav, startDestination = Routes.HOME) {
         composable(Routes.HOME) { HomeScreen(nav) }
