@@ -142,7 +142,7 @@
     <string name="about_contacts">Kontakte</string>
     <string name="about_support">Projekt unterstützen</string>
     <string name="about_donate_button">DonationAlerts</string>
-    <string name="about_version_full">Version: 1.0.0</string>
+    <string name="about_version_full">Version: 1.1.0</string>
     <string name="about_app_title">Über</string>
     <string name="about_app_desc">QR Tools — schneller Scanner und Generator für QR-Codes und Barcodes. Unterstützt alle gängigen Formate, Galerie-Scan, Verlauf, Favoriten, Datenexport und WLAN-Verbindung per QR.</string>
     <string name="about_development">Entwicklung</string>
