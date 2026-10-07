@@ -301,7 +301,6 @@
     <string name="swipe_favorites">Favoriten öffnen</string>
     <string name="swipe_settings">Einstellungen öffnen</string>
 
-    <string name="settings_swipes">Gestes</string>
     <string name="settings_swipes_desc">Gestes de l\'écran d\'accueil</string>
     <string name="swipe_left">Glisser à gauche</string>
     <string name="swipe_right">Glisser à droite</string>
