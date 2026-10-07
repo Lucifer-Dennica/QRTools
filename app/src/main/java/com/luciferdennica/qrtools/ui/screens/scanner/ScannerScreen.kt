@@ -21,10 +21,8 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -33,13 +31,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -101,70 +97,68 @@ fun ScannerScreen(
         AdsManager.preloadInterstitial(context)
     }
 
-    // Одиночный выбор
+    // ОДНА кнопка — выбор 1 или нескольких
     val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        if (uri == null) return@rememberLauncherForActivityResult
-        QrCodeAnalyzer.decodeFromUri(
-            context = context,
-            uri = uri,
-            onResult = { barcode ->
-                val raw = barcode.rawValue
-                if (!raw.isNullOrBlank()) {
-                    scope.launch {
-                        val type = TypeDetector.detect(raw, barcode.format.toString())
-                        val saveHistory = prefs.getSaveHistoryOnce()
-                        val id = repo.add(raw, barcode.format.toString(), type, saveHistory)
-                        navigateAfterScan(nav, context, prefs, id)
-                    }
-                } else {
-                    Toast.makeText(context, context.getString(R.string.no_code_in_image), Toast.LENGTH_SHORT).show()
-                }
-            },
-            onError = {
-                Toast.makeText(context, context.getString(R.string.no_code_in_image), Toast.LENGTH_SHORT).show()
-            }
-        )
-    }
-
-    // Пакетный выбор
-    val batchLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()
     ) { uris: List<Uri> ->
         if (uris.isEmpty()) return@rememberLauncherForActivityResult
-        batchProcessing = true
-        scope.launch {
-            val saveHistory = prefs.getSaveHistoryOnce()
-            val results = QrCodeAnalyzer.decodeFromUris(context, uris)
 
-            var lastId: Long = -1
-            results.forEach { barcode ->
-                val raw = barcode.rawValue
-                if (!raw.isNullOrBlank()) {
-                    val type = TypeDetector.detect(raw, barcode.format.toString())
-                    lastId = repo.add(raw, barcode.format.toString(), type, saveHistory)
+        if (uris.size == 1) {
+            // Одиночный скан
+            QrCodeAnalyzer.decodeFromUri(
+                context = context,
+                uri = uris.first(),
+                onResult = { barcode ->
+                    val raw = barcode.rawValue
+                    if (!raw.isNullOrBlank()) {
+                        scope.launch {
+                            val type = TypeDetector.detect(raw, barcode.format.toString())
+                            val saveHistory = prefs.getSaveHistoryOnce()
+                            val id = repo.add(raw, barcode.format.toString(), type, saveHistory)
+                            navigateAfterScan(nav, context, prefs, id)
+                        }
+                    } else {
+                        Toast.makeText(context, context.getString(R.string.no_code_in_image), Toast.LENGTH_SHORT).show()
+                    }
+                },
+                onError = {
+                    Toast.makeText(context, context.getString(R.string.no_code_in_image), Toast.LENGTH_SHORT).show()
                 }
-            }
+            )
+        } else {
+            // Пакетный скан
+            batchProcessing = true
+            scope.launch {
+                val saveHistory = prefs.getSaveHistoryOnce()
+                val results = QrCodeAnalyzer.decodeFromUris(context, uris)
 
-            batchProcessing = false
+                var lastId: Long = -1
+                results.forEach { barcode ->
+                    val raw = barcode.rawValue
+                    if (!raw.isNullOrBlank()) {
+                        val type = TypeDetector.detect(raw, barcode.format.toString())
+                        lastId = repo.add(raw, barcode.format.toString(), type, saveHistory)
+                    }
+                }
 
-            if (results.isEmpty()) {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.batch_nothing),
-                    Toast.LENGTH_LONG
-                ).show()
-            } else {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.batch_result, results.size, uris.size),
-                    Toast.LENGTH_LONG
-                ).show()
-                // Переходим к последнему распознанному
-                if (lastId > 0) {
-                    nav.navigate(Routes.result(lastId)) {
-                        popUpTo(Routes.SCANNER) { inclusive = true }
+                batchProcessing = false
+
+                if (results.isEmpty()) {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.batch_nothing),
+                        Toast.LENGTH_LONG
+                    ).show()
+                } else {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.batch_result, results.size, uris.size),
+                        Toast.LENGTH_LONG
+                    ).show()
+                    if (lastId > 0) {
+                        nav.navigate(Routes.result(lastId)) {
+                            popUpTo(Routes.SCANNER) { inclusive = true }
+                        }
                     }
                 }
             }
@@ -216,45 +210,24 @@ fun ScannerScreen(
                     }
                 )
 
-                // Нижние кнопки
-                Column(
+                // ОДНА непрозрачная кнопка
+                Button(
+                    onClick = { galleryLauncher.launch("image/*") },
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                        .padding(24.dp),
+                    enabled = !batchProcessing
                 ) {
-                    OutlinedButton(
-                        onClick = { galleryLauncher.launch("image/*") },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = !batchProcessing
-                    ) {
-                        Icon(
-                            Icons.Default.Image,
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Text(
-                            "  " + stringResource(R.string.from_gallery),
-                            style = MaterialTheme.typography.titleSmall
-                        )
-                    }
-
-                    Button(
-                        onClick = { batchLauncher.launch("image/*") },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = !batchProcessing
-                    ) {
-                        Icon(
-                            Icons.Default.PhotoLibrary,
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Text(
-                            "  " + if (batchProcessing) "…" else stringResource(R.string.batch_scan),
-                            style = MaterialTheme.typography.titleSmall
-                        )
-                    }
+                    Icon(
+                        Icons.Default.Image,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(
+                        "  " + if (batchProcessing) "…" else stringResource(R.string.batch_scan),
+                        style = MaterialTheme.typography.titleSmall
+                    )
                 }
             }
         }
