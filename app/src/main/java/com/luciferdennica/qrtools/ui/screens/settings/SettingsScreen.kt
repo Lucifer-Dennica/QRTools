@@ -14,11 +14,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -43,9 +42,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.luciferdennica.qrtools.R
+import com.luciferdennica.qrtools.ui.components.BannerAd
 import com.luciferdennica.qrtools.ui.nav.Routes
 import com.luciferdennica.qrtools.util.LocaleHelper
 
@@ -75,84 +76,100 @@ fun SettingsScreen(nav: NavController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Язык
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Column(Modifier.fillMaxWidth().padding(12.dp)) {
-                    ExposedDropdownMenuBox(
-                        expanded = langExpanded,
-                        onExpandedChange = { langExpanded = it }
-                    ) {
-                        OutlinedTextField(
-                            value = langLabel(currentLang),
-                            onValueChange = {},
-                            readOnly = true,
-                            label = { Text(stringResource(R.string.settings_language)) },
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = langExpanded)
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
-                        )
-                        ExposedDropdownMenu(
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    Column(Modifier.fillMaxWidth().padding(12.dp)) {
+                        ExposedDropdownMenuBox(
                             expanded = langExpanded,
-                            onDismissRequest = { langExpanded = false }
+                            onExpandedChange = { langExpanded = it }
                         ) {
-                            listOf(
-                                "system" to R.string.lang_system,
-                                "ru" to R.string.lang_russian,
-                                "en" to R.string.lang_english,
-                                "zh" to R.string.lang_chinese
-                            ).forEach { (code, labelRes) ->
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(labelRes)) },
-                                    onClick = {
-                                        currentLang = code
-                                        langExpanded = false
-                                        LocaleHelper.setLang(context, code)
-                                        (context as? Activity)?.recreate()
-                                    }
-                                )
+                            OutlinedTextField(
+                                value = langLabel(currentLang),
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text(stringResource(R.string.settings_language)) },
+                                trailingIcon = {
+                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = langExpanded)
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
+                            )
+                            ExposedDropdownMenu(
+                                expanded = langExpanded,
+                                onDismissRequest = { langExpanded = false }
+                            ) {
+                                listOf(
+                                    "system" to R.string.lang_system,
+                                    "ru" to R.string.lang_russian,
+                                    "en" to R.string.lang_english,
+                                    "zh" to R.string.lang_chinese
+                                ).forEach { (code, labelRes) ->
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(labelRes)) },
+                                        onClick = {
+                                            currentLang = code
+                                            langExpanded = false
+                                            LocaleHelper.setLang(context, code)
+                                            (context as? Activity)?.recreate()
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
                 }
+
+                NavCard(
+                    icon = Icons.Default.Palette,
+                    title = stringResource(R.string.settings_design),
+                    subtitle = stringResource(R.string.settings_design_desc),
+                    onClick = { nav.navigate(Routes.SETTINGS_DESIGN) }
+                )
+
+                NavCard(
+                    icon = Icons.Default.Tune,
+                    title = stringResource(R.string.settings_behavior),
+                    subtitle = stringResource(R.string.settings_behavior_desc),
+                    onClick = { nav.navigate(Routes.SETTINGS_BEHAVIOR) }
+                )
+
+                NavCard(
+                    icon = Icons.Default.History,
+                    title = stringResource(R.string.settings_history),
+                    subtitle = stringResource(R.string.settings_history_desc),
+                    onClick = { nav.navigate(Routes.SETTINGS_HISTORY) }
+                )
+
+                NavCard(
+                    icon = Icons.Default.Info,
+                    title = stringResource(R.string.settings_about),
+                    subtitle = stringResource(R.string.settings_about_desc),
+                    onClick = { nav.navigate(Routes.ABOUT) }
+                )
+
+                Text(
+                    text = stringResource(R.string.settings_rate_text),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
+                )
             }
 
-            NavCard(
-                icon = Icons.Default.Palette,
-                title = stringResource(R.string.settings_design),
-                subtitle = stringResource(R.string.settings_design_desc),
-                onClick = { nav.navigate(Routes.SETTINGS_DESIGN) }
-            )
-
-            NavCard(
-                icon = Icons.Default.Tune,
-                title = stringResource(R.string.settings_behavior),
-                subtitle = stringResource(R.string.settings_behavior_desc),
-                onClick = { nav.navigate(Routes.SETTINGS_BEHAVIOR) }
-            )
-
-            NavCard(
-                icon = Icons.Default.History,
-                title = stringResource(R.string.settings_history),
-                subtitle = stringResource(R.string.settings_history_desc),
-                onClick = { nav.navigate(Routes.SETTINGS_HISTORY) }
-            )
-
-            NavCard(
-                icon = Icons.Default.Info,
-                title = stringResource(R.string.settings_about),
-                subtitle = stringResource(R.string.settings_about_desc),
-                onClick = { nav.navigate(Routes.ABOUT) }
-            )
+            BannerAd()
         }
     }
 }
