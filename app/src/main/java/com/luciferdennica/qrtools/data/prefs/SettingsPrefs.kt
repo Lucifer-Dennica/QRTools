@@ -13,8 +13,28 @@ import com.luciferdennica.qrtools.util.AppIcon
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import org.json.JSONArray
+import org.json.JSONObject
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "qrtools_prefs")
+
+/** Пресеты разрешения QR */
+enum class QrResolution(val size: Int) {
+    HD(1080),
+    TWO_K(2048),
+    FOUR_K(3840)
+}
+
+/** Шаблон стиля QR */
+data class QrTemplate(
+    val name: String,
+    val dotColor: Long,
+    val dotColor2: Long,
+    val bgColor: Long,
+    val bgColor2: Long,
+    val dotGradient: Boolean,
+    val bgGradient: Boolean
+)
 
 class SettingsPrefs(private val context: Context) {
 
@@ -28,6 +48,8 @@ class SettingsPrefs(private val context: Context) {
         private val KEY_ICON = stringPreferencesKey("app_icon")
         private val KEY_REVIEW_COUNTER = intPreferencesKey("review_counter")
         private val KEY_REVIEW_DONT_ASK = booleanPreferencesKey("review_dont_ask")
+        private val KEY_QR_RESOLUTION = stringPreferencesKey("qr_resolution")
+        private val KEY_QR_TEMPLATES = stringPreferencesKey("qr_templates")
 
         private val KEY_LAST_WIFI_SSID = stringPreferencesKey("last_wifi_ssid")
         private val KEY_LAST_WIFI_PASS = stringPreferencesKey("last_wifi_pass")
@@ -51,6 +73,15 @@ class SettingsPrefs(private val context: Context) {
         AppIcon.fromKey(it[KEY_ICON] ?: AppIcon.BLUE.key)
     }
 
+    val qrResolution: Flow<QrResolution> = context.dataStore.data.map {
+        val name = it[KEY_QR_RESOLUTION] ?: QrResolution.HD.name
+        runCatching { QrResolution.valueOf(name) }.getOrDefault(QrResolution.HD)
+    }
+
+    val qrTemplates: Flow<List<QrTemplate>> = context.dataStore.data.map {
+        parseTemplates(it[KEY_QR_TEMPLATES] ?: "[]")
+    }
+
     suspend fun setTheme(mode: ThemeMode) = context.dataStore.edit { it[KEY_THEME] = mode.name }
     suspend fun setAutoCopy(value: Boolean) = context.dataStore.edit { it[KEY_AUTO_COPY] = value }
     suspend fun setSound(value: Boolean) = context.dataStore.edit { it[KEY_SOUND] = value }
@@ -58,10 +89,14 @@ class SettingsPrefs(private val context: Context) {
     suspend fun setSaveHistory(value: Boolean) = context.dataStore.edit { it[KEY_SAVE_HISTORY] = value }
     suspend fun setAppIcon(icon: AppIcon) = context.dataStore.edit { it[KEY_ICON] = icon.key }
 
+    suspend fun setQrResolution(res: QrResolution) =
+        context.dataStore.edit { it[KEY_QR_RESOLUTION] = res.name }
+
     suspend fun getVibroOnce(): Boolean = vibro.first()
     suspend fun getSoundOnce(): Boolean = sound.first()
     suspend fun getAutoCopyOnce(): Boolean = autoCopy.first()
     suspend fun getSaveHistoryOnce(): Boolean = saveHistory.first()
+    suspend fun getQrResolutionOnce(): QrResolution = qrResolution.first()
 
     suspend fun incrementScanCounter(): Int {
         var result = 0
@@ -81,19 +116,12 @@ class SettingsPrefs(private val context: Context) {
         var shouldShow = false
         context.dataStore.edit { prefs ->
             val dontAsk = prefs[KEY_REVIEW_DONT_ASK] ?: false
-            if (dontAsk) {
-                shouldShow = false
-                return@edit
-            }
+            if (dontAsk) return@edit
             val cur = prefs[KEY_REVIEW_COUNTER] ?: 0
             val next = cur + 1
             prefs[KEY_REVIEW_COUNTER] = next
-
-            if (cur == 0 && next >= 10) {
-                shouldShow = true
-            } else if (cur >= 10 && next >= cur + 20) {
-                shouldShow = true
-            }
+            if (cur == 0 && next >= 10) shouldShow = true
+            else if (cur >= 10 && next >= cur + 20) shouldShow = true
         }
         return shouldShow
     }
@@ -142,5 +170,57 @@ class SettingsPrefs(private val context: Context) {
 
     suspend fun setLastText(text: String) {
         context.dataStore.edit { it[KEY_LAST_TEXT] = text }
+    }
+
+    // ===== ШАБЛОНЫ QR =====
+
+    suspend fun addQrTemplate(template: QrTemplate) {
+        context.dataStore.edit { prefs ->
+            val current = parseTemplates(prefs[KEY_QR_TEMPLATES] ?: "[]").toMutableList()
+            current.removeAll { it.name.equals(template.name, ignoreCase = true) }
+            current.add(template)
+            prefs[KEY_QR_TEMPLATES] = serializeTemplates(current)
+        }
+    }
+
+    suspend fun deleteQrTemplate(name: String) {
+        context.dataStore.edit { prefs ->
+            val current = parseTemplates(prefs[KEY_QR_TEMPLATES] ?: "[]").toMutableList()
+            current.removeAll { it.name.equals(name, ignoreCase = true) }
+            prefs[KEY_QR_TEMPLATES] = serializeTemplates(current)
+        }
+    }
+
+    private fun parseTemplates(json: String): List<QrTemplate> = runCatching {
+        val arr = JSONArray(json)
+        (0 until arr.length()).map { i ->
+            val o = arr.getJSONObject(i)
+            QrTemplate(
+                name = o.getString("name"),
+                dotColor = o.getLong("dotColor"),
+                dotColor2 = o.getLong("dotColor2"),
+                bgColor = o.getLong("bgColor"),
+                bgColor2 = o.getLong("bgColor2"),
+                dotGradient = o.getBoolean("dotGradient"),
+                bgGradient = o.getBoolean("bgGradient")
+            )
+        }
+    }.getOrDefault(emptyList())
+
+    private fun serializeTemplates(list: List<QrTemplate>): String {
+        val arr = JSONArray()
+        list.forEach { t ->
+            val o = JSONObject().apply {
+                put("name", t.name)
+                put("dotColor", t.dotColor)
+                put("dotColor2", t.dotColor2)
+                put("bgColor", t.bgColor)
+                put("bgColor2", t.bgColor2)
+                put("dotGradient", t.dotGradient)
+                put("bgGradient", t.bgGradient)
+            }
+            arr.put(o)
+        }
+        return arr.toString()
     }
 }
