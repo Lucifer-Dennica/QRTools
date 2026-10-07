@@ -225,4 +225,11 @@
     <string name="note_save">Save</string>
     <string name="note_remove">Delete</string>
     <string name="note_saved">Note saved</string>
+    
+    <string name="settings_save_history">Save scan history</string>
+    <string name="history_filter_all">All</string>
+    <string name="pin">Pin</string>
+    <string name="unpin">Unpin</string>
+    <string name="settings_clear_hidden">Delete hidden scans</string>
+    <string name="hidden_cleared">Hidden scans deleted</string>
 </resources>
