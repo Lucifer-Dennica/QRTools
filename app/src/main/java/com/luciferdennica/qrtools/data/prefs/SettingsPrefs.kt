@@ -18,14 +18,12 @@ import org.json.JSONObject
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "qrtools_prefs")
 
-/** Пресеты разрешения QR */
 enum class QrResolution(val size: Int) {
     HD(1080),
     TWO_K(2048),
     FOUR_K(3840)
 }
 
-/** Шаблон стиля QR */
 data class QrTemplate(
     val name: String,
     val dotColor: Long,
@@ -35,6 +33,16 @@ data class QrTemplate(
     val dotGradient: Boolean,
     val bgGradient: Boolean
 )
+
+/** Действия для свайпов */
+enum class SwipeAction {
+    OFF,
+    SCANNER,
+    GENERATOR,
+    HISTORY,
+    FAVORITES,
+    SETTINGS
+}
 
 class SettingsPrefs(private val context: Context) {
 
@@ -50,6 +58,11 @@ class SettingsPrefs(private val context: Context) {
         private val KEY_REVIEW_DONT_ASK = booleanPreferencesKey("review_dont_ask")
         private val KEY_QR_RESOLUTION = stringPreferencesKey("qr_resolution")
         private val KEY_QR_TEMPLATES = stringPreferencesKey("qr_templates")
+
+        private val KEY_SWIPE_LEFT = stringPreferencesKey("swipe_left")
+        private val KEY_SWIPE_RIGHT = stringPreferencesKey("swipe_right")
+        private val KEY_SWIPE_UP = stringPreferencesKey("swipe_up")
+        private val KEY_SWIPE_DOWN = stringPreferencesKey("swipe_down")
 
         private val KEY_LAST_WIFI_SSID = stringPreferencesKey("last_wifi_ssid")
         private val KEY_LAST_WIFI_PASS = stringPreferencesKey("last_wifi_pass")
@@ -82,6 +95,19 @@ class SettingsPrefs(private val context: Context) {
         parseTemplates(it[KEY_QR_TEMPLATES] ?: "[]")
     }
 
+    val swipeLeft: Flow<SwipeAction> = context.dataStore.data.map {
+        runCatching { SwipeAction.valueOf(it[KEY_SWIPE_LEFT] ?: "OFF") }.getOrDefault(SwipeAction.OFF)
+    }
+    val swipeRight: Flow<SwipeAction> = context.dataStore.data.map {
+        runCatching { SwipeAction.valueOf(it[KEY_SWIPE_RIGHT] ?: "OFF") }.getOrDefault(SwipeAction.OFF)
+    }
+    val swipeUp: Flow<SwipeAction> = context.dataStore.data.map {
+        runCatching { SwipeAction.valueOf(it[KEY_SWIPE_UP] ?: "OFF") }.getOrDefault(SwipeAction.OFF)
+    }
+    val swipeDown: Flow<SwipeAction> = context.dataStore.data.map {
+        runCatching { SwipeAction.valueOf(it[KEY_SWIPE_DOWN] ?: "OFF") }.getOrDefault(SwipeAction.OFF)
+    }
+
     suspend fun setTheme(mode: ThemeMode) = context.dataStore.edit { it[KEY_THEME] = mode.name }
     suspend fun setAutoCopy(value: Boolean) = context.dataStore.edit { it[KEY_AUTO_COPY] = value }
     suspend fun setSound(value: Boolean) = context.dataStore.edit { it[KEY_SOUND] = value }
@@ -92,11 +118,20 @@ class SettingsPrefs(private val context: Context) {
     suspend fun setQrResolution(res: QrResolution) =
         context.dataStore.edit { it[KEY_QR_RESOLUTION] = res.name }
 
+    suspend fun setSwipeLeft(a: SwipeAction) = context.dataStore.edit { it[KEY_SWIPE_LEFT] = a.name }
+    suspend fun setSwipeRight(a: SwipeAction) = context.dataStore.edit { it[KEY_SWIPE_RIGHT] = a.name }
+    suspend fun setSwipeUp(a: SwipeAction) = context.dataStore.edit { it[KEY_SWIPE_UP] = a.name }
+    suspend fun setSwipeDown(a: SwipeAction) = context.dataStore.edit { it[KEY_SWIPE_DOWN] = a.name }
+
     suspend fun getVibroOnce(): Boolean = vibro.first()
     suspend fun getSoundOnce(): Boolean = sound.first()
     suspend fun getAutoCopyOnce(): Boolean = autoCopy.first()
     suspend fun getSaveHistoryOnce(): Boolean = saveHistory.first()
     suspend fun getQrResolutionOnce(): QrResolution = qrResolution.first()
+    suspend fun getSwipeLeftOnce(): SwipeAction = swipeLeft.first()
+    suspend fun getSwipeRightOnce(): SwipeAction = swipeRight.first()
+    suspend fun getSwipeUpOnce(): SwipeAction = swipeUp.first()
+    suspend fun getSwipeDownOnce(): SwipeAction = swipeDown.first()
 
     suspend fun incrementScanCounter(): Int {
         var result = 0
@@ -171,8 +206,6 @@ class SettingsPrefs(private val context: Context) {
     suspend fun setLastText(text: String) {
         context.dataStore.edit { it[KEY_LAST_TEXT] = text }
     }
-
-    // ===== ШАБЛОНЫ QR =====
 
     suspend fun addQrTemplate(template: QrTemplate) {
         context.dataStore.edit { prefs ->
