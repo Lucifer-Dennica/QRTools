@@ -119,7 +119,6 @@
     <string name="settings_donate">Поддержать через DonationAlerts</string>
     <string name="settings_our_apps">Наши приложения</string>
     <string name="settings_about">О приложении</string>
-    <string name="settings_about_desc">Версия, автор, контакты</string>
 
     <string name="lang_system">Системный</string>
     <string name="lang_russian">Русский</string>
