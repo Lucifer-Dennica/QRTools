@@ -3,12 +3,6 @@ package com.luciferdennica.qrtools.qr
 import android.graphics.Bitmap
 import androidx.compose.ui.graphics.Color
 
-enum class DotShape(val titleRes: Int) {
-    SQUARE(com.luciferdennica.qrtools.R.string.shape_square),
-    ROUNDED(com.luciferdennica.qrtools.R.string.shape_rounded),
-    CIRCLE(com.luciferdennica.qrtools.R.string.shape_circle)
-}
-
 data class QrStyle(
     val dotColor: Color = Color(0xFF000000),
     val dotColor2: Color = Color(0xFF424242),
@@ -16,12 +10,10 @@ data class QrStyle(
     val bgColor2: Color = Color(0xFFE3F2FD),
     val dotGradient: Boolean = false,
     val bgGradient: Boolean = false,
-    val dotShape: DotShape = DotShape.SQUARE,
     val logo: Bitmap? = null,
     val logoBackground: Color = Color(0xFFFFFFFF)
 ) {
     companion object {
-        /** Палитра точек: (основной, парный для градиента) */
         val DOT_PALETTE: List<Pair<Color, Color>> = listOf(
             Color(0xFF000000) to Color(0xFF424242),
             Color(0xFFFFFFFF) to Color(0xFFBDBDBD),
@@ -38,7 +30,6 @@ data class QrStyle(
             Color(0xFF6D4C41) to Color(0xFFA1887F)
         )
 
-        /** Палитра фона */
         val BG_PALETTE: List<Pair<Color, Color>> = listOf(
             Color(0xFFFFFFFF) to Color(0xFFE3F2FD),
             Color(0xFFF5F5F5) to Color(0xFFEEEEEE),
@@ -52,17 +43,10 @@ data class QrStyle(
             Color(0xFFE0F7FA) to Color(0xFFB2EBF2)
         )
 
-        /** Готовые пресеты */
         val PRESETS: List<Pair<String, QrStyle>> = listOf(
             "Классика" to QrStyle(),
-            "Синий" to QrStyle(
-                dotColor = Color(0xFF0D47A1),
-                bgColor = Color(0xFFFFFFFF)
-            ),
-            "Тёмная" to QrStyle(
-                dotColor = Color(0xFFFFFFFF),
-                bgColor = Color(0xFF0A0A0A)
-            ),
+            "Синий" to QrStyle(dotColor = Color(0xFF0D47A1), bgColor = Color(0xFFFFFFFF)),
+            "Тёмная" to QrStyle(dotColor = Color(0xFFFFFFFF), bgColor = Color(0xFF0A0A0A)),
             "Закат" to QrStyle(
                 dotColor = Color(0xFFE53935),
                 dotColor2 = Color(0xFFFB8C00),
