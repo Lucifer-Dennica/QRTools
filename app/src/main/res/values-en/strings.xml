@@ -262,4 +262,20 @@
     <string name="import_confirm_title">Import records?</string>
     <string name="import_confirm_desc">Current history will be kept. New records will be added.</string>
     <string name="import_confirm_yes">Import</string>
+    
+    <string name="settings_qr_resolution">QR resolution</string>
+    <string name="resolution_hd">HD — 1080×1080</string>
+    <string name="resolution_2k">2K — 2048×2048</string>
+    <string name="resolution_4k">4K — 3840×3840</string>
+
+    <string name="from_clipboard">From clipboard</string>
+    <string name="clipboard_no_image">No image in clipboard</string>
+
+    <string name="qr_templates">My templates</string>
+    <string name="qr_template_save">Save as template</string>
+    <string name="qr_template_name_hint">Template name</string>
+    <string name="qr_template_saved">Template saved</string>
+    <string name="qr_template_deleted">Template deleted</string>
+    <string name="qr_template_delete">Delete template</string>
+    <string name="qr_template_confirm_delete">Delete template "%1$s"?</string>
 </resources>
