@@ -289,4 +289,17 @@
     <string name="batch_create_done">Done: %1$d of %2$d</string>
     <string name="batch_create_nothing">Failed to create any QR</string>
     <string name="batch_create_open_folder">Open folder</string>
+
+    <string name="settings_swipes">Swipes</string>
+    <string name="settings_swipes_desc">Home screen gestures</string>
+    <string name="swipe_left">Swipe left</string>
+    <string name="swipe_right">Swipe right</string>
+    <string name="swipe_up">Swipe up</string>
+    <string name="swipe_down">Swipe down</string>
+    <string name="swipe_off">Disabled</string>
+    <string name="swipe_scanner">Open scanner</string>
+    <string name="swipe_generator">Open generator</string>
+    <string name="swipe_history">Open history</string>
+    <string name="swipe_favorites">Open favorites</string>
+    <string name="swipe_settings">Open settings</string>
 </resources>
