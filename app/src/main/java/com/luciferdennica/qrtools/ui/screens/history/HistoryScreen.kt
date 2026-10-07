@@ -1,6 +1,7 @@
 package com.luciferdennica.qrtools.ui.screens.history
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -28,6 +30,7 @@ import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Notes
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Search
@@ -37,6 +40,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -91,12 +95,19 @@ fun HistoryScreen(nav: NavController, repo: HistoryRepository, autoCopy: Boolean
     val scope = rememberCoroutineScope()
 
     var query by remember { mutableStateOf("") }
+    var selectedType by remember { mutableStateOf<ScanType?>(null) }
     var selectionMode by remember { mutableStateOf(false) }
     val selectedIds = remember { mutableStateListOf<Long>() }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
-    val items by (if (query.isBlank()) repo.getAll() else repo.search(query))
-        .collectAsState(initial = emptyList())
+    val items by remember(selectedType, query) {
+        when {
+            selectedType == null && query.isBlank() -> repo.getAll()
+            selectedType == null -> repo.search(query)
+            query.isBlank() -> repo.getByType(selectedType!!)
+            else -> repo.searchByType(selectedType!!, query)
+        }
+    }.collectAsState(initial = emptyList())
 
     val todayLabel = stringResource(R.string.history_today)
     val yesterdayLabel = stringResource(R.string.history_yesterday)
@@ -181,6 +192,39 @@ fun HistoryScreen(nav: NavController, repo: HistoryRepository, autoCopy: Boolean
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 )
+
+                // Фильтр по типу
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    FilterChip(
+                        selected = selectedType == null,
+                        onClick = { selectedType = null },
+                        label = { Text(stringResource(R.string.history_filter_all)) }
+                    )
+                    listOf(
+                        ScanType.URL,
+                        ScanType.WIFI,
+                        ScanType.CONTACT,
+                        ScanType.BARCODE,
+                        ScanType.TEXT,
+                        ScanType.EMAIL,
+                        ScanType.PHONE,
+                        ScanType.SMS
+                    ).forEach { type ->
+                        FilterChip(
+                            selected = selectedType == type,
+                            onClick = {
+                                selectedType = if (selectedType == type) null else type
+                            },
+                            label = { Text(stringResource(type.titleRes)) }
+                        )
+                    }
+                }
             }
 
             if (items.isEmpty()) {
@@ -227,6 +271,7 @@ fun HistoryScreen(nav: NavController, repo: HistoryRepository, autoCopy: Boolean
                                     }
                                 },
                                 onToggleFavorite = { scope.launch { repo.toggleFavorite(item.entity) } },
+                                onTogglePinned = { scope.launch { repo.togglePinned(item.entity) } },
                                 onDelete = { scope.launch { repo.delete(item.entity) } }
                             )
                         }
@@ -282,6 +327,7 @@ private fun ScanRow(
     onToggleSelect: () -> Unit,
     onClick: () -> Unit,
     onToggleFavorite: () -> Unit,
+    onTogglePinned: () -> Unit,
     onDelete: () -> Unit
 ) {
     val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
@@ -329,13 +375,24 @@ private fun ScanRow(
             }
 
             Column(Modifier.weight(1f)) {
-                Text(
-                    text = displayTitle,
-                    style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (item.isPinned) {
+                        Icon(
+                            imageVector = Icons.Default.PushPin,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(Modifier.size(4.dp))
+                    }
+                    Text(
+                        text = displayTitle,
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
                 if (item.note.isNotBlank()) {
                     Text(
                         text = "📝 ${item.note}",
@@ -356,6 +413,14 @@ private fun ScanRow(
             }
 
             if (!selectionMode) {
+                IconButton(onClick = onTogglePinned) {
+                    Icon(
+                        imageVector = Icons.Default.PushPin,
+                        contentDescription = stringResource(if (item.isPinned) R.string.unpin else R.string.pin),
+                        tint = if (item.isPinned) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                    )
+                }
                 IconButton(onClick = onToggleFavorite) {
                     Icon(
                         imageVector = if (item.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
@@ -393,7 +458,9 @@ private fun buildGroupedList(
     var lastHeader: String? = null
 
     items.forEach { item ->
+        // Закреплённые показываем без группировки по дням
         val header = when {
+            item.isPinned -> "📌"
             item.timestamp >= todayStart -> todayLabel
             item.timestamp >= yesterdayStart -> yesterdayLabel
             else -> dateFormat.format(Date(item.timestamp))
