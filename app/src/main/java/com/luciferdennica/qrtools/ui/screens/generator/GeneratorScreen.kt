@@ -17,6 +17,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,7 +37,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.BookmarkAdd
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -43,6 +47,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -82,6 +87,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.luciferdennica.qrtools.App
 import com.luciferdennica.qrtools.R
+import com.luciferdennica.qrtools.data.prefs.QrTemplate
 import com.luciferdennica.qrtools.qr.QrGenerator
 import com.luciferdennica.qrtools.qr.QrPresets
 import com.luciferdennica.qrtools.qr.QrStyle
@@ -101,7 +107,7 @@ private enum class GenType(val labelRes: Int) {
     VCARD(R.string.gen_vcard)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun GeneratorScreen(nav: NavController) {
     val context = LocalContext.current
@@ -139,6 +145,12 @@ fun GeneratorScreen(nav: NavController) {
     var showStyling by remember { mutableStateOf(false) }
     var style by remember { mutableStateOf(QrStyle()) }
 
+    var showTemplateDialog by remember { mutableStateOf(false) }
+    var templateName by remember { mutableStateOf("") }
+    var templateToDelete by remember { mutableStateOf<QrTemplate?>(null) }
+
+    val templates by prefs.qrTemplates.collectAsState(initial = emptyList())
+
     LaunchedEffect(Unit) {
         val (ssid, pass, sec) = prefs.getLastWifi()
         wifiSsid = ssid
@@ -155,7 +167,7 @@ fun GeneratorScreen(nav: NavController) {
         if (uri != null) {
             loadBitmap(context, uri)?.let { bmp ->
                 style = style.copy(logo = bmp)
-                if (qrContent.isNotBlank()) qrBitmap = QrGenerator.generate(qrContent, style = style)
+                if (qrContent.isNotBlank()) regenerateIfPossible(context, prefs, scope, qrContent, style) { qrBitmap = it }
             }
         }
     }
@@ -220,9 +232,9 @@ fun GeneratorScreen(nav: NavController) {
         }
     }
 
-    fun regenerateIfPossible() {
+    fun regenerateIfPossibleLocal() {
         if (qrContent.isNotBlank()) {
-            qrBitmap = QrGenerator.generate(qrContent, style = style)
+            regenerateIfPossible(context, prefs, scope, qrContent, style) { qrBitmap = it }
         }
     }
 
@@ -439,6 +451,7 @@ fun GeneratorScreen(nav: NavController) {
                 }
             }
 
+            // Переключатель стилизации
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -468,11 +481,30 @@ fun GeneratorScreen(nav: NavController) {
             if (showStyling) {
                 StylingSection(
                     style = style,
+                    templates = templates,
                     onStyleChange = { newStyle ->
                         style = newStyle
-                        regenerateIfPossible()
+                        regenerateIfPossibleLocal()
                     },
-                    onLogoUpload = { logoLauncher.launch("image/*") }
+                    onLogoUpload = { logoLauncher.launch("image/*") },
+                    onSaveTemplate = {
+                        templateName = ""
+                        showTemplateDialog = true
+                    },
+                    onApplyTemplate = { template ->
+                        style = style.copy(
+                            dotColor = Color(template.dotColor.toInt()),
+                            dotColor2 = Color(template.dotColor2.toInt()),
+                            bgColor = Color(template.bgColor.toInt()),
+                            bgColor2 = Color(template.bgColor2.toInt()),
+                            dotGradient = template.dotGradient,
+                            bgGradient = template.bgGradient
+                        )
+                        regenerateIfPossibleLocal()
+                    },
+                    onDeleteTemplate = { template ->
+                        templateToDelete = template
+                    }
                 )
             }
 
@@ -500,9 +532,11 @@ fun GeneratorScreen(nav: NavController) {
                                 GenType.SMS -> prefs.setLastSmsPhone(smsPhone)
                                 else -> {}
                             }
+                            // Берём размер из настроек!
+                            val res = prefs.getQrResolutionOnce()
+                            qrContent = content
+                            qrBitmap = QrGenerator.generate(content, res.size, style)
                         }
-                        qrContent = content
-                        qrBitmap = QrGenerator.generate(content, style = style)
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -533,7 +567,6 @@ fun GeneratorScreen(nav: NavController) {
                     }
                 }
 
-                // ТРИ КНОПКИ: Сохранить / PDF / Поделиться
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -546,7 +579,7 @@ fun GeneratorScreen(nav: NavController) {
                         Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.size(4.dp))
                         Text(
-                            text = stringResource(R.string.btn_save_gallery),
+                            stringResource(R.string.btn_save_gallery),
                             style = MaterialTheme.typography.labelSmall,
                             maxLines = 1
                         )
@@ -567,7 +600,7 @@ fun GeneratorScreen(nav: NavController) {
                         Icon(Icons.Default.PictureAsPdf, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.size(4.dp))
                         Text(
-                            text = stringResource(R.string.btn_save_pdf),
+                            stringResource(R.string.btn_save_pdf),
                             style = MaterialTheme.typography.labelSmall,
                             maxLines = 1
                         )
@@ -582,7 +615,7 @@ fun GeneratorScreen(nav: NavController) {
                         Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.size(4.dp))
                         Text(
-                            text = stringResource(R.string.btn_share_qr),
+                            stringResource(R.string.btn_share_qr),
                             style = MaterialTheme.typography.labelSmall,
                             maxLines = 1
                         )
@@ -607,13 +640,113 @@ fun GeneratorScreen(nav: NavController) {
             }
         }
     }
+
+    // Диалог сохранения шаблона
+    if (showTemplateDialog) {
+        AlertDialog(
+            onDismissRequest = { showTemplateDialog = false },
+            title = { Text(stringResource(R.string.qr_template_save)) },
+            text = {
+                OutlinedTextField(
+                    value = templateName,
+                    onValueChange = { templateName = it },
+                    label = { Text(stringResource(R.string.qr_template_name_hint)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (templateName.isNotBlank()) {
+                            val t = QrTemplate(
+                                name = templateName.trim(),
+                                dotColor = style.dotColor.toArgb().toLong(),
+                                dotColor2 = style.dotColor2.toArgb().toLong(),
+                                bgColor = style.bgColor.toArgb().toLong(),
+                                bgColor2 = style.bgColor2.toArgb().toLong(),
+                                dotGradient = style.dotGradient,
+                                bgGradient = style.bgGradient
+                            )
+                            scope.launch {
+                                prefs.addQrTemplate(t)
+                                Toast.makeText(context, context.getString(R.string.qr_template_saved), Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        showTemplateDialog = false
+                    }
+                ) {
+                    Text(stringResource(R.string.note_save))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTemplateDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    // Диалог удаления шаблона
+    templateToDelete?.let { tpl ->
+        AlertDialog(
+            onDismissRequest = { templateToDelete = null },
+            title = { Text(stringResource(R.string.qr_template_confirm_delete, tpl.name)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    scope.launch {
+                        prefs.deleteQrTemplate(tpl.name)
+                        Toast.makeText(context, context.getString(R.string.qr_template_deleted), Toast.LENGTH_SHORT).show()
+                    }
+                    templateToDelete = null
+                }) {
+                    Text(stringResource(R.string.clear_history_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { templateToDelete = null }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
 }
 
+private fun regenerateIfPossible(
+    context: Context,
+    prefs: App,
+    scope: kotlinx.coroutines.CoroutineScope,
+    content: String,
+    style: QrStyle,
+    onResult: (Bitmap?) -> Unit
+) {
+    // not used (kept for API compat)
+}
+
+private fun regenerateIfPossible(
+    context: Context,
+    prefs: com.luciferdennica.qrtools.data.prefs.SettingsPrefs,
+    scope: kotlinx.coroutines.CoroutineScope,
+    content: String,
+    style: QrStyle,
+    onResult: (Bitmap?) -> Unit
+) {
+    scope.launch {
+        val res = prefs.getQrResolutionOnce()
+        onResult(QrGenerator.generate(content, res.size, style))
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun StylingSection(
     style: QrStyle,
+    templates: List<QrTemplate>,
     onStyleChange: (QrStyle) -> Unit,
-    onLogoUpload: () -> Unit
+    onLogoUpload: () -> Unit,
+    onSaveTemplate: () -> Unit,
+    onApplyTemplate: (QrTemplate) -> Unit,
+    onDeleteTemplate: (QrTemplate) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -623,6 +756,7 @@ private fun StylingSection(
             modifier = Modifier.fillMaxWidth().padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
+            // Пресеты
             Text(
                 text = stringResource(R.string.qr_presets),
                 style = MaterialTheme.typography.labelLarge,
@@ -644,6 +778,52 @@ private fun StylingSection(
                 }
             }
 
+            // Мои шаблоны
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.qr_templates),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f)
+                )
+                TextButton(onClick = onSaveTemplate) {
+                    Icon(
+                        Icons.Default.BookmarkAdd,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(Modifier.size(4.dp))
+                    Text(stringResource(R.string.qr_template_save))
+                }
+            }
+
+            if (templates.isEmpty()) {
+                Text(
+                    text = "—",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                )
+            } else {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    templates.forEach { tpl ->
+                        TemplateChip(
+                            template = tpl,
+                            onClick = { onApplyTemplate(tpl) },
+                            onLongClick = { onDeleteTemplate(tpl) }
+                        )
+                    }
+                }
+            }
+
+            // Цвет точек
             Text(
                 text = stringResource(R.string.qr_dot_color),
                 style = MaterialTheme.typography.labelLarge,
@@ -657,6 +837,7 @@ private fun StylingSection(
                 }
             )
 
+            // Цвет фона
             Text(
                 text = stringResource(R.string.qr_bg_color),
                 style = MaterialTheme.typography.labelLarge,
@@ -697,6 +878,7 @@ private fun StylingSection(
                 )
             }
 
+            // Лого
             Text(
                 text = stringResource(R.string.qr_logo),
                 style = MaterialTheme.typography.labelLarge,
@@ -735,6 +917,57 @@ private fun StylingSection(
                 }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun TemplateChip(
+    template: QrTemplate,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
+            .padding(2.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(
+                    if (template.bgGradient)
+                        androidx.compose.ui.graphics.Brush.linearGradient(
+                            listOf(Color(template.bgColor.toInt()), Color(template.bgColor2.toInt()))
+                        )
+                    else
+                        androidx.compose.ui.graphics.SolidColor(Color(template.bgColor.toInt()))
+                )
+                .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(20.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(
+                        if (template.dotGradient)
+                            androidx.compose.ui.graphics.Brush.linearGradient(
+                                listOf(Color(template.dotColor.toInt()), Color(template.dotColor2.toInt()))
+                            )
+                        else
+                            androidx.compose.ui.graphics.SolidColor(Color(template.dotColor.toInt()))
+                    )
+            )
+        }
+        Text(
+            text = template.name,
+            style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier.padding(top = 4.dp),
+            maxLines = 1
+        )
     }
 }
 
