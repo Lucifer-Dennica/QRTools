@@ -23,12 +23,12 @@ class SettingsPrefs(private val context: Context) {
         private val KEY_AUTO_COPY = booleanPreferencesKey("auto_copy")
         private val KEY_SOUND = booleanPreferencesKey("sound")
         private val KEY_VIBRO = booleanPreferencesKey("vibro")
+        private val KEY_SAVE_HISTORY = booleanPreferencesKey("save_history")
         private val KEY_SCAN_COUNTER = intPreferencesKey("scan_counter")
         private val KEY_ICON = stringPreferencesKey("app_icon")
         private val KEY_REVIEW_COUNTER = intPreferencesKey("review_counter")
         private val KEY_REVIEW_DONT_ASK = booleanPreferencesKey("review_dont_ask")
 
-        // Последние введённые данные
         private val KEY_LAST_WIFI_SSID = stringPreferencesKey("last_wifi_ssid")
         private val KEY_LAST_WIFI_PASS = stringPreferencesKey("last_wifi_pass")
         private val KEY_LAST_WIFI_SEC = stringPreferencesKey("last_wifi_sec")
@@ -45,6 +45,7 @@ class SettingsPrefs(private val context: Context) {
     val autoCopy: Flow<Boolean> = context.dataStore.data.map { it[KEY_AUTO_COPY] ?: false }
     val sound: Flow<Boolean> = context.dataStore.data.map { it[KEY_SOUND] ?: true }
     val vibro: Flow<Boolean> = context.dataStore.data.map { it[KEY_VIBRO] ?: true }
+    val saveHistory: Flow<Boolean> = context.dataStore.data.map { it[KEY_SAVE_HISTORY] ?: true }
 
     val appIcon: Flow<AppIcon> = context.dataStore.data.map {
         AppIcon.fromKey(it[KEY_ICON] ?: AppIcon.BLUE.key)
@@ -54,11 +55,13 @@ class SettingsPrefs(private val context: Context) {
     suspend fun setAutoCopy(value: Boolean) = context.dataStore.edit { it[KEY_AUTO_COPY] = value }
     suspend fun setSound(value: Boolean) = context.dataStore.edit { it[KEY_SOUND] = value }
     suspend fun setVibro(value: Boolean) = context.dataStore.edit { it[KEY_VIBRO] = value }
+    suspend fun setSaveHistory(value: Boolean) = context.dataStore.edit { it[KEY_SAVE_HISTORY] = value }
     suspend fun setAppIcon(icon: AppIcon) = context.dataStore.edit { it[KEY_ICON] = icon.key }
 
     suspend fun getVibroOnce(): Boolean = vibro.first()
     suspend fun getSoundOnce(): Boolean = sound.first()
     suspend fun getAutoCopyOnce(): Boolean = autoCopy.first()
+    suspend fun getSaveHistoryOnce(): Boolean = saveHistory.first()
 
     suspend fun incrementScanCounter(): Int {
         var result = 0
@@ -73,8 +76,6 @@ class SettingsPrefs(private val context: Context) {
     suspend fun resetScanCounter() {
         context.dataStore.edit { it[KEY_SCAN_COUNTER] = 0 }
     }
-
-    // ===== ОЦЕНКА ПРИЛОЖЕНИЯ =====
 
     suspend fun shouldShowReviewDialog(): Boolean {
         var shouldShow = false
@@ -104,8 +105,6 @@ class SettingsPrefs(private val context: Context) {
     suspend fun resetReviewCounter() {
         context.dataStore.edit { it[KEY_REVIEW_COUNTER] = 10 }
     }
-
-    // ===== ПОСЛЕДНИЕ ВВЕДЁННЫЕ ДАННЫЕ =====
 
     suspend fun getLastWifi(): Triple<String, String, String> {
         val prefs = context.dataStore.data.first()
