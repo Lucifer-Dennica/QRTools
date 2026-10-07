@@ -114,6 +114,9 @@ fun SettingsScreen(nav: NavController) {
                                     "ru" to R.string.lang_russian,
                                     "en" to R.string.lang_english,
                                     "zh" to R.string.lang_chinese
+                                    "es" to R.string.lang_spanish,
+                                    "de" to R.string.lang_german,
+                                    "fr" to R.string.lang_french
                                 ).forEach { (code, labelRes) ->
                                     DropdownMenuItem(
                                         text = { Text(stringResource(labelRes)) },
