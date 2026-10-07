@@ -239,4 +239,8 @@
     
     <string name="batch_scan">From gallery</string>
     <string name="settings_rate_text">We\'d love your feedback about our app in the store</string>
+    <string name="btn_save_pdf">Save as PDF</string>
+    <string name="pdf_saved">PDF saved to Downloads</string>
+    <string name="pdf_failed">Failed to save PDF</string>
+    <string name="pdf_share">Share PDF</string>
 </resources>
