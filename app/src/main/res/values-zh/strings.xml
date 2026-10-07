@@ -242,7 +242,7 @@
     <string name="pdf_saved">PDF 已保存到下载</string>
     <string name="pdf_failed">保存 PDF 失败</string>
     <string name="pdf_share">分享 PDF</string>
-    <!-- 名片 -->
+    
     <string name="gen_vcard">名片</string>
     <string name="field_vcard_firstname">名字</string>
     <string name="field_vcard_lastname">姓氏</string>
@@ -255,4 +255,11 @@
     <string name="field_vcard_note">备注</string>
     <string name="widget_desc">快速访问扫描器</string>
     <string name="widget_scan">扫描</string>
+    <string name="settings_import_csv">从 CSV 导入</string>
+    <string name="import_success">已导入记录: %1$d</string>
+    <string name="import_failed">导入失败</string>
+    <string name="import_empty">文件为空或格式错误</string>
+    <string name="import_confirm_title">导入记录？</string>
+    <string name="import_confirm_desc">当前历史将保留。新记录将添加。</string>
+    <string name="import_confirm_yes">导入</string>
 </resources>
