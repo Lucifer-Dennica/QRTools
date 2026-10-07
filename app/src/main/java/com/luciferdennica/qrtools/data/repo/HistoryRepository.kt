@@ -16,10 +16,6 @@ class HistoryRepository(private val dao: ScanDao) {
         dao.searchByType(type.name, query)
     suspend fun getById(id: Long): ScanEntity? = dao.getById(id)
 
-    /**
-     * Добавляет скан в историю.
-     * @param saveToHistory — если false, запись помечается isHidden и не показывается в списке
-     */
     suspend fun add(
         content: String,
         format: String,
@@ -59,6 +55,8 @@ class HistoryRepository(private val dao: ScanDao) {
     suspend fun delete(item: ScanEntity) = dao.delete(item)
 
     suspend fun deleteByIds(ids: List<Long>) = dao.deleteByIds(ids)
+
+    suspend fun clearHidden() = dao.clearHidden()
 
     suspend fun clearAll() = dao.clearAll()
 }
