@@ -242,4 +242,15 @@
     <string name="pdf_saved">PDF 已保存到下载</string>
     <string name="pdf_failed">保存 PDF 失败</string>
     <string name="pdf_share">分享 PDF</string>
+    <!-- 名片 -->
+    <string name="gen_vcard">名片</string>
+    <string name="field_vcard_firstname">名字</string>
+    <string name="field_vcard_lastname">姓氏</string>
+    <string name="field_vcard_company">公司</string>
+    <string name="field_vcard_position">职位</string>
+    <string name="field_vcard_phone">电话</string>
+    <string name="field_vcard_email">邮箱</string>
+    <string name="field_vcard_website">网站</string>
+    <string name="field_vcard_address">地址</string>
+    <string name="field_vcard_note">备注</string>
 </resources>
