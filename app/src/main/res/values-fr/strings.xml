@@ -118,7 +118,6 @@
     <string name="settings_donate">Don via DonationAlerts</string>
     <string name="settings_our_apps">Nos apps</string>
     <string name="settings_about">À propos</string>
-    <string name="settings_about_desc">Version, auteur, info</string>
 
     <string name="lang_system">Système</string>
     <string name="lang_russian">Русский</string>
@@ -142,7 +141,7 @@
     <string name="about_contacts">Contacts</string>
     <string name="about_support">Soutenir le projet</string>
     <string name="about_donate_button">DonationAlerts</string>
-    <string name="about_version_full">Version : 1.1.0</string>
+    <string name="about_version_full">Version : 1.0.0</string>
     <string name="about_app_title">À propos</string>
     <string name="about_app_desc">QR Tools — scanner et générateur rapide de codes QR et-barres. Prend en charge tous les formats populaires, scan depuis la galerie, historique, favoris, export de données et connexion WiFi par QR.</string>
     <string name="about_development">Développement</string>
@@ -200,6 +199,7 @@
     <string name="settings_design_desc">Thème et icône de l\'app</string>
     <string name="settings_behavior_desc">Son, vibration et copie</string>
     <string name="settings_history_desc">Export et suppression</string>
+    <string name="settings_about_desc">Version, auteur, info</string>
 
     <string name="gen_vcard">Carte de visite</string>
     <string name="field_vcard_firstname">Prénom</string>
