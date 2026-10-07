@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Refresh
@@ -65,6 +66,7 @@ import com.luciferdennica.qrtools.R
 import com.luciferdennica.qrtools.data.db.ScanEntity
 import com.luciferdennica.qrtools.data.repo.HistoryRepository
 import com.luciferdennica.qrtools.domain.model.ScanType
+import com.luciferdennica.qrtools.ui.components.NoteDialog
 import com.luciferdennica.qrtools.ui.components.Placeholder
 import com.luciferdennica.qrtools.ui.nav.Routes
 import com.luciferdennica.qrtools.util.ClipboardUtils
@@ -85,6 +87,7 @@ fun ResultScreen(nav: NavController, repo: HistoryRepository, id: Long) {
     val scope = rememberCoroutineScope()
     var item by remember { mutableStateOf<ScanEntity?>(null) }
     var showRaw by remember { mutableStateOf(false) }
+    var showNoteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(id) { item = repo.getById(id) }
 
@@ -123,12 +126,41 @@ fun ResultScreen(nav: NavController, repo: HistoryRepository, id: Long) {
                         item = repo.getById(data.id)
                     }
                 },
+                onEditNote = { showNoteDialog = true },
                 onScanAgain = {
                     nav.navigate(Routes.SCANNER) { popUpTo(Routes.HOME) }
                 },
                 context = context
             )
         }
+    }
+
+    // Диалог заметки
+    val currentItem = item
+    if (showNoteDialog && currentItem != null) {
+        NoteDialog(
+            initialNote = currentItem.note,
+            onSave = { note ->
+                scope.launch {
+                    repo.setNote(currentItem.id, note)
+                    item = repo.getById(currentItem.id)
+                    showNoteDialog = false
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.note_saved),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            },
+            onDelete = {
+                scope.launch {
+                    repo.setNote(currentItem.id, "")
+                    item = repo.getById(currentItem.id)
+                    showNoteDialog = false
+                }
+            },
+            onDismiss = { showNoteDialog = false }
+        )
     }
 }
 
@@ -138,6 +170,7 @@ private fun ResultContent(
     showRaw: Boolean,
     onToggleRaw: () -> Unit,
     onToggleFavorite: () -> Unit,
+    onEditNote: () -> Unit,
     onScanAgain: () -> Unit,
     context: Context
 ) {
@@ -158,6 +191,7 @@ private fun ResultContent(
             color = MaterialTheme.colorScheme.primary
         )
 
+        // Основная карточка в зависимости от типа
         when {
             data.type == ScanType.WIFI.name -> {
                 val wifi = WifiParser.parse(data.content)
@@ -174,6 +208,31 @@ private fun ResultContent(
             else -> RawCard(data.content)
         }
 
+        // Заметка (если есть)
+        if (data.note.isNotBlank()) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            ) {
+                Column(Modifier.padding(12.dp)) {
+                    Text(
+                        text = "📝 ${stringResource(R.string.note_title)}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = data.note,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            }
+        }
+
+        // Кнопка «Открыть» для URL/email/phone
         if (data.type == ScanType.URL.name ||
             data.type == ScanType.EMAIL.name ||
             data.type == ScanType.PHONE.name
@@ -218,6 +277,24 @@ private fun ResultContent(
             )
             Spacer(Modifier.size(8.dp))
             Text(stringResource(R.string.action_share))
+        }
+
+        // Заметка — кнопка
+        OutlinedButton(
+            onClick = onEditNote,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(Modifier.size(8.dp))
+            Text(
+                stringResource(
+                    if (data.note.isBlank()) R.string.note_add else R.string.note_edit
+                )
+            )
         }
 
         OutlinedButton(
