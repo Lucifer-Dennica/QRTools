@@ -193,4 +193,13 @@
     <string name="off_quantity">Объём</string>
     <string name="off_categories">Категории</string>
     <string name="off_show_details">Открыть в Open Food Facts</string>
+    <!-- Пресеты QR -->
+    <string name="preset_classic">Классика</string>
+    <string name="preset_blue">Синий</string>
+    <string name="preset_dark">Тёмная</string>
+    <string name="preset_sunset">Закат</string>
+    <string name="preset_ocean">Океан</string>
+    <string name="preset_forest">Лес</string>
+    <string name="preset_amethyst">Аметист</string>
+    <string name="preset_inverse">Инверсия</string>
 </resources>
