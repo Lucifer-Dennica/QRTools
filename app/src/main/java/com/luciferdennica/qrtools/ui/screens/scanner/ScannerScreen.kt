@@ -107,7 +107,8 @@ fun ScannerScreen(
                 if (!raw.isNullOrBlank()) {
                     scope.launch {
                         val type = TypeDetector.detect(raw, barcode.format.toString())
-                        val id = repo.add(raw, barcode.format.toString(), type)
+                        val saveHistory = prefs.getSaveHistoryOnce()
+                        val id = repo.add(raw, barcode.format.toString(), type, saveHistory)
                         navigateAfterScan(nav, context, prefs, id)
                     }
                 } else {
