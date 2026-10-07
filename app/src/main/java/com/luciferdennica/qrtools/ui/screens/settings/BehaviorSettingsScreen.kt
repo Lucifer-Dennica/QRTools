@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.luciferdennica.qrtools.R
 import com.luciferdennica.qrtools.data.prefs.SettingsPrefs
+import com.luciferdennica.qrtools.ui.components.BannerAd
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,40 +64,47 @@ fun BehaviorSettingsScreen(nav: NavController, prefs: SettingsPrefs) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Column(Modifier.fillMaxWidth().padding(8.dp)) {
-                    SettingSwitch(
-                        title = stringResource(R.string.settings_sound),
-                        checked = sound,
-                        onCheckedChange = { scope.launch { prefs.setSound(it) } }
-                    )
-                    HorizontalDivider()
-                    SettingSwitch(
-                        title = stringResource(R.string.settings_vibro),
-                        checked = vibro,
-                        onCheckedChange = { scope.launch { prefs.setVibro(it) } }
-                    )
-                    HorizontalDivider()
-                    SettingSwitch(
-                        title = stringResource(R.string.settings_auto_copy),
-                        checked = autoCopy,
-                        onCheckedChange = { scope.launch { prefs.setAutoCopy(it) } }
-                    )
-                    HorizontalDivider()
-                    SettingSwitch(
-                        title = stringResource(R.string.settings_save_history),
-                        checked = saveHistory,
-                        onCheckedChange = { scope.launch { prefs.setSaveHistory(it) } }
-                    )
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    Column(Modifier.fillMaxWidth().padding(8.dp)) {
+                        SettingSwitch(
+                            title = stringResource(R.string.settings_sound),
+                            checked = sound,
+                            onCheckedChange = { scope.launch { prefs.setSound(it) } }
+                        )
+                        HorizontalDivider()
+                        SettingSwitch(
+                            title = stringResource(R.string.settings_vibro),
+                            checked = vibro,
+                            onCheckedChange = { scope.launch { prefs.setVibro(it) } }
+                        )
+                        HorizontalDivider()
+                        SettingSwitch(
+                            title = stringResource(R.string.settings_auto_copy),
+                            checked = autoCopy,
+                            onCheckedChange = { scope.launch { prefs.setAutoCopy(it) } }
+                        )
+                        HorizontalDivider()
+                        SettingSwitch(
+                            title = stringResource(R.string.settings_save_history),
+                            checked = saveHistory,
+                            onCheckedChange = { scope.launch { prefs.setSaveHistory(it) } }
+                        )
+                    }
                 }
             }
+
+            BannerAd()
         }
     }
 }
