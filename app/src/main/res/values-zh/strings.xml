@@ -192,7 +192,7 @@
     <string name="off_quantity">容量</string>
     <string name="off_categories">分类</string>
     <string name="off_show_details">在 Open Food Facts 中打开</string>
-    <!-- 二维码预设 -->
+    
     <string name="preset_classic">经典</string>
     <string name="preset_blue">蓝色</string>
     <string name="preset_dark">深色</string>
@@ -207,7 +207,7 @@
     <string name="settings_behavior_desc">声音、震动和复制</string>
     <string name="settings_history_desc">导出和清除历史</string>
     <string name="settings_about_desc">版本、作者、信息</string>
-    <!-- 批量删除 -->
+    
     <string name="history_select">选择</string>
     <string name="history_cancel">取消</string>
     <string name="history_selected">已选: %1$d</string>
@@ -217,7 +217,6 @@
     <string name="history_delete_confirm_desc">将删除记录数: %1$d</string>
     <string name="history_deleted">已删除记录数: %1$d</string>
 
-    <!-- 备注 -->
     <string name="note_title">备注</string>
     <string name="note_add">添加备注</string>
     <string name="note_edit">编辑备注</string>
@@ -232,4 +231,9 @@
     <string name="unpin">取消置顶</string>
     <string name="settings_clear_hidden">删除隐藏的扫描</string>
     <string name="hidden_cleared">已删除隐藏的扫描</string>
+    <!-- 批量扫描 -->
+    <string name="batch_scan">从相册批量扫描</string>
+    <string name="batch_scanning">处理中 %1$d / %2$d…</string>
+    <string name="batch_result">已识别: %1$d / %2$d</string>
+    <string name="batch_nothing">未找到</string>
 </resources>
