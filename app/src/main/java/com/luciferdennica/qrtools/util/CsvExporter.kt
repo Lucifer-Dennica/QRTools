@@ -17,13 +17,9 @@ import java.util.Locale
 
 object CsvExporter {
 
-    /**
-     * Экспортирует список сканов в CSV и сразу открывает меню «Поделиться».
-     * Возвращает true при успехе.
-     */
     fun exportAndShare(context: Context, items: List<ScanEntity>): Boolean {
         return runCatching {
-            val csv = buildCsv(items)
+            val csv = buildCsv(context, items)
             val fileName = "qrtools_${System.currentTimeMillis()}.csv"
             val uri = saveFile(context, fileName, csv)
 
@@ -34,14 +30,15 @@ object CsvExporter {
         }.getOrDefault(false)
     }
 
-    private fun buildCsv(items: List<ScanEntity>): String {
+    private fun buildCsv(context: Context, items: List<ScanEntity>): String {
         val df = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault())
         val sb = StringBuilder()
-        // BOM для корректной кириллицы в Excel
         sb.append("\uFEFF")
         sb.append("Дата;Тип;Формат;Содержимое;Избранное\n")
         items.forEach { item ->
-            val typeTitle = runCatching { ScanType.valueOf(item.type).title }.getOrDefault(item.type)
+            val typeTitle = runCatching {
+                context.getString(ScanType.valueOf(item.type).titleRes)
+            }.getOrDefault(item.type)
             sb.append(escape(df.format(Date(item.timestamp)))).append(';')
             sb.append(escape(typeTitle)).append(';')
             sb.append(escape(item.format)).append(';')
