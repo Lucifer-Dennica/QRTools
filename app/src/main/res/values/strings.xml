@@ -1,47 +1,4 @@
 <resources>
-
-        <!-- Open Food Facts -->
-    <string name="off_title">Информация о продукте</string>
-    <string name="off_loading">Загрузка информации…</string>
-    <string name="off_not_found">Продукт не найден в базе</string>
-    <string name="off_no_internet">Нет подключения к интернету</string>
-    <string name="off_brand">Бренд</string>
-    <string name="off_quantity">Объём</string>
-    <string name="off_categories">Категории</string>
-    <string name="off_show_details">Открыть в Open Food Facts</string>
-
-    <!-- Разрешение на контакты -->
-    <string name="permission_contacts_title">Нужен доступ к контактам</string>
-    <string name="permission_contacts_desc">Разрешите доступ, чтобы загружать контакты в генератор</string>
-       
-        <!-- Группировка истории -->
-    <string name="history_today">Сегодня</string>
-    <string name="history_yesterday">Вчера</string>
-
-    <!-- Подзаголовки карточек -->
-    <string name="home_scan_sub">QR и штрихкоды</string>
-    <string name="home_create_sub">5 типов кодов</string>
-    <string name="home_history_sub">Все сканирования</string>
-    <string name="home_favorites_sub">Важные коды</string>
-        
-        <!-- Стилизация QR -->
-    <string name="qr_styling">Стилизация QR</string>
-    <string name="qr_presets">Пресеты</string>
-    <string name="qr_dot_color">Цвет точек</string>
-    <string name="qr_bg_color">Цвет фона</string>
-    <string name="qr_gradient_dots">Градиент точек</string>
-    <string name="qr_gradient_bg">Градиент фона</string>
-    <string name="qr_dot_shape">Форма точек</string>
-    <string name="qr_logo">Логотип в центре</string>
-    <string name="qr_logo_upload">Загрузить логотип</string>
-    <string name="qr_logo_remove">Удалить логотип</string>
-    <string name="qr_contrast_warning">Слабый контраст. QR-код может не сканироваться</string>
-    <string name="shape_square">Квадрат</string>
-    <string name="shape_rounded">Скруглённый</string>
-    <string name="shape_circle">Круг</string>
-    <string name="qr_show_styling">Показать стилизацию</string>
-    <string name="qr_hide_styling">Скрыть стилизацию</string>
-    
     <string name="app_name">QR Tools</string>
     <string name="home">Главная</string>
     <string name="scanner">Сканер</string>
@@ -65,9 +22,17 @@
     <string name="favorite">В избранное</string>
     <string name="unfavorite">Убрать из избранного</string>
 
+    <string name="home_scan_sub">QR и штрихкоды</string>
+    <string name="home_create_sub">5 типов кодов</string>
+    <string name="home_history_sub">Все сканирования</string>
+    <string name="home_favorites_sub">Важные коды</string>
+
     <string name="permission_camera_title">Нужен доступ к камере</string>
     <string name="permission_camera_desc">Разрешите доступ, чтобы сканировать QR-коды и штрихкоды</string>
     <string name="permission_grant">Разрешить</string>
+    <string name="permission_contacts_title">Нужен доступ к контактам</string>
+    <string name="permission_contacts_desc">Разрешите доступ, чтобы загружать контакты в генератор</string>
+    <string name="permission_contacts_denied">Без разрешения нельзя выбрать контакт</string>
 
     <string name="scan_hint">Наведите камеру на код</string>
     <string name="scan_result">Результат</string>
@@ -78,6 +43,7 @@
     <string name="action_unsave">Убрать из избранного</string>
     <string name="action_scan_again">Сканировать ещё</string>
     <string name="copied">Скопировано</string>
+    <string name="qr_copied">QR скопирован</string>
     <string name="show_raw">Показать исходные данные</string>
     <string name="hide_raw">Скрыть исходные данные</string>
 
@@ -101,11 +67,12 @@
     <string name="field_contact_email">Email</string>
     <string name="field_sms_phone">Номер телефона</string>
     <string name="field_sms_message">Сообщение</string>
+    <string name="qr_pick_contact">Загрузить из контактов</string>
+    <string name="contact_read_failed">Не удалось прочитать контакт</string>
 
     <string name="btn_generate">Сгенерировать</string>
     <string name="btn_save_gallery">Сохранить</string>
     <string name="btn_share_qr">Поделиться</string>
-    <string name="btn_reset">Очистить</string>
 
     <string name="generated_title">Готовый QR-код</string>
     <string name="saved_gallery">Сохранено в галерею</string>
@@ -126,17 +93,17 @@
     <string name="wifi_connecting">Подключение…</string>
     <string name="wifi_connect_failed">Не удалось подключиться</string>
     <string name="wifi_no_password">Без пароля</string>
+    <string name="wifi_open">Открытая</string>
 
     <string name="contact_name">Имя</string>
     <string name="contact_phone">Телефон</string>
     <string name="contact_email">Email</string>
     <string name="contact_call">Позвонить</string>
-    <string name="contact_save">Добавить в контакты</string>
-    <string name="action_send_sms">Отправить SMS</string>
     <string name="action_send_email">Написать письмо</string>
-    <string name="action_call">Позвонить</string>
 
+    <string name="settings_language">Язык</string>
     <string name="settings_theme">Тема оформления</string>
+    <string name="settings_icon">Иконка приложения</string>
     <string name="settings_behavior">Поведение</string>
     <string name="settings_sound">Звук при сканировании</string>
     <string name="settings_vibro">Вибрация при сканировании</string>
@@ -144,6 +111,21 @@
     <string name="settings_history">История</string>
     <string name="settings_clear_history">Очистить всю историю</string>
     <string name="settings_export_csv">Экспорт в CSV (Excel)</string>
+    <string name="settings_support">Поддержать автора</string>
+    <string name="settings_support_desc">Любой размер на развитие проекта</string>
+    <string name="settings_feedback">Обратная связь</string>
+    <string name="settings_email">Написать на Email</string>
+    <string name="settings_telegram">Написать в Telegram</string>
+    <string name="settings_donate">Поддержать через DonationAlerts</string>
+    <string name="settings_our_apps">Наши приложения</string>
+    <string name="settings_about">О приложении</string>
+    <string name="settings_about_desc">Версия, автор, контакты</string>
+
+    <string name="lang_system">Системный</string>
+    <string name="lang_russian">Русский</string>
+    <string name="lang_english">English</string>
+    <string name="lang_chinese">中文</string>
+
     <string name="clear_history_title">Очистить историю?</string>
     <string name="clear_history_desc">Все записи будут удалены безвозвратно</string>
     <string name="clear_history_confirm">Очистить</string>
@@ -152,29 +134,63 @@
     <string name="csv_exported">Файл сохранён в Загрузки</string>
     <string name="csv_export_failed">Не удалось сохранить файл</string>
     <string name="csv_no_data">Нет данных для экспорта</string>
-    <string name="csv_share">Поделиться</string>
-    <string name="qr_pick_contact">Загрузить из контактов</string>
 
-    <string name="settings_support">Поддержать автора</string>
-    <string name="settings_support_desc">Любой размер на развитие проекта</string>
-    <string name="settings_feedback">Обратная связь</string>
-    <string name="settings_email">Написать на Email</string>
-    <string name="settings_telegram">Написать в Telegram</string>
-    <string name="settings_donate">Поддержать через DonationAlerts</string>
-    <string name="settings_about">О приложении</string>
-    <string name="settings_about_desc">Версия, автор, контакты</string>
     <string name="donate_success">Спасибо за поддержку!</string>
     <string name="link_error">Не удалось открыть ссылку</string>
     <string name="about_contacts">Контакты</string>
     <string name="about_support">Поддержать проект</string>
-    <string name="about_version">Версия</string>
-    <string name="about_author">Автор</string>
+    <string name="about_donate_button">DonationAlerts</string>
+    <string name="about_version_full">Версия: 1.0.0</string>
+    <string name="about_app_title">О приложении</string>
+    <string name="about_app_desc">QR Tools — удобный сканер и генератор QR-кодов и штрихкодов. Поддерживает все популярные форматы, чтение из галереи, историю, избранное, экспорт данных и подключение к Wi-Fi по QR.</string>
+    <string name="about_development">Разработка</string>
+    <string name="about_our_apps">Наши приложения</string>
+    <string name="about_our_apps_desc">Все проекты разработчика в одном месте</string>
+    <string name="about_our_apps_button">Открыть каталог</string>
+    <string name="about_copyright">© 2026 QR Tools. Все права защищены.</string>
 
-    <!-- Иконка приложения -->
-    <string name="settings_icon">Иконка приложения</string>
+    <string name="history_today">Сегодня</string>
+    <string name="history_yesterday">Вчера</string>
+
     <string name="icon_blue">Синяя</string>
     <string name="icon_dark">Тёмная</string>
     <string name="icon_green">Изумруд</string>
     <string name="icon_purple">Аметист</string>
     <string name="icon_changed">Иконка изменена. Если не обновилась — перезапустите лаунчер.</string>
+
+    <string name="theme_system">Системная</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Тёмная</string>
+    <string name="theme_ocean">Океан</string>
+    <string name="theme_forest">Лес</string>
+    <string name="theme_amethyst">Аметист</string>
+
+    <string name="type_text">Текст</string>
+    <string name="type_url">Ссылка</string>
+    <string name="type_wifi">WiFi</string>
+    <string name="type_contact">Контакт</string>
+    <string name="type_sms">SMS</string>
+    <string name="type_email">Email</string>
+    <string name="type_phone">Телефон</string>
+    <string name="type_barcode">Штрихкод</string>
+    <string name="type_other">Другое</string>
+
+    <string name="qr_styling">Стилизация QR</string>
+    <string name="qr_presets">Пресеты</string>
+    <string name="qr_dot_color">Цвет точек</string>
+    <string name="qr_bg_color">Цвет фона</string>
+    <string name="qr_gradient_dots">Градиент точек</string>
+    <string name="qr_gradient_bg">Градиент фона</string>
+    <string name="qr_logo">Логотип в центре</string>
+    <string name="qr_logo_upload">Загрузить логотип</string>
+    <string name="qr_logo_remove">Удалить логотип</string>
+
+    <string name="off_title">Информация о продукте</string>
+    <string name="off_loading">Загрузка информации…</string>
+    <string name="off_not_found">Продукт не найден в базе</string>
+    <string name="off_no_internet">Нет подключения к интернету</string>
+    <string name="off_brand">Бренд</string>
+    <string name="off_quantity">Объём</string>
+    <string name="off_categories">Категории</string>
+    <string name="off_show_details">Открыть в Open Food Facts</string>
 </resources>
