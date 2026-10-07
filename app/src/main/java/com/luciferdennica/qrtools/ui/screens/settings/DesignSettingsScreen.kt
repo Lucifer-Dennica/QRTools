@@ -49,6 +49,7 @@ import androidx.navigation.NavController
 import com.luciferdennica.qrtools.R
 import com.luciferdennica.qrtools.data.prefs.SettingsPrefs
 import com.luciferdennica.qrtools.domain.model.ThemeMode
+import com.luciferdennica.qrtools.ui.components.BannerAd
 import com.luciferdennica.qrtools.util.AppIcon
 import com.luciferdennica.qrtools.util.IconManager
 import kotlinx.coroutines.launch
@@ -83,94 +84,99 @@ fun DesignSettingsScreen(nav: NavController, prefs: SettingsPrefs) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Тема
-            SectionTitle(stringResource(R.string.settings_theme))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Column(Modifier.fillMaxWidth().padding(12.dp)) {
-                    ExposedDropdownMenuBox(
-                        expanded = themeExpanded,
-                        onExpandedChange = { themeExpanded = it }
-                    ) {
-                        OutlinedTextField(
-                            value = stringResource(currentTheme.titleRes),
-                            onValueChange = {},
-                            readOnly = true,
-                            label = { Text(stringResource(R.string.settings_theme)) },
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = themeExpanded)
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
-                        )
-                        ExposedDropdownMenu(
+                SectionTitle(stringResource(R.string.settings_theme))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    Column(Modifier.fillMaxWidth().padding(12.dp)) {
+                        ExposedDropdownMenuBox(
                             expanded = themeExpanded,
-                            onDismissRequest = { themeExpanded = false }
+                            onExpandedChange = { themeExpanded = it }
                         ) {
-                            ThemeMode.values().forEach { mode ->
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(mode.titleRes)) },
-                                    onClick = {
-                                        scope.launch { prefs.setTheme(mode) }
-                                        themeExpanded = false
-                                    }
-                                )
+                            OutlinedTextField(
+                                value = stringResource(currentTheme.titleRes),
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text(stringResource(R.string.settings_theme)) },
+                                trailingIcon = {
+                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = themeExpanded)
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
+                            )
+                            ExposedDropdownMenu(
+                                expanded = themeExpanded,
+                                onDismissRequest = { themeExpanded = false }
+                            ) {
+                                ThemeMode.values().forEach { mode ->
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(mode.titleRes)) },
+                                        onClick = {
+                                            scope.launch { prefs.setTheme(mode) }
+                                            themeExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                SectionTitle(stringResource(R.string.settings_icon))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconOption(AppIcon.BLUE, R.drawable.ic_launcher, currentIcon) {
+                            scope.launch {
+                                prefs.setAppIcon(AppIcon.BLUE)
+                                IconManager.setIcon(context, AppIcon.BLUE)
+                                Toast.makeText(context, context.getString(R.string.icon_changed), Toast.LENGTH_LONG).show()
+                            }
+                        }
+                        IconOption(AppIcon.DARK, R.drawable.ic_launcher_dark, currentIcon) {
+                            scope.launch {
+                                prefs.setAppIcon(AppIcon.DARK)
+                                IconManager.setIcon(context, AppIcon.DARK)
+                                Toast.makeText(context, context.getString(R.string.icon_changed), Toast.LENGTH_LONG).show()
+                            }
+                        }
+                        IconOption(AppIcon.GREEN, R.drawable.ic_launcher_green, currentIcon) {
+                            scope.launch {
+                                prefs.setAppIcon(AppIcon.GREEN)
+                                IconManager.setIcon(context, AppIcon.GREEN)
+                                Toast.makeText(context, context.getString(R.string.icon_changed), Toast.LENGTH_LONG).show()
+                            }
+                        }
+                        IconOption(AppIcon.PURPLE, R.drawable.ic_launcher_purple, currentIcon) {
+                            scope.launch {
+                                prefs.setAppIcon(AppIcon.PURPLE)
+                                IconManager.setIcon(context, AppIcon.PURPLE)
+                                Toast.makeText(context, context.getString(R.string.icon_changed), Toast.LENGTH_LONG).show()
                             }
                         }
                     }
                 }
             }
 
-            // Иконка
-            SectionTitle(stringResource(R.string.settings_icon))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconOption(AppIcon.BLUE, R.drawable.ic_launcher, currentIcon) {
-                        scope.launch {
-                            prefs.setAppIcon(AppIcon.BLUE)
-                            IconManager.setIcon(context, AppIcon.BLUE)
-                            Toast.makeText(context, context.getString(R.string.icon_changed), Toast.LENGTH_LONG).show()
-                        }
-                    }
-                    IconOption(AppIcon.DARK, R.drawable.ic_launcher_dark, currentIcon) {
-                        scope.launch {
-                            prefs.setAppIcon(AppIcon.DARK)
-                            IconManager.setIcon(context, AppIcon.DARK)
-                            Toast.makeText(context, context.getString(R.string.icon_changed), Toast.LENGTH_LONG).show()
-                        }
-                    }
-                    IconOption(AppIcon.GREEN, R.drawable.ic_launcher_green, currentIcon) {
-                        scope.launch {
-                            prefs.setAppIcon(AppIcon.GREEN)
-                            IconManager.setIcon(context, AppIcon.GREEN)
-                            Toast.makeText(context, context.getString(R.string.icon_changed), Toast.LENGTH_LONG).show()
-                        }
-                    }
-                    IconOption(AppIcon.PURPLE, R.drawable.ic_launcher_purple, currentIcon) {
-                        scope.launch {
-                            prefs.setAppIcon(AppIcon.PURPLE)
-                            IconManager.setIcon(context, AppIcon.PURPLE)
-                            Toast.makeText(context, context.getString(R.string.icon_changed), Toast.LENGTH_LONG).show()
-                        }
-                    }
-                }
-            }
+            BannerAd()
         }
     }
 }
