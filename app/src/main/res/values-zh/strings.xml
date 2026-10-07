@@ -193,4 +193,13 @@
     <string name="off_quantity">容量</string>
     <string name="off_categories">分类</string>
     <string name="off_show_details">在 Open Food Facts 中打开</string>
+    <!-- 二维码预设 -->
+    <string name="preset_classic">经典</string>
+    <string name="preset_blue">蓝色</string>
+    <string name="preset_dark">深色</string>
+    <string name="preset_sunset">日落</string>
+    <string name="preset_ocean">海洋</string>
+    <string name="preset_forest">森林</string>
+    <string name="preset_amethyst">紫水晶</string>
+    <string name="preset_inverse">反色</string>
 </resources>
