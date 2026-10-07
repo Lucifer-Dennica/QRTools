@@ -84,6 +84,7 @@ fun SettingsScreen(nav: NavController) {
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                // Язык
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -113,7 +114,7 @@ fun SettingsScreen(nav: NavController) {
                                     "system" to R.string.lang_system,
                                     "ru" to R.string.lang_russian,
                                     "en" to R.string.lang_english,
-                                    "zh" to R.string.lang_chinese
+                                    "zh" to R.string.lang_chinese,
                                     "es" to R.string.lang_spanish,
                                     "de" to R.string.lang_german,
                                     "fr" to R.string.lang_french
@@ -227,5 +228,8 @@ private fun langLabel(code: String): String = when (code) {
     "ru" -> stringResource(R.string.lang_russian)
     "en" -> stringResource(R.string.lang_english)
     "zh" -> stringResource(R.string.lang_chinese)
+    "es" -> stringResource(R.string.lang_spanish)
+    "de" -> stringResource(R.string.lang_german)
+    "fr" -> stringResource(R.string.lang_french)
     else -> stringResource(R.string.lang_system)
 }
