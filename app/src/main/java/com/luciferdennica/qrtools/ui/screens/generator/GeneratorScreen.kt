@@ -51,6 +51,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -98,7 +99,11 @@ import com.luciferdennica.qrtools.util.ClipboardUtils
 import com.luciferdennica.qrtools.util.GalleryUtils
 import com.luciferdennica.qrtools.util.IntentUtils
 import com.luciferdennica.qrtools.util.PdfExporter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private enum class GenType(val labelRes: Int) {
     TEXT(R.string.gen_text),
@@ -146,6 +151,7 @@ fun GeneratorScreen(nav: NavController) {
     var qrContent by remember { mutableStateOf("") }
     var showStyling by remember { mutableStateOf(false) }
     var style by remember { mutableStateOf(QrStyle()) }
+    var generating by remember { mutableStateOf(false) }
 
     var showTemplateDialog by remember { mutableStateOf(false) }
     var templateName by remember { mutableStateOf("") }
@@ -163,18 +169,34 @@ fun GeneratorScreen(nav: NavController) {
         smsPhone = prefs.getLastSmsPhone()
     }
 
+    // Job для отмены предыдущей генерации
+    var generationJob by remember { mutableStateOf<Job?>(null) }
+
+    /**
+     * Генерирует QR в фоне. Отменяет предыдущую генерацию, если она ещё идёт.
+     */
+    fun regenerate(content: String, newStyle: QrStyle) {
+        generationJob?.cancel()
+        generationJob = scope.launch {
+            generating = true
+            // Небольшой debounce, чтобы не запускать генерацию 10 раз при быстром тапе по палитре
+            delay(150)
+            val res = prefs.getQrResolutionOnce()
+            val result = withContext(Dispatchers.Default) {
+                QrGenerator.generate(content, res.size, newStyle)
+            }
+            qrBitmap = result
+            generating = false
+        }
+    }
+
     val logoLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) {
             loadBitmap(context, uri)?.let { bmp ->
                 style = style.copy(logo = bmp)
-                if (qrContent.isNotBlank()) {
-                    scope.launch {
-                        val res = prefs.getQrResolutionOnce()
-                        qrBitmap = QrGenerator.generate(qrContent, res.size, style)
-                    }
-                }
+                if (qrContent.isNotBlank()) regenerate(qrContent, style)
             }
         }
     }
@@ -236,15 +258,6 @@ fun GeneratorScreen(nav: NavController) {
             ).show()
         } else {
             storagePermLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        }
-    }
-
-    fun regenerateIfPossible() {
-        if (qrContent.isNotBlank()) {
-            scope.launch {
-                val res = prefs.getQrResolutionOnce()
-                qrBitmap = QrGenerator.generate(qrContent, res.size, style)
-            }
         }
     }
 
@@ -461,7 +474,6 @@ fun GeneratorScreen(nav: NavController) {
                 }
             }
 
-            // Переключатель стилизации
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -494,7 +506,7 @@ fun GeneratorScreen(nav: NavController) {
                     templates = templates,
                     onStyleChange = { newStyle ->
                         style = newStyle
-                        regenerateIfPossible()
+                        if (qrContent.isNotBlank()) regenerate(qrContent, newStyle)
                     },
                     onLogoUpload = { logoLauncher.launch("image/*") },
                     onSaveTemplate = {
@@ -502,7 +514,7 @@ fun GeneratorScreen(nav: NavController) {
                         showTemplateDialog = true
                     },
                     onApplyTemplate = { template ->
-                        style = style.copy(
+                        val newStyle = style.copy(
                             dotColor = Color(template.dotColor.toInt()),
                             dotColor2 = Color(template.dotColor2.toInt()),
                             bgColor = Color(template.bgColor.toInt()),
@@ -510,7 +522,8 @@ fun GeneratorScreen(nav: NavController) {
                             dotGradient = template.dotGradient,
                             bgGradient = template.bgGradient
                         )
-                        regenerateIfPossible()
+                        style = newStyle
+                        if (qrContent.isNotBlank()) regenerate(qrContent, newStyle)
                     },
                     onDeleteTemplate = { template ->
                         templateToDelete = template
@@ -518,7 +531,6 @@ fun GeneratorScreen(nav: NavController) {
                 )
             }
 
-            // Кнопка «Сгенерировать»
             Button(
                 onClick = {
                     val content = when (type) {
@@ -543,18 +555,25 @@ fun GeneratorScreen(nav: NavController) {
                                 GenType.SMS -> prefs.setLastSmsPhone(smsPhone)
                                 else -> {}
                             }
-                            val res = prefs.getQrResolutionOnce()
-                            qrContent = content
-                            qrBitmap = QrGenerator.generate(content, res.size, style)
                         }
+                        qrContent = content
+                        regenerate(content, style)
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !generating
             ) {
+                if (generating) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Spacer(Modifier.size(8.dp))
+                }
                 Text(stringResource(R.string.btn_generate))
             }
 
-            // Пакетное создание из CSV
             OutlinedButton(
                 onClick = { nav.navigate(Routes.BATCH_GENERATOR) },
                 modifier = Modifier.fillMaxWidth()
@@ -665,7 +684,6 @@ fun GeneratorScreen(nav: NavController) {
         }
     }
 
-    // Диалог сохранения шаблона
     if (showTemplateDialog) {
         AlertDialog(
             onDismissRequest = { showTemplateDialog = false },
@@ -711,7 +729,6 @@ fun GeneratorScreen(nav: NavController) {
         )
     }
 
-    // Диалог удаления шаблона
     templateToDelete?.let { tpl ->
         AlertDialog(
             onDismissRequest = { templateToDelete = null },
@@ -736,10 +753,6 @@ fun GeneratorScreen(nav: NavController) {
     }
 }
 
-// ========================================================
-// Стилизация
-// ========================================================
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun StylingSection(
@@ -759,7 +772,6 @@ private fun StylingSection(
             modifier = Modifier.fillMaxWidth().padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            // Пресеты
             Text(
                 text = stringResource(R.string.qr_presets),
                 style = MaterialTheme.typography.labelLarge,
@@ -781,7 +793,6 @@ private fun StylingSection(
                 }
             }
 
-            // Мои шаблоны
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -826,7 +837,6 @@ private fun StylingSection(
                 }
             }
 
-            // Цвет точек
             Text(
                 text = stringResource(R.string.qr_dot_color),
                 style = MaterialTheme.typography.labelLarge,
@@ -840,7 +850,6 @@ private fun StylingSection(
                 }
             )
 
-            // Цвет фона
             Text(
                 text = stringResource(R.string.qr_bg_color),
                 style = MaterialTheme.typography.labelLarge,
@@ -881,7 +890,6 @@ private fun StylingSection(
                 )
             }
 
-            // Лого
             Text(
                 text = stringResource(R.string.qr_logo),
                 style = MaterialTheme.typography.labelLarge,
@@ -1047,10 +1055,6 @@ private fun ColorPaletteRow(
         }
     }
 }
-
-// ========================================================
-// Хелперы
-// ========================================================
 
 private fun openContactPicker(
     context: Context,
