@@ -207,4 +207,22 @@
     <string name="settings_behavior_desc">Звук, вибрация и копирование</string>
     <string name="settings_history_desc">Экспорт и очистка истории</string>
     <string name="settings_about_desc">Версия, автор, информация</string>
+    <!-- Пакетная очистка -->
+    <string name="history_select">Выбрать</string>
+    <string name="history_cancel">Отмена</string>
+    <string name="history_selected">Выбрано: %1$d</string>
+    <string name="history_delete_selected">Удалить</string>
+    <string name="history_select_all">Выбрать все</string>
+    <string name="history_delete_confirm_title">Удалить выбранные записи?</string>
+    <string name="history_delete_confirm_desc">Будет удалено записей: %1$d</string>
+    <string name="history_deleted">Удалено записей: %1$d</string>
+
+    <!-- Заметки -->
+    <string name="note_title">Заметка</string>
+    <string name="note_add">Добавить заметку</string>
+    <string name="note_edit">Редактировать заметку</string>
+    <string name="note_hint">Например: «Пароль от Wi-Fi на даче»</string>
+    <string name="note_save">Сохранить</string>
+    <string name="note_remove">Удалить</string>
+    <string name="note_saved">Заметка сохранена</string>
 </resources>
