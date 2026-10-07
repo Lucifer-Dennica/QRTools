@@ -62,29 +62,13 @@ object QrGenerator {
                         } else {
                             style.dotColor.toArgb()
                         }
-
-                        val left = x * cellSize
-                        val top = y * cellSize
-                        val right = left + cellSize
-                        val bottom = top + cellSize
-
-                        when (style.dotShape) {
-                            DotShape.SQUARE -> canvas.drawRect(left, top, right, bottom, dotPaint)
-
-                            // Более выраженное скругление (0.5 вместо 0.3)
-                            DotShape.ROUNDED -> canvas.drawRoundRect(
-                                RectF(left, top, right, bottom),
-                                cellSize * 0.5f, cellSize * 0.5f, dotPaint
-                            )
-
-                            // Круг чуть меньше ячейки, чтобы был зазор между точками
-                            DotShape.CIRCLE -> canvas.drawCircle(
-                                left + cellSize / 2f,
-                                top + cellSize / 2f,
-                                cellSize * 0.45f,  // 0.45 вместо 0.5 — точки разделены
-                                dotPaint
-                            )
-                        }
+                        canvas.drawRect(
+                            x * cellSize,
+                            y * cellSize,
+                            (x + 1) * cellSize,
+                            (y + 1) * cellSize,
+                            dotPaint
+                        )
                     }
                 }
             }
