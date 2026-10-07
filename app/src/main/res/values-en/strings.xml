@@ -242,4 +242,15 @@
     <string name="pdf_saved">PDF saved to Downloads</string>
     <string name="pdf_failed">Failed to save PDF</string>
     <string name="pdf_share">Share PDF</string>
+    <!-- Business card -->
+    <string name="gen_vcard">Business card</string>
+    <string name="field_vcard_firstname">First name</string>
+    <string name="field_vcard_lastname">Last name</string>
+    <string name="field_vcard_company">Company</string>
+    <string name="field_vcard_position">Position</string>
+    <string name="field_vcard_phone">Phone</string>
+    <string name="field_vcard_email">Email</string>
+    <string name="field_vcard_website">Website</string>
+    <string name="field_vcard_address">Address</string>
+    <string name="field_vcard_note">Note</string>
 </resources>
