@@ -1,0 +1,288 @@
+<resources>
+    <string name="app_name">QR Tools</string>
+    <string name="home">Inicio</string>
+    <string name="scanner">Escáner</string>
+    <string name="generator">Generador</string>
+    <string name="history">Historial</string>
+    <string name="favorites">Favoritos</string>
+    <string name="settings">Ajustes</string>
+    <string name="about">Acerca de</string>
+    <string name="back">Atrás</string>
+
+    <string name="scan_qr">Escanear código</string>
+    <string name="scan_qr_desc">Apunta la cámara a un QR o código de barras</string>
+    <string name="create_qr">Crear QR</string>
+    <string name="create_qr_desc">Texto, enlace, WiFi, contacto, SMS</string>
+    <string name="history_desc">Todos los códigos escaneados</string>
+    <string name="favorites_desc">Códigos guardados</string>
+    <string name="history_empty">El historial está vacío</string>
+    <string name="favorites_empty">Sin favoritos</string>
+    <string name="delete">Eliminar</string>
+    <string name="favorite">Añadir a favoritos</string>
+    <string name="unfavorite">Quitar de favoritos</string>
+
+    <string name="home_scan_sub">QR y códigos de barras</string>
+    <string name="home_create_sub">5 tipos de códigos</string>
+    <string name="home_history_sub">Todos los escaneos</string>
+    <string name="home_favorites_sub">Códigos importantes</string>
+
+    <string name="permission_camera_title">Se necesita acceso a la cámara</string>
+    <string name="permission_camera_desc">Permite el acceso para escanear códigos QR y de barras</string>
+    <string name="permission_grant">Permitir</string>
+    <string name="permission_contacts_title">Se necesita acceso a contactos</string>
+    <string name="permission_contacts_desc">Permite cargar contactos en el generador</string>
+    <string name="permission_contacts_denied">No se puede elegir contacto sin permiso</string>
+
+    <string name="scan_hint">Apunta la cámara al código</string>
+    <string name="scan_result">Resultado</string>
+    <string name="action_open">Abrir</string>
+    <string name="action_copy">Copiar</string>
+    <string name="action_share">Compartir</string>
+    <string name="action_save">Añadir a favoritos</string>
+    <string name="action_unsave">Quitar de favoritos</string>
+    <string name="action_scan_again">Escanear otra vez</string>
+    <string name="copied">Copiado</string>
+    <string name="qr_copied">QR copiado</string>
+    <string name="show_raw">Mostrar datos originales</string>
+    <string name="hide_raw">Ocultar datos originales</string>
+
+    <string name="gen_type">Tipo de código</string>
+    <string name="gen_text">Texto</string>
+    <string name="gen_url">Enlace</string>
+    <string name="gen_wifi">WiFi</string>
+    <string name="gen_contact">Contacto</string>
+    <string name="gen_sms">SMS</string>
+
+    <string name="field_text">Introduce el texto</string>
+    <string name="field_url">Introduce la URL (https://…)</string>
+    <string name="field_wifi_ssid">Nombre de red (SSID)</string>
+    <string name="field_wifi_password">Contraseña</string>
+    <string name="field_wifi_security">Tipo de seguridad</string>
+    <string name="wifi_wpa">WPA/WPA2</string>
+    <string name="wifi_wep">WEP</string>
+    <string name="wifi_none">Abierta</string>
+    <string name="field_contact_name">Nombre</string>
+    <string name="field_contact_phone">Teléfono</string>
+    <string name="field_contact_email">Email</string>
+    <string name="field_sms_phone">Número de teléfono</string>
+    <string name="field_sms_message">Mensaje</string>
+    <string name="qr_pick_contact">Cargar de contactos</string>
+    <string name="contact_read_failed">Error al leer el contacto</string>
+
+    <string name="btn_generate">Generar</string>
+    <string name="btn_save_gallery">Guardar</string>
+    <string name="btn_share_qr">Compartir</string>
+
+    <string name="generated_title">QR generado</string>
+    <string name="saved_gallery">Guardado en galería</string>
+    <string name="save_failed">Error al guardar</string>
+    <string name="fill_fields">Completa los campos</string>
+
+    <string name="from_gallery">De galería</string>
+    <string name="no_code_in_image">No se encontró código en la imagen</string>
+    <string name="search_hint">Buscar por contenido</string>
+
+    <string name="wifi_network">Red</string>
+    <string name="wifi_password">Contraseña</string>
+    <string name="wifi_security">Seguridad</string>
+    <string name="wifi_hidden">Red oculta</string>
+    <string name="wifi_hidden_yes">Sí</string>
+    <string name="wifi_hidden_no">No</string>
+    <string name="wifi_connect">Conectar a Wi-Fi</string>
+    <string name="wifi_connecting">Conectando…</string>
+    <string name="wifi_connect_failed">Error al conectar</string>
+    <string name="wifi_no_password">Sin contraseña</string>
+    <string name="wifi_open">Abierta</string>
+
+    <string name="contact_name">Nombre</string>
+    <string name="contact_phone">Teléfono</string>
+    <string name="contact_email">Email</string>
+    <string name="contact_call">Llamar</string>
+    <string name="action_send_email">Enviar email</string>
+
+    <string name="settings_language">Idioma</string>
+    <string name="settings_theme">Tema</string>
+    <string name="settings_icon">Icono de app</string>
+    <string name="settings_behavior">Comportamiento</string>
+    <string name="settings_sound">Sonido al escanear</string>
+    <string name="settings_vibro">Vibración al escanear</string>
+    <string name="settings_auto_copy">Auto-copiar al portapapeles</string>
+    <string name="settings_history">Historial</string>
+    <string name="settings_clear_history">Borrar todo el historial</string>
+    <string name="settings_export_csv">Exportar a CSV (Excel)</string>
+    <string name="settings_support">Apoyar al autor</string>
+    <string name="settings_support_desc">Cualquier cantidad para el desarrollo</string>
+    <string name="settings_feedback">Comentarios</string>
+    <string name="settings_email">Enviar Email</string>
+    <string name="settings_telegram">Mensaje en Telegram</string>
+    <string name="settings_donate">Donar vía DonationAlerts</string>
+    <string name="settings_our_apps">Nuestras apps</string>
+    <string name="settings_about">Acerca de</string>
+    <string name="settings_about_desc">Versión, autor, información</string>
+
+    <string name="lang_system">Sistema</string>
+    <string name="lang_russian">Русский</string>
+    <string name="lang_english">English</string>
+    <string name="lang_chinese">中文</string>
+
+    <string name="clear_history_title">¿Borrar historial?</string>
+    <string name="clear_history_desc">Todos los registros serán eliminados permanentemente</string>
+    <string name="clear_history_confirm">Borrar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="history_cleared">Historial borrado</string>
+    <string name="csv_exported">Archivo guardado en Descargas</string>
+    <string name="csv_export_failed">Error al guardar el archivo</string>
+    <string name="csv_no_data">Sin datos para exportar</string>
+
+    <string name="donate_success">¡Gracias por tu apoyo!</string>
+    <string name="link_error">Error al abrir el enlace</string>
+    <string name="about_contacts">Contactos</string>
+    <string name="about_support">Apoyar el proyecto</string>
+    <string name="about_donate_button">DonationAlerts</string>
+    <string name="about_version_full">Versión: 1.0.0</string>
+    <string name="about_app_title">Acerca de</string>
+    <string name="about_app_desc">QR Tools — escáner y generador rápido de códigos QR y de barras. Compatible con todos los formatos populares, escaneo desde galería, historial, favoritos, exportación de datos y conexión Wi-Fi por QR.</string>
+    <string name="about_development">Desarrollo</string>
+    <string name="about_our_apps">Nuestras apps</string>
+    <string name="about_our_apps_desc">Todos los proyectos del desarrollador</string>
+    <string name="about_our_apps_button">Abrir catálogo</string>
+    <string name="about_copyright">© 2026 QR Tools. Todos los derechos reservados.</string>
+
+    <string name="history_today">Hoy</string>
+    <string name="history_yesterday">Ayer</string>
+
+    <string name="icon_blue">Azul</string>
+    <string name="icon_dark">Oscuro</string>
+    <string name="icon_green">Esmeralda</string>
+    <string name="icon_purple">Amatista</string>
+    <string name="icon_changed">Icono cambiado. Si no se actualiza, reinicia el launcher.</string>
+
+    <string name="theme_system">Sistema</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="theme_ocean">Océano</string>
+    <string name="theme_forest">Bosque</string>
+    <string name="theme_amethyst">Amatista</string>
+
+    <string name="type_text">Texto</string>
+    <string name="type_url">Enlace</string>
+    <string name="type_wifi">WiFi</string>
+    <string name="type_contact">Contacto</string>
+    <string name="type_sms">SMS</string>
+    <string name="type_email">Email</string>
+    <string name="type_phone">Teléfono</string>
+    <string name="type_barcode">Código de barras</string>
+    <string name="type_other">Otro</string>
+
+    <string name="qr_styling">Estilo del QR</string>
+    <string name="qr_presets">Preajustes</string>
+    <string name="qr_dot_color">Color de puntos</string>
+    <string name="qr_bg_color">Color de fondo</string>
+    <string name="qr_gradient_dots">Degradado de puntos</string>
+    <string name="qr_gradient_bg">Degradado de fondo</string>
+    <string name="qr_logo">Logo central</string>
+    <string name="qr_logo_upload">Subir logo</string>
+    <string name="qr_logo_remove">Eliminar logo</string>
+
+    <string name="off_title">Información del producto</string>
+    <string name="off_loading">Cargando…</string>
+    <string name="off_not_found">Producto no encontrado</string>
+    <string name="off_no_internet">Sin conexión a internet</string>
+    <string name="off_brand">Marca</string>
+    <string name="off_quantity">Cantidad</string>
+    <string name="off_categories">Categorías</string>
+    <string name="off_show_details">Abrir en Open Food Facts</string>
+
+    <string name="settings_design">Diseño</string>
+    <string name="settings_design_desc">Tema e icono de la app</string>
+    <string name="settings_behavior_desc">Sonido, vibración y copia</string>
+    <string name="settings_history_desc">Exportar y borrar historial</string>
+    <string name="settings_about_desc">Versión, autor, información</string>
+
+    <string name="gen_vcard">Tarjeta de visita</string>
+    <string name="field_vcard_firstname">Nombre</string>
+    <string name="field_vcard_lastname">Apellido</string>
+    <string name="field_vcard_company">Empresa</string>
+    <string name="field_vcard_position">Puesto</string>
+    <string name="field_vcard_phone">Teléfono</string>
+    <string name="field_vcard_email">Email</string>
+    <string name="field_vcard_website">Sitio web</string>
+    <string name="field_vcard_address">Dirección</string>
+    <string name="field_vcard_note">Nota</string>
+
+    <string name="btn_save_pdf">Guardar en PDF</string>
+    <string name="pdf_saved">PDF guardado en Descargas</string>
+    <string name="pdf_failed">Error al guardar PDF</string>
+    <string name="pdf_share">Compartir PDF</string>
+
+    <string name="batch_scan">De galería</string>
+    <string name="batch_scanning">Procesando %1$d de %2$d…</string>
+    <string name="batch_result">Reconocidos: %1$d de %2$d</string>
+    <string name="batch_nothing">Nada encontrado</string>
+
+    <string name="settings_rate_text">¡Nos encantaría tu opinión sobre nuestra app en la tienda!</string>
+    <string name="settings_save_history">Guardar historial de escaneos</string>
+    <string name="history_filter_all">Todos</string>
+    <string name="pin">Fijar</string>
+    <string name="unpin">Quitar fijado</string>
+    <string name="settings_clear_hidden">Eliminar escaneos ocultos</string>
+    <string name="hidden_cleared">Escaneos ocultos eliminados</string>
+
+    <string name="history_select">Seleccionar</string>
+    <string name="history_cancel">Cancelar</string>
+    <string name="history_selected">Seleccionados: %1$d</string>
+    <string name="history_delete_selected">Eliminar</string>
+    <string name="history_select_all">Seleccionar todo</string>
+    <string name="history_delete_confirm_title">¿Eliminar registros seleccionados?</string>
+    <string name="history_delete_confirm_desc">Registros a eliminar: %1$d</string>
+    <string name="history_deleted">Eliminados: %1$d</string>
+
+    <string name="note_title">Nota</string>
+    <string name="note_add">Añadir nota</string>
+    <string name="note_edit">Editar nota</string>
+    <string name="note_hint">Por ejemplo: "Contraseña WiFi de casa"</string>
+    <string name="note_save">Guardar</string>
+    <string name="note_remove">Eliminar</string>
+    <string name="note_saved">Nota guardada</string>
+
+    <string name="preset_classic">Clásico</string>
+    <string name="preset_blue">Azul</string>
+    <string name="preset_dark">Oscuro</string>
+    <string name="preset_sunset">Atardecer</string>
+    <string name="preset_ocean">Océano</string>
+    <string name="preset_forest">Bosque</string>
+    <string name="preset_amethyst">Amatista</string>
+    <string name="preset_inverse">Inverso</string>
+
+    <string name="from_clipboard">Del portapapeles</string>
+    <string name="clipboard_no_image">No hay imagen en el portapapeles</string>
+
+    <string name="settings_qr_resolution">Resolución QR</string>
+    <string name="resolution_hd">HD — 1080×1080</string>
+    <string name="resolution_2k">2K — 2048×2048</string>
+    <string name="resolution_4k">4K — 3840×3840</string>
+
+    <string name="qr_templates">Mis plantillas</string>
+    <string name="qr_template_save">Guardar como plantilla</string>
+    <string name="qr_template_name_hint">Nombre de plantilla</string>
+    <string name="qr_template_saved">Plantilla guardada</string>
+    <string name="qr_template_deleted">Plantilla eliminada</string>
+    <string name="qr_template_delete">Eliminar plantilla</string>
+    <string name="qr_template_confirm_delete">¿Eliminar plantilla "%1$s"?</string>
+
+    <string name="batch_create">Lote desde CSV</string>
+    <string name="batch_create_hint">Un QR por línea. La primera línea es el encabezado.</string>
+    <string name="batch_create_start">Crear QRs</string>
+    <string name="batch_create_progress">Procesando %1$d de %2$d…</string>
+    <string name="batch_create_done">Hecho: %1$d de %2$d</string>
+    <string name="batch_create_nothing">No se pudo crear ningún QR</string>
+    <string name="batch_create_open_folder">Abrir carpeta</string>
+
+    <string name="settings_import_csv">Importar desde CSV</string>
+    <string name="import_success">Importados: %1$d</string>
+    <string name="import_failed">Error al importar</string>
+    <string name="import_empty">Archivo vacío o formato inválido</string>
+    <string name="import_confirm_title">¿Importar registros?</string>
+    <string name="import_confirm_desc">El historial actual se conservará. Se añadirán nuevos registros.</string>
+    <string name="import_confirm_yes">Importar</string>
+</resources>
