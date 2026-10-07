@@ -16,7 +16,7 @@ object QrGenerator {
 
     fun generate(
         content: String,
-        size: Int = 1400,
+        size: Int = 1080,
         style: QrStyle = QrStyle()
     ): Bitmap? {
         if (content.isBlank()) return null
@@ -30,45 +30,55 @@ object QrGenerator {
             )
 
             val matrix = QRCodeWriter().encode(content, BarcodeFormat.QR_CODE, size, size, hints)
-            val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+
+            // Для больших размеров используем RGB_565 (в 2 раза меньше памяти)
+            val config = if (size >= 2000) Bitmap.Config.RGB_565 else Bitmap.Config.ARGB_8888
+            val bmp = Bitmap.createBitmap(size, size, config)
             val canvas = Canvas(bmp)
+
+            val bgPaint = Paint().apply { isAntiAlias = false }
 
             // ФОН
             if (style.bgGradient) {
-                val shader = LinearGradient(
+                bgPaint.shader = LinearGradient(
                     0f, 0f, size.toFloat(), size.toFloat(),
                     style.bgColor.toArgb(), style.bgColor2.toArgb(),
                     Shader.TileMode.CLAMP
                 )
-                val paint = Paint().apply { this.shader = shader }
-                canvas.drawRect(0f, 0f, size.toFloat(), size.toFloat(), paint)
             } else {
-                canvas.drawColor(style.bgColor.toArgb())
+                bgPaint.color = style.bgColor.toArgb()
             }
+            canvas.drawRect(0f, 0f, size.toFloat(), size.toFloat(), bgPaint)
 
-            // ТОЧКИ
+            // ТОЧКИ — рисуем через один Paint, без antiAlias для скорости
             val cellSize = size.toFloat() / matrix.width
-            val dotPaint = Paint().apply { isAntiAlias = true }
+            val dotPaint = Paint().apply { isAntiAlias = false }
 
-            for (x in 0 until matrix.width) {
-                for (y in 0 until matrix.height) {
-                    if (matrix[x, y]) {
-                        dotPaint.color = if (style.dotGradient) {
-                            interpolate(
-                                style.dotColor.toArgb(),
-                                style.dotColor2.toArgb(),
-                                (x + y).toFloat() / (matrix.width + matrix.height - 2)
-                            )
-                        } else {
-                            style.dotColor.toArgb()
+            if (!style.dotGradient) {
+                // Быстрый путь без градиента — один цвет, один проход
+                dotPaint.color = style.dotColor.toArgb()
+                for (x in 0 until matrix.width) {
+                    val left = x * cellSize
+                    val right = left + cellSize
+                    for (y in 0 until matrix.height) {
+                        if (matrix[x, y]) {
+                            canvas.drawRect(left, y * cellSize, right, (y + 1) * cellSize, dotPaint)
                         }
-                        canvas.drawRect(
-                            x * cellSize,
-                            y * cellSize,
-                            (x + 1) * cellSize,
-                            (y + 1) * cellSize,
-                            dotPaint
-                        )
+                    }
+                }
+            } else {
+                // Градиент — вычисляем цвет для каждой точки
+                val fromArgb = style.dotColor.toArgb()
+                val toArgb = style.dotColor2.toArgb()
+                val maxT = (matrix.width + matrix.height - 2).toFloat()
+                for (x in 0 until matrix.width) {
+                    val left = x * cellSize
+                    val right = left + cellSize
+                    for (y in 0 until matrix.height) {
+                        if (matrix[x, y]) {
+                            dotPaint.color = interpolate(fromArgb, toArgb, (x + y) / maxT)
+                            canvas.drawRect(left, y * cellSize, right, (y + 1) * cellSize, dotPaint)
+                        }
                     }
                 }
             }
@@ -80,17 +90,19 @@ object QrGenerator {
                 val left = (size - logoSize) / 2f
                 val top = (size - logoSize) / 2f
 
-                val bgPaint = Paint().apply {
+                val bgLogoPaint = Paint().apply {
                     isAntiAlias = true
                     color = style.logoBackground.toArgb()
                 }
                 canvas.drawRoundRect(
                     RectF(left - pad, top - pad, left + logoSize + pad, top + logoSize + pad),
-                    pad * 1.5f, pad * 1.5f, bgPaint
+                    pad * 1.5f, pad * 1.5f, bgLogoPaint
                 )
 
                 val scaled = Bitmap.createScaledBitmap(logo, logoSize, logoSize, true)
                 canvas.drawBitmap(scaled, left, top, null)
+                // Освобождаем масштабированную копию
+                if (scaled != logo) scaled.recycle()
             }
 
             bmp
