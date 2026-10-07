@@ -1,0 +1,196 @@
+<resources>
+    <string name="app_name">QR Tools</string>
+    <string name="home">主页</string>
+    <string name="scanner">扫描</string>
+    <string name="generator">生成</string>
+    <string name="history">历史</string>
+    <string name="favorites">收藏</string>
+    <string name="settings">设置</string>
+    <string name="about">关于</string>
+    <string name="back">返回</string>
+
+    <string name="scan_qr">扫描二维码</string>
+    <string name="scan_qr_desc">将相机对准二维码或条形码</string>
+    <string name="create_qr">创建二维码</string>
+    <string name="create_qr_desc">文本、链接、WiFi、联系人、短信</string>
+    <string name="history_desc">所有扫描记录</string>
+    <string name="favorites_desc">收藏的二维码</string>
+
+    <string name="history_empty">历史记录为空</string>
+    <string name="favorites_empty">暂无收藏</string>
+    <string name="delete">删除</string>
+    <string name="favorite">添加到收藏</string>
+    <string name="unfavorite">取消收藏</string>
+
+    <string name="home_scan_sub">二维码和条形码</string>
+    <string name="home_create_sub">5 种类型</string>
+    <string name="home_history_sub">所有扫描</string>
+    <string name="home_favorites_sub">重要代码</string>
+
+    <string name="permission_camera_title">需要相机权限</string>
+    <string name="permission_camera_desc">请允许相机权限以扫描二维码和条形码</string>
+    <string name="permission_grant">允许</string>
+    <string name="permission_contacts_title">需要联系人权限</string>
+    <string name="permission_contacts_desc">请允许联系人权限以从通讯录加载联系人</string>
+    <string name="permission_contacts_denied">没有权限无法选择联系人</string>
+
+    <string name="scan_hint">将相机对准代码</string>
+    <string name="scan_result">结果</string>
+    <string name="action_open">打开</string>
+    <string name="action_copy">复制</string>
+    <string name="action_share">分享</string>
+    <string name="action_save">收藏</string>
+    <string name="action_unsave">取消收藏</string>
+    <string name="action_scan_again">继续扫描</string>
+    <string name="copied">已复制</string>
+    <string name="qr_copied">二维码已复制</string>
+    <string name="show_raw">显示原始数据</string>
+    <string name="hide_raw">隐藏原始数据</string>
+
+    <string name="gen_type">代码类型</string>
+    <string name="gen_text">文本</string>
+    <string name="gen_url">链接</string>
+    <string name="gen_wifi">WiFi</string>
+    <string name="gen_contact">联系人</string>
+    <string name="gen_sms">短信</string>
+
+    <string name="field_text">输入文本</string>
+    <string name="field_url">输入链接 (https://…)</string>
+    <string name="field_wifi_ssid">网络名称 (SSID)</string>
+    <string name="field_wifi_password">密码</string>
+    <string name="field_wifi_security">加密类型</string>
+    <string name="wifi_wpa">WPA/WPA2</string>
+    <string name="wifi_wep">WEP</string>
+    <string name="wifi_none">开放</string>
+    <string name="field_contact_name">姓名</string>
+    <string name="field_contact_phone">电话</string>
+    <string name="field_contact_email">邮箱</string>
+    <string name="field_sms_phone">电话号码</string>
+    <string name="field_sms_message">短信内容</string>
+    <string name="qr_pick_contact">从通讯录加载</string>
+    <string name="contact_read_failed">读取联系人失败</string>
+
+    <string name="btn_generate">生成</string>
+    <string name="btn_save_gallery">保存</string>
+    <string name="btn_share_qr">分享</string>
+
+    <string name="generated_title">生成的二维码</string>
+    <string name="saved_gallery">已保存到相册</string>
+    <string name="save_failed">保存失败</string>
+    <string name="fill_fields">请填写字段</string>
+
+    <string name="from_gallery">从相册选择</string>
+    <string name="no_code_in_image">图片中未找到代码</string>
+    <string name="search_hint">按内容搜索</string>
+
+    <string name="wifi_network">网络</string>
+    <string name="wifi_password">密码</string>
+    <string name="wifi_security">加密</string>
+    <string name="wifi_hidden">隐藏网络</string>
+    <string name="wifi_hidden_yes">是</string>
+    <string name="wifi_hidden_no">否</string>
+    <string name="wifi_connect">连接 Wi-Fi</string>
+    <string name="wifi_connecting">连接中…</string>
+    <string name="wifi_connect_failed">连接失败</string>
+    <string name="wifi_no_password">无密码</string>
+    <string name="wifi_open">开放</string>
+
+    <string name="contact_name">姓名</string>
+    <string name="contact_phone">电话</string>
+    <string name="contact_email">邮箱</string>
+    <string name="contact_call">拨打电话</string>
+    <string name="action_send_email">发送邮件</string>
+
+    <string name="settings_language">语言</string>
+    <string name="settings_theme">主题</string>
+    <string name="settings_icon">应用图标</string>
+    <string name="settings_behavior">行为</string>
+    <string name="settings_sound">扫描声音</string>
+    <string name="settings_vibro">扫描震动</string>
+    <string name="settings_auto_copy">自动复制到剪贴板</string>
+    <string name="settings_history">历史</string>
+    <string name="settings_clear_history">清空所有历史</string>
+    <string name="settings_export_csv">导出为 CSV (Excel)</string>
+    <string name="settings_support">支持作者</string>
+    <string name="settings_support_desc">任意金额支持项目发展</string>
+    <string name="settings_feedback">反馈</string>
+    <string name="settings_email">发送邮件</string>
+    <string name="settings_telegram">Telegram 联系</string>
+    <string name="settings_donate">通过 DonationAlerts 捐赠</string>
+    <string name="settings_our_apps">我们的应用</string>
+    <string name="settings_about">关于</string>
+    <string name="settings_about_desc">版本、作者、联系方式</string>
+
+    <string name="lang_system">跟随系统</string>
+    <string name="lang_russian">Русский</string>
+    <string name="lang_english">English</string>
+    <string name="lang_chinese">中文</string>
+
+    <string name="clear_history_title">清空历史？</string>
+    <string name="clear_history_desc">所有记录将被永久删除</string>
+    <string name="clear_history_confirm">清空</string>
+    <string name="cancel">取消</string>
+    <string name="history_cleared">历史已清空</string>
+    <string name="csv_exported">文件已保存到下载</string>
+    <string name="csv_export_failed">保存文件失败</string>
+    <string name="csv_no_data">没有可导出的数据</string>
+
+    <string name="donate_success">感谢您的支持！</string>
+    <string name="link_error">无法打开链接</string>
+    <string name="about_contacts">联系方式</string>
+    <string name="about_support">支持项目</string>
+    <string name="about_donate_button">DonationAlerts</string>
+    <string name="about_version_full">版本: 1.0.0</string>
+    <string name="about_app_title">关于</string>
+    <string name="about_app_desc">QR Tools — 快速便捷的二维码和条形码扫描与生成工具。支持所有主流格式、相册扫描、历史记录、收藏、数据导出以及通过二维码连接 Wi-Fi。</string>
+    <string name="about_development">开发</string>
+    <string name="about_our_apps">我们的应用</string>
+    <string name="about_our_apps_desc">开发者的所有项目集中在这里</string>
+    <string name="about_our_apps_button">打开目录</string>
+    <string name="about_copyright">© 2026 QR Tools. 保留所有权利。</string>
+
+    <string name="history_today">今天</string>
+    <string name="history_yesterday">昨天</string>
+
+    <string name="icon_blue">蓝色</string>
+    <string name="icon_dark">深色</string>
+    <string name="icon_green">翠绿</string>
+    <string name="icon_purple">紫水晶</string>
+    <string name="icon_changed">图标已更改。如果未更新，请重启桌面。</string>
+
+    <string name="theme_system">跟随系统</string>
+    <string name="theme_light">浅色</string>
+    <string name="theme_dark">深色</string>
+    <string name="theme_ocean">海洋</string>
+    <string name="theme_forest">森林</string>
+    <string name="theme_amethyst">紫水晶</string>
+
+    <string name="type_text">文本</string>
+    <string name="type_url">链接</string>
+    <string name="type_wifi">WiFi</string>
+    <string name="type_contact">联系人</string>
+    <string name="type_sms">短信</string>
+    <string name="type_email">邮箱</string>
+    <string name="type_phone">电话</string>
+    <string name="type_barcode">条形码</string>
+    <string name="type_other">其他</string>
+
+    <string name="qr_styling">二维码样式</string>
+    <string name="qr_presets">预设</string>
+    <string name="qr_dot_color">点颜色</string>
+    <string name="qr_bg_color">背景颜色</string>
+    <string name="qr_gradient_dots">点渐变</string>
+    <string name="qr_gradient_bg">背景渐变</string>
+    <string name="qr_logo">中心 Logo</string>
+    <string name="qr_logo_upload">上传 Logo</string>
+    <string name="qr_logo_remove">删除 Logo</string>
+
+    <string name="off_title">产品信息</string>
+    <string name="off_loading">加载中…</string>
+    <string name="off_not_found">数据库中未找到产品</string>
+    <string name="off_no_internet">无网络连接</string>
+    <string name="off_brand">品牌</string>
+    <string name="off_quantity">容量</string>
+    <string name="off_categories">分类</string>
+    <string name="off_show_details">在 Open Food Facts 中打开</string>
+</resources>
