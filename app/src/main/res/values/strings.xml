@@ -239,4 +239,8 @@
     
     <string name="batch_scan">Из галереи</string>
     <string name="settings_rate_text">Будем рады вашему отзыву о нашем приложении в магазине</string>
+    <string name="btn_save_pdf">Сохранить в PDF</string>
+    <string name="pdf_saved">PDF сохранён в Загрузки</string>
+    <string name="pdf_failed">Не удалось сохранить PDF</string>
+    <string name="pdf_share">Поделиться PDF</string>
 </resources>
