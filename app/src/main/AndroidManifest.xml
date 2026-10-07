@@ -25,11 +25,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.QRTools">
 
+        <!-- Главная активити (без launcher-фильтра — запускается через alias) -->
         <activity
             android:name=".MainActivity"
             android:exported="false"
             android:theme="@style/Theme.QRTools" />
 
+        <!-- Псевдонимы для разных иконок -->
         <activity-alias
             android:name=".IconBlue"
             android:enabled="true"
@@ -86,6 +88,19 @@
             </intent-filter>
         </activity-alias>
 
+        <!-- Виджет -->
+        <receiver
+            android:name=".widget.QrWidgetProvider"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_qr_info" />
+        </receiver>
+
+        <!-- FileProvider для PDF/CSV/шаринга -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
