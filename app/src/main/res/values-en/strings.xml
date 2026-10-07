@@ -192,7 +192,7 @@
     <string name="off_quantity">Quantity</string>
     <string name="off_categories">Categories</string>
     <string name="off_show_details">Open in Open Food Facts</string>
-    <!-- QR presets -->
+    
     <string name="preset_classic">Classic</string>
     <string name="preset_blue">Blue</string>
     <string name="preset_dark">Dark</string>
@@ -207,7 +207,7 @@
     <string name="settings_behavior_desc">Sound, vibration and copy</string>
     <string name="settings_history_desc">Export and clear history</string>
     <string name="settings_about_desc">Version, author, info</string>
-    <!-- Batch delete -->
+    
     <string name="history_select">Select</string>
     <string name="history_cancel">Cancel</string>
     <string name="history_selected">Selected: %1$d</string>
@@ -217,7 +217,6 @@
     <string name="history_delete_confirm_desc">Records to delete: %1$d</string>
     <string name="history_deleted">Deleted records: %1$d</string>
 
-    <!-- Notes -->
     <string name="note_title">Note</string>
     <string name="note_add">Add note</string>
     <string name="note_edit">Edit note</string>
@@ -232,4 +231,9 @@
     <string name="unpin">Unpin</string>
     <string name="settings_clear_hidden">Delete hidden scans</string>
     <string name="hidden_cleared">Hidden scans deleted</string>
+    <!-- Batch scan -->
+    <string name="batch_scan">Batch from gallery</string>
+    <string name="batch_scanning">Processing %1$d of %2$d…</string>
+    <string name="batch_result">Recognized: %1$d of %2$d</string>
+    <string name="batch_nothing">Nothing found</string>
 </resources>
