@@ -16,8 +16,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -27,9 +29,11 @@ import androidx.compose.material.icons.filled.Notes
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.QrCode
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Sms
 import androidx.compose.material.icons.filled.Wifi
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,10 +43,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -54,6 +61,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -83,6 +91,9 @@ fun HistoryScreen(nav: NavController, repo: HistoryRepository, autoCopy: Boolean
     val scope = rememberCoroutineScope()
 
     var query by remember { mutableStateOf("") }
+    var selectionMode by remember { mutableStateOf(false) }
+    val selectedIds = remember { mutableStateListOf<Long>() }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     val items by (if (query.isBlank()) repo.getAll() else repo.search(query))
         .collectAsState(initial = emptyList())
@@ -95,34 +106,82 @@ fun HistoryScreen(nav: NavController, repo: HistoryRepository, autoCopy: Boolean
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.history)) },
-                navigationIcon = {
-                    IconButton(onClick = { nav.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+            if (selectionMode) {
+                TopAppBar(
+                    title = { Text(stringResource(R.string.history_selected, selectedIds.size)) },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            selectionMode = false
+                            selectedIds.clear()
+                        }) {
+                            Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.history_cancel))
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = {
+                            if (selectedIds.size == items.size) {
+                                selectedIds.clear()
+                            } else {
+                                selectedIds.clear()
+                                selectedIds.addAll(items.map { it.id })
+                            }
+                        }) {
+                            Icon(
+                                Icons.Default.DoneAll,
+                                contentDescription = stringResource(R.string.history_select_all)
+                            )
+                        }
+                        IconButton(
+                            onClick = { if (selectedIds.isNotEmpty()) showDeleteDialog = true },
+                            enabled = selectedIds.isNotEmpty()
+                        ) {
+                            Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.history_delete_selected))
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                )
+            } else {
+                TopAppBar(
+                    title = { Text(stringResource(R.string.history)) },
+                    navigationIcon = {
+                        IconButton(onClick = { nav.popBackStack() }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+                        }
+                    },
+                    actions = {
+                        if (items.isNotEmpty()) {
+                            TextButton(onClick = { selectionMode = true }) {
+                                Text(stringResource(R.string.history_select))
+                            }
+                        }
                     }
-                }
-            )
+                )
+            }
         }
     ) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
-            OutlinedTextField(
-                value = query,
-                onValueChange = { query = it },
-                placeholder = { Text(stringResource(R.string.search_hint)) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                trailingIcon = {
-                    if (query.isNotEmpty()) {
-                        IconButton(onClick = { query = "" }) {
-                            Icon(Icons.Default.Clear, contentDescription = null)
+            if (!selectionMode) {
+                OutlinedTextField(
+                    value = query,
+                    onValueChange = { query = it },
+                    placeholder = { Text(stringResource(R.string.search_hint)) },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                    trailingIcon = {
+                        if (query.isNotEmpty()) {
+                            IconButton(onClick = { query = "" }) {
+                                Icon(Icons.Default.Clear, contentDescription = null)
+                            }
                         }
-                    }
-                },
-                singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-            )
+                    },
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            }
 
             if (items.isEmpty()) {
                 Box(Modifier.fillMaxSize()) {
@@ -144,11 +203,28 @@ fun HistoryScreen(nav: NavController, repo: HistoryRepository, autoCopy: Boolean
                             is HistoryItem.Header -> DayHeader(item.title)
                             is HistoryItem.Scan -> ScanRow(
                                 item = item.entity,
-                                onClick = {
-                                    if (autoCopy) {
-                                        ClipboardUtils.copy(context, item.entity.content, context.getString(R.string.copied))
+                                selectionMode = selectionMode,
+                                selected = selectedIds.contains(item.entity.id),
+                                onToggleSelect = {
+                                    if (selectedIds.contains(item.entity.id)) {
+                                        selectedIds.remove(item.entity.id)
+                                    } else {
+                                        selectedIds.add(item.entity.id)
                                     }
-                                    nav.navigate("result/${item.entity.id}")
+                                },
+                                onClick = {
+                                    if (selectionMode) {
+                                        if (selectedIds.contains(item.entity.id)) {
+                                            selectedIds.remove(item.entity.id)
+                                        } else {
+                                            selectedIds.add(item.entity.id)
+                                        }
+                                    } else {
+                                        if (autoCopy) {
+                                            ClipboardUtils.copy(context, item.entity.content, context.getString(R.string.copied))
+                                        }
+                                        nav.navigate("result/${item.entity.id}")
+                                    }
                                 },
                                 onToggleFavorite = { scope.launch { repo.toggleFavorite(item.entity) } },
                                 onDelete = { scope.launch { repo.delete(item.entity) } }
@@ -158,6 +234,32 @@ fun HistoryScreen(nav: NavController, repo: HistoryRepository, autoCopy: Boolean
                 }
             }
         }
+    }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text(stringResource(R.string.history_delete_confirm_title)) },
+            text = { Text(stringResource(R.string.history_delete_confirm_desc, selectedIds.size)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    val toDelete = selectedIds.toList()
+                    scope.launch {
+                        repo.deleteByIds(toDelete)
+                        selectedIds.clear()
+                        selectionMode = false
+                        showDeleteDialog = false
+                    }
+                }) {
+                    Text(stringResource(R.string.clear_history_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
     }
 }
 
@@ -175,6 +277,9 @@ private fun DayHeader(title: String) {
 @Composable
 private fun ScanRow(
     item: ScanEntity,
+    selectionMode: Boolean,
+    selected: Boolean,
+    onToggleSelect: () -> Unit,
     onClick: () -> Unit,
     onToggleFavorite: () -> Unit,
     onDelete: () -> Unit
@@ -188,7 +293,7 @@ private fun ScanRow(
     val displayTitle = ScanDisplay.shortTitle(item.content, item.type)
 
     Card(
-        onClick = onClick,
+        onClick = { if (selectionMode) onToggleSelect() else onClick() },
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
@@ -196,22 +301,32 @@ private fun ScanRow(
             modifier = Modifier.fillMaxWidth().padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(accent.copy(alpha = 0.15f)),
-                contentAlignment = Alignment.Center
-            ) {
+            if (selectionMode) {
                 Icon(
-                    imageVector = icon,
+                    imageVector = if (selected) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
                     contentDescription = null,
-                    tint = accent,
+                    tint = if (selected) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
                     modifier = Modifier.size(24.dp)
                 )
+                Spacer(Modifier.size(12.dp))
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(accent.copy(alpha = 0.15f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = accent,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                Spacer(Modifier.size(12.dp))
             }
-
-            Spacer(Modifier.size(12.dp))
 
             Column(Modifier.weight(1f)) {
                 Text(
@@ -221,6 +336,17 @@ private fun ScanRow(
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurface
                 )
+                if (item.note.isNotBlank()) {
+                    Text(
+                        text = "📝 ${item.note}",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontStyle = FontStyle.Italic,
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
+                }
                 Text(
                     text = "$typeTitle · ${timeFormat.format(Date(item.timestamp))}",
                     style = MaterialTheme.typography.bodySmall,
@@ -229,15 +355,17 @@ private fun ScanRow(
                 )
             }
 
-            IconButton(onClick = onToggleFavorite) {
-                Icon(
-                    imageVector = if (item.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                    contentDescription = stringResource(if (item.isFavorite) R.string.unfavorite else R.string.favorite),
-                    tint = if (item.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                )
-            }
-            IconButton(onClick = onDelete) {
-                Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
+            if (!selectionMode) {
+                IconButton(onClick = onToggleFavorite) {
+                    Icon(
+                        imageVector = if (item.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = stringResource(if (item.isFavorite) R.string.unfavorite else R.string.favorite),
+                        tint = if (item.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                }
+                IconButton(onClick = onDelete) {
+                    Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
+                }
             }
         }
     }
