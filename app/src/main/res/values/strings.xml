@@ -242,4 +242,15 @@
     <string name="pdf_saved">PDF сохранён в Загрузки</string>
     <string name="pdf_failed">Не удалось сохранить PDF</string>
     <string name="pdf_share">Поделиться PDF</string>
+    <!-- Визитка -->
+    <string name="gen_vcard">Визитка</string>
+    <string name="field_vcard_firstname">Имя</string>
+    <string name="field_vcard_lastname">Фамилия</string>
+    <string name="field_vcard_company">Компания</string>
+    <string name="field_vcard_position">Должность</string>
+    <string name="field_vcard_phone">Телефон</string>
+    <string name="field_vcard_email">Email</string>
+    <string name="field_vcard_website">Сайт</string>
+    <string name="field_vcard_address">Адрес</string>
+    <string name="field_vcard_note">Заметка</string>
 </resources>
