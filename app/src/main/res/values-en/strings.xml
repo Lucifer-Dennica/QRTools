@@ -193,4 +193,13 @@
     <string name="off_quantity">Quantity</string>
     <string name="off_categories">Categories</string>
     <string name="off_show_details">Open in Open Food Facts</string>
+    <!-- QR presets -->
+    <string name="preset_classic">Classic</string>
+    <string name="preset_blue">Blue</string>
+    <string name="preset_dark">Dark</string>
+    <string name="preset_sunset">Sunset</string>
+    <string name="preset_ocean">Ocean</string>
+    <string name="preset_forest">Forest</string>
+    <string name="preset_amethyst">Amethyst</string>
+    <string name="preset_inverse">Inverse</string>
 </resources>
