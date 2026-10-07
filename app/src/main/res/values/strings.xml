@@ -242,7 +242,7 @@
     <string name="pdf_saved">PDF сохранён в Загрузки</string>
     <string name="pdf_failed">Не удалось сохранить PDF</string>
     <string name="pdf_share">Поделиться PDF</string>
-    <!-- Визитка -->
+    
     <string name="gen_vcard">Визитка</string>
     <string name="field_vcard_firstname">Имя</string>
     <string name="field_vcard_lastname">Фамилия</string>
@@ -255,4 +255,11 @@
     <string name="field_vcard_note">Заметка</string>
     <string name="widget_desc">Быстрый доступ к сканеру</string>
     <string name="widget_scan">Сканировать</string>
+    <string name="settings_import_csv">Импорт из CSV</string>
+    <string name="import_success">Импортировано записей: %1$d</string>
+    <string name="import_failed">Не удалось импортировать</string>
+    <string name="import_empty">Файл пуст или неверный формат</string>
+    <string name="import_confirm_title">Импортировать записи?</string>
+    <string name="import_confirm_desc">Текущая история сохранится. Новые записи добавятся к ней.</string>
+    <string name="import_confirm_yes">Импортировать</string>
 </resources>
