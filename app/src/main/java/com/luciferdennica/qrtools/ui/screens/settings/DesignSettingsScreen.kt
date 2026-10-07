@@ -47,6 +47,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.luciferdennica.qrtools.R
+import com.luciferdennica.qrtools.data.prefs.QrResolution
 import com.luciferdennica.qrtools.data.prefs.SettingsPrefs
 import com.luciferdennica.qrtools.domain.model.ThemeMode
 import com.luciferdennica.qrtools.ui.components.BannerAd
@@ -62,8 +63,10 @@ fun DesignSettingsScreen(nav: NavController, prefs: SettingsPrefs) {
 
     val currentTheme by prefs.theme.collectAsState(initial = ThemeMode.SYSTEM)
     val currentIcon by prefs.appIcon.collectAsState(initial = AppIcon.BLUE)
+    val currentRes by prefs.qrResolution.collectAsState(initial = QrResolution.HD)
 
     var themeExpanded by remember { mutableStateOf(false) }
+    var resExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -92,6 +95,7 @@ fun DesignSettingsScreen(nav: NavController, prefs: SettingsPrefs) {
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // Тема
                 SectionTitle(stringResource(R.string.settings_theme))
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -132,6 +136,7 @@ fun DesignSettingsScreen(nav: NavController, prefs: SettingsPrefs) {
                     }
                 }
 
+                // Иконка
                 SectionTitle(stringResource(R.string.settings_icon))
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -174,11 +179,59 @@ fun DesignSettingsScreen(nav: NavController, prefs: SettingsPrefs) {
                         }
                     }
                 }
+
+                // Разрешение QR
+                SectionTitle(stringResource(R.string.settings_qr_resolution))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    Column(Modifier.fillMaxWidth().padding(12.dp)) {
+                        ExposedDropdownMenuBox(
+                            expanded = resExpanded,
+                            onExpandedChange = { resExpanded = it }
+                        ) {
+                            OutlinedTextField(
+                                value = resolutionLabel(currentRes),
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text(stringResource(R.string.settings_qr_resolution)) },
+                                trailingIcon = {
+                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = resExpanded)
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
+                            )
+                            ExposedDropdownMenu(
+                                expanded = resExpanded,
+                                onDismissRequest = { resExpanded = false }
+                            ) {
+                                QrResolution.values().forEach { res ->
+                                    DropdownMenuItem(
+                                        text = { Text(resolutionLabel(res)) },
+                                        onClick = {
+                                            scope.launch { prefs.setQrResolution(res) }
+                                            resExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             BannerAd()
         }
     }
+}
+
+@Composable
+private fun resolutionLabel(res: QrResolution): String = when (res) {
+    QrResolution.HD -> stringResource(R.string.resolution_hd)
+    QrResolution.TWO_K -> stringResource(R.string.resolution_2k)
+    QrResolution.FOUR_K -> stringResource(R.string.resolution_4k)
 }
 
 @Composable
