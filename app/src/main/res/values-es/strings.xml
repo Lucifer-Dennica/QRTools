@@ -287,4 +287,17 @@
     <string name="import_confirm_title">¿Importar registros?</string>
     <string name="import_confirm_desc">El historial actual se conservará. Se añadirán nuevos registros.</string>
     <string name="import_confirm_yes">Importar</string>
+
+    <string name="settings_swipes">Gestos</string>
+    <string name="settings_swipes_desc">Gestos en pantalla principal</string>
+    <string name="swipe_left">Deslizar a la izquierda</string>
+    <string name="swipe_right">Deslizar a la derecha</string>
+    <string name="swipe_up">Deslizar arriba</string>
+    <string name="swipe_down">Deslizar abajo</string>
+    <string name="swipe_off">Desactivado</string>
+    <string name="swipe_scanner">Abrir escáner</string>
+    <string name="swipe_generator">Abrir generador</string>
+    <string name="swipe_history">Abrir historial</string>
+    <string name="swipe_favorites">Abrir favoritos</string>
+    <string name="swipe_settings">Abrir ajustes</string>
 </resources>
