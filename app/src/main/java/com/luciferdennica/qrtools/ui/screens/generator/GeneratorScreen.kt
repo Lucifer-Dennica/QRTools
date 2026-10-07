@@ -21,6 +21,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,6 +40,7 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
@@ -87,6 +89,7 @@ import com.luciferdennica.qrtools.qr.QrTypeBuilders
 import com.luciferdennica.qrtools.util.ClipboardUtils
 import com.luciferdennica.qrtools.util.GalleryUtils
 import com.luciferdennica.qrtools.util.IntentUtils
+import com.luciferdennica.qrtools.util.PdfExporter
 import kotlinx.coroutines.launch
 
 private enum class GenType(val labelRes: Int) {
@@ -530,27 +533,59 @@ fun GeneratorScreen(nav: NavController) {
                     }
                 }
 
+                // ТРИ КНОПКИ: Сохранить / PDF / Поделиться
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     OutlinedButton(
                         onClick = { saveCurrentToGallery() },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp)
                     ) {
-                        Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.size(6.dp))
-                        Text(stringResource(R.string.btn_save_gallery))
+                        Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(Modifier.size(4.dp))
+                        Text(
+                            text = stringResource(R.string.btn_save_gallery),
+                            style = MaterialTheme.typography.labelSmall,
+                            maxLines = 1
+                        )
+                    }
+                    OutlinedButton(
+                        onClick = {
+                            val uri = PdfExporter.exportToPdf(context, bmp, qrContent)
+                            if (uri != null) {
+                                Toast.makeText(context, context.getString(R.string.pdf_saved), Toast.LENGTH_SHORT).show()
+                                PdfExporter.sharePdf(context, uri)
+                            } else {
+                                Toast.makeText(context, context.getString(R.string.pdf_failed), Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        modifier = Modifier.weight(1f),
+                        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp)
+                    ) {
+                        Icon(Icons.Default.PictureAsPdf, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(Modifier.size(4.dp))
+                        Text(
+                            text = stringResource(R.string.btn_save_pdf),
+                            style = MaterialTheme.typography.labelSmall,
+                            maxLines = 1
+                        )
                     }
                     OutlinedButton(
                         onClick = {
                             IntentUtils.shareImage(context, bmp, "qrtools_${System.currentTimeMillis()}.png")
                         },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp)
                     ) {
-                        Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.size(6.dp))
-                        Text(stringResource(R.string.btn_share_qr))
+                        Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(Modifier.size(4.dp))
+                        Text(
+                            text = stringResource(R.string.btn_share_qr),
+                            style = MaterialTheme.typography.labelSmall,
+                            maxLines = 1
+                        )
                     }
                 }
 
