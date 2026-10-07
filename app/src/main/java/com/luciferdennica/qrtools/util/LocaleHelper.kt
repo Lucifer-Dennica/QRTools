@@ -31,6 +31,9 @@ object LocaleHelper {
             "ru" -> Locale("ru", "RU")
             "en" -> Locale("en", "US")
             "zh" -> Locale("zh", "CN")
+            "es" -> Locale("es", "ES")
+            "de" -> Locale("de", "DE")
+            "fr" -> Locale("fr", "FR")
             else -> Locale.getDefault()
         }
 
