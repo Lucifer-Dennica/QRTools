@@ -2,6 +2,7 @@ package com.luciferdennica.qrtools.qr
 
 import android.graphics.Bitmap
 import androidx.compose.ui.graphics.Color
+import com.luciferdennica.qrtools.R
 
 data class QrStyle(
     val dotColor: Color = Color(0xFF000000),
@@ -42,41 +43,55 @@ data class QrStyle(
             Color(0xFFFFF3E0) to Color(0xFFFFE0B2),
             Color(0xFFE0F7FA) to Color(0xFFB2EBF2)
         )
-
-        val PRESETS: List<Pair<String, QrStyle>> = listOf(
-            "Классика" to QrStyle(),
-            "Синий" to QrStyle(dotColor = Color(0xFF0D47A1), bgColor = Color(0xFFFFFFFF)),
-            "Тёмная" to QrStyle(dotColor = Color(0xFFFFFFFF), bgColor = Color(0xFF0A0A0A)),
-            "Закат" to QrStyle(
-                dotColor = Color(0xFFE53935),
-                dotColor2 = Color(0xFFFB8C00),
-                dotGradient = true,
-                bgColor = Color(0xFFFFFFFF)
-            ),
-            "Океан" to QrStyle(
-                dotColor = Color(0xFF0D47A1),
-                dotColor2 = Color(0xFF00BCD4),
-                dotGradient = true,
-                bgColor = Color(0xFFFFFFFF)
-            ),
-            "Лес" to QrStyle(
-                dotColor = Color(0xFF1B5E20),
-                dotColor2 = Color(0xFF66BB6A),
-                dotGradient = true,
-                bgColor = Color(0xFFFFFFFF)
-            ),
-            "Аметист" to QrStyle(
-                dotColor = Color(0xFF4A148C),
-                dotColor2 = Color(0xFFE91E63),
-                dotGradient = true,
-                bgColor = Color(0xFFFFFFFF)
-            ),
-            "Инверсия" to QrStyle(
-                dotColor = Color(0xFFFFFFFF),
-                bgColor = Color(0xFF1E88E5),
-                bgColor2 = Color(0xFF0D47A1),
-                bgGradient = true
-            )
-        )
     }
+}
+
+/** Пресеты — отдельно, чтобы можно было перевести названия через ресурсы. */
+data class QrPreset(
+    val titleRes: Int,
+    val style: QrStyle
+)
+
+object QrPresets {
+    val ALL: List<QrPreset> = listOf(
+        QrPreset(R.string.preset_classic, QrStyle()),
+        QrPreset(R.string.preset_blue, QrStyle(
+            dotColor = Color(0xFF0D47A1),
+            bgColor = Color(0xFFFFFFFF)
+        )),
+        QrPreset(R.string.preset_dark, QrStyle(
+            dotColor = Color(0xFFFFFFFF),
+            bgColor = Color(0xFF0A0A0A)
+        )),
+        QrPreset(R.string.preset_sunset, QrStyle(
+            dotColor = Color(0xFFE53935),
+            dotColor2 = Color(0xFFFB8C00),
+            dotGradient = true,
+            bgColor = Color(0xFFFFFFFF)
+        )),
+        QrPreset(R.string.preset_ocean, QrStyle(
+            dotColor = Color(0xFF0D47A1),
+            dotColor2 = Color(0xFF00BCD4),
+            dotGradient = true,
+            bgColor = Color(0xFFFFFFFF)
+        )),
+        QrPreset(R.string.preset_forest, QrStyle(
+            dotColor = Color(0xFF1B5E20),
+            dotColor2 = Color(0xFF66BB6A),
+            dotGradient = true,
+            bgColor = Color(0xFFFFFFFF)
+        )),
+        QrPreset(R.string.preset_amethyst, QrStyle(
+            dotColor = Color(0xFF4A148C),
+            dotColor2 = Color(0xFFE91E63),
+            dotGradient = true,
+            bgColor = Color(0xFFFFFFFF)
+        )),
+        QrPreset(R.string.preset_inverse, QrStyle(
+            dotColor = Color(0xFFFFFFFF),
+            bgColor = Color(0xFF1E88E5),
+            bgColor2 = Color(0xFF0D47A1),
+            bgGradient = true
+        ))
+    )
 }
