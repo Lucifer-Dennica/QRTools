@@ -36,6 +36,7 @@ import androidx.navigation.NavController
 import com.luciferdennica.qrtools.R
 import com.luciferdennica.qrtools.data.prefs.SettingsPrefs
 import com.luciferdennica.qrtools.data.repo.HistoryRepository
+import com.luciferdennica.qrtools.ui.components.BannerAd
 import com.luciferdennica.qrtools.util.CsvExporter
 import kotlinx.coroutines.launch
 
@@ -69,69 +70,76 @@ fun HistorySettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth().padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
-                    OutlinedButton(
-                        onClick = {
-                            scope.launch {
-                                val items = repo.getAllOnce()
-                                if (items.isEmpty()) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = {
+                                scope.launch {
+                                    val items = repo.getAllOnce()
+                                    if (items.isEmpty()) {
+                                        Toast.makeText(
+                                            context,
+                                            context.getString(R.string.csv_no_data),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        val ok = CsvExporter.exportAndShare(context, items)
+                                        Toast.makeText(
+                                            context,
+                                            context.getString(
+                                                if (ok) R.string.csv_exported else R.string.csv_export_failed
+                                            ),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(stringResource(R.string.settings_export_csv))
+                        }
+
+                        OutlinedButton(
+                            onClick = {
+                                scope.launch {
+                                    repo.clearHidden()
                                     Toast.makeText(
                                         context,
-                                        context.getString(R.string.csv_no_data),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                } else {
-                                    val ok = CsvExporter.exportAndShare(context, items)
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(
-                                            if (ok) R.string.csv_exported else R.string.csv_export_failed
-                                        ),
+                                        context.getString(R.string.hidden_cleared),
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(stringResource(R.string.settings_export_csv))
-                    }
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(stringResource(R.string.settings_clear_hidden))
+                        }
 
-                    OutlinedButton(
-                        onClick = {
-                            scope.launch {
-                                repo.clearHidden()
-                                Toast.makeText(
-                                    context,
-                                    context.getString(R.string.hidden_cleared),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(stringResource(R.string.settings_clear_hidden))
-                    }
-
-                    OutlinedButton(
-                        onClick = { showClearDialog = true },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(stringResource(R.string.settings_clear_history))
+                        OutlinedButton(
+                            onClick = { showClearDialog = true },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(stringResource(R.string.settings_clear_history))
+                        }
                     }
                 }
             }
+
+            BannerAd()
         }
     }
 
