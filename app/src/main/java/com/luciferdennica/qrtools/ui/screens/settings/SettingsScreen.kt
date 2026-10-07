@@ -1,9 +1,7 @@
 package com.luciferdennica.qrtools.ui.screens.settings
 
+import android.app.Activity
 import android.widget.Toast
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,12 +9,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
@@ -49,10 +46,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -61,12 +55,12 @@ import com.luciferdennica.qrtools.data.prefs.SettingsPrefs
 import com.luciferdennica.qrtools.data.repo.HistoryRepository
 import com.luciferdennica.qrtools.domain.model.ThemeMode
 import com.luciferdennica.qrtools.ui.nav.Routes
-import com.luciferdennica.qrtools.util.AppIcon
 import com.luciferdennica.qrtools.util.CsvExporter
-import com.luciferdennica.qrtools.util.IconManager
 import com.luciferdennica.qrtools.util.IntentUtils
+import com.luciferdennica.qrtools.util.LocaleHelper
 import kotlinx.coroutines.launch
 
+private const val APPS_URL = "https://lucifer-dennica.github.io/apps.html"
 private const val SUPPORT_EMAIL = "denis22142qwe@gmail.com"
 private const val SUPPORT_TELEGRAM = "Lucifer_Denicca_22142"
 private const val DONATE_URL = "https://www.donationalerts.com/r/lucifer_dennica_1999"
@@ -85,10 +79,11 @@ fun SettingsScreen(
     val sound by prefs.sound.collectAsState(initial = true)
     val vibro by prefs.vibro.collectAsState(initial = true)
     val autoCopy by prefs.autoCopy.collectAsState(initial = false)
-    val currentIcon by prefs.appIcon.collectAsState(initial = AppIcon.BLUE)
 
     var showClearDialog by remember { mutableStateOf(false) }
     var themeExpanded by remember { mutableStateOf(false) }
+    var langExpanded by remember { mutableStateOf(false) }
+    var currentLang by remember { mutableStateOf(LocaleHelper.getLang(context)) }
 
     Scaffold(
         topBar = {
@@ -113,6 +108,54 @@ fun SettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // ===== ЯЗЫК =====
+            SectionTitle(stringResource(R.string.settings_language))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Column(Modifier.fillMaxWidth().padding(12.dp)) {
+                    ExposedDropdownMenuBox(
+                        expanded = langExpanded,
+                        onExpandedChange = { langExpanded = it }
+                    ) {
+                        OutlinedTextField(
+                            value = langLabel(currentLang),
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text(stringResource(R.string.settings_language)) },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = langExpanded)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
+                        )
+                        ExposedDropdownMenu(
+                            expanded = langExpanded,
+                            onDismissRequest = { langExpanded = false }
+                        ) {
+                            listOf(
+                                "system" to R.string.lang_system,
+                                "ru" to R.string.lang_russian,
+                                "en" to R.string.lang_english,
+                                "zh" to R.string.lang_chinese
+                            ).forEach { (code, labelRes) ->
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(labelRes)) },
+                                    onClick = {
+                                        currentLang = code
+                                        langExpanded = false
+                                        LocaleHelper.setLang(context, code)
+                                        (context as? Activity)?.recreate()
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
             // ===== ТЕМА =====
             SectionTitle(stringResource(R.string.settings_theme))
             Card(
@@ -125,7 +168,7 @@ fun SettingsScreen(
                         onExpandedChange = { themeExpanded = it }
                     ) {
                         OutlinedTextField(
-                            value = currentTheme.title,
+                            value = stringResource(currentTheme.titleRes),
                             onValueChange = {},
                             readOnly = true,
                             label = { Text(stringResource(R.string.settings_theme)) },
@@ -142,57 +185,13 @@ fun SettingsScreen(
                         ) {
                             ThemeMode.values().forEach { mode ->
                                 DropdownMenuItem(
-                                    text = { Text(mode.title) },
+                                    text = { Text(stringResource(mode.titleRes)) },
                                     onClick = {
                                         scope.launch { prefs.setTheme(mode) }
                                         themeExpanded = false
                                     }
                                 )
                             }
-                        }
-                    }
-                }
-            }
-
-            // ===== ИКОНКА =====
-            SectionTitle(stringResource(R.string.settings_icon))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconOption(AppIcon.BLUE, R.drawable.ic_launcher, currentIcon) {
-                        scope.launch {
-                            prefs.setAppIcon(AppIcon.BLUE)
-                            IconManager.setIcon(context, AppIcon.BLUE)
-                            Toast.makeText(context, context.getString(R.string.icon_changed), Toast.LENGTH_LONG).show()
-                        }
-                    }
-                    IconOption(AppIcon.DARK, R.drawable.ic_launcher_dark, currentIcon) {
-                        scope.launch {
-                            prefs.setAppIcon(AppIcon.DARK)
-                            IconManager.setIcon(context, AppIcon.DARK)
-                            Toast.makeText(context, context.getString(R.string.icon_changed), Toast.LENGTH_LONG).show()
-                        }
-                    }
-                    IconOption(AppIcon.GREEN, R.drawable.ic_launcher_green, currentIcon) {
-                        scope.launch {
-                            prefs.setAppIcon(AppIcon.GREEN)
-                            IconManager.setIcon(context, AppIcon.GREEN)
-                            Toast.makeText(context, context.getString(R.string.icon_changed), Toast.LENGTH_LONG).show()
-                        }
-                    }
-                    IconOption(AppIcon.PURPLE, R.drawable.ic_launcher_purple, currentIcon) {
-                        scope.launch {
-                            prefs.setAppIcon(AppIcon.PURPLE)
-                            IconManager.setIcon(context, AppIcon.PURPLE)
-                            Toast.makeText(context, context.getString(R.string.icon_changed), Toast.LENGTH_LONG).show()
                         }
                     }
                 }
@@ -271,6 +270,39 @@ fun SettingsScreen(
                 }
             }
 
+            // ===== НАШИ ПРИЛОЖЕНИЯ =====
+            SectionTitle(stringResource(R.string.settings_our_apps))
+            Card(
+                onClick = { IntentUtils.openUrlSafe(context, APPS_URL) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Default.Apps,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(Modifier.padding(start = 12.dp))
+                    Column {
+                        Text(
+                            text = stringResource(R.string.settings_our_apps),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Text(
+                            text = stringResource(R.string.about_our_apps_desc),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        )
+                    }
+                }
+            }
+
             // ===== ПОДДЕРЖАТЬ АВТОРА =====
             SectionTitle(stringResource(R.string.settings_support))
             Card(
@@ -321,7 +353,7 @@ fun SettingsScreen(
                 ) {
                     OutlinedButton(
                         onClick = {
-                            IntentUtils.openEmail(context, SUPPORT_EMAIL, "QR Tools — обратная связь")
+                            IntentUtils.openEmail(context, SUPPORT_EMAIL, "QR Tools")
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -443,41 +475,11 @@ private fun SettingSwitch(
     }
 }
 
+/** Отображаемое имя языка для текущего кода */
 @Composable
-private fun IconOption(
-    icon: AppIcon,
-    drawableRes: Int,
-    current: AppIcon,
-    onClick: () -> Unit
-) {
-    val selected = current == icon
-    val borderColor = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .clip(CircleShape)
-            .clickable { onClick() }
-            .padding(4.dp)
-    ) {
-        Image(
-            painter = painterResource(drawableRes),
-            contentDescription = null,
-            modifier = Modifier
-                .size(64.dp)
-                .clip(CircleShape)
-                .border(3.dp, borderColor, CircleShape)
-        )
-        Text(
-            text = when (icon) {
-                AppIcon.BLUE -> stringResource(R.string.icon_blue)
-                AppIcon.DARK -> stringResource(R.string.icon_dark)
-                AppIcon.GREEN -> stringResource(R.string.icon_green)
-                AppIcon.PURPLE -> stringResource(R.string.icon_purple)
-            },
-            style = MaterialTheme.typography.bodySmall,
-            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(top = 4.dp)
-        )
-    }
+private fun langLabel(code: String): String = when (code) {
+    "ru" -> stringResource(R.string.lang_russian)
+    "en" -> stringResource(R.string.lang_english)
+    "zh" -> stringResource(R.string.lang_chinese)
+    else -> stringResource(R.string.lang_system)
 }
