@@ -207,4 +207,22 @@
     <string name="settings_behavior_desc">Sound, vibration and copy</string>
     <string name="settings_history_desc">Export and clear history</string>
     <string name="settings_about_desc">Version, author, info</string>
+    <!-- Batch delete -->
+    <string name="history_select">Select</string>
+    <string name="history_cancel">Cancel</string>
+    <string name="history_selected">Selected: %1$d</string>
+    <string name="history_delete_selected">Delete</string>
+    <string name="history_select_all">Select all</string>
+    <string name="history_delete_confirm_title">Delete selected records?</string>
+    <string name="history_delete_confirm_desc">Records to delete: %1$d</string>
+    <string name="history_deleted">Deleted records: %1$d</string>
+
+    <!-- Notes -->
+    <string name="note_title">Note</string>
+    <string name="note_add">Add note</string>
+    <string name="note_edit">Edit note</string>
+    <string name="note_hint">For example: "WiFi password at dacha"</string>
+    <string name="note_save">Save</string>
+    <string name="note_remove">Delete</string>
+    <string name="note_saved">Note saved</string>
 </resources>
