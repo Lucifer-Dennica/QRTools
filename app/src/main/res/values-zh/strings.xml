@@ -207,4 +207,22 @@
     <string name="settings_behavior_desc">声音、震动和复制</string>
     <string name="settings_history_desc">导出和清除历史</string>
     <string name="settings_about_desc">版本、作者、信息</string>
+    <!-- 批量删除 -->
+    <string name="history_select">选择</string>
+    <string name="history_cancel">取消</string>
+    <string name="history_selected">已选: %1$d</string>
+    <string name="history_delete_selected">删除</string>
+    <string name="history_select_all">全选</string>
+    <string name="history_delete_confirm_title">删除选中的记录？</string>
+    <string name="history_delete_confirm_desc">将删除记录数: %1$d</string>
+    <string name="history_deleted">已删除记录数: %1$d</string>
+
+    <!-- 备注 -->
+    <string name="note_title">备注</string>
+    <string name="note_add">添加备注</string>
+    <string name="note_edit">编辑备注</string>
+    <string name="note_hint">例如："别墅的Wi-Fi密码"</string>
+    <string name="note_save">保存</string>
+    <string name="note_remove">删除</string>
+    <string name="note_saved">备注已保存</string>
 </resources>
