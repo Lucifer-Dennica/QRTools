@@ -109,6 +109,22 @@ fun HistorySettingsScreen(
                     }
 
                     OutlinedButton(
+                        onClick = {
+                            scope.launch {
+                                repo.clearHidden()
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.hidden_cleared),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.settings_clear_hidden))
+                    }
+
+                    OutlinedButton(
                         onClick = { showClearDialog = true },
                         modifier = Modifier.fillMaxWidth()
                     ) {
