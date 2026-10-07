@@ -262,4 +262,20 @@
     <string name="import_confirm_title">Импортировать записи?</string>
     <string name="import_confirm_desc">Текущая история сохранится. Новые записи добавятся к ней.</string>
     <string name="import_confirm_yes">Импортировать</string>
+    <!-- Разрешение QR -->
+    <string name="settings_qr_resolution">Разрешение QR</string>
+    <string name="resolution_hd">HD — 1080×1080</string>
+    <string name="resolution_2k">2K — 2048×2048</string>
+    <string name="resolution_4k">4K — 3840×3840</string>
+    <!-- Скан из буфера -->
+    <string name="from_clipboard">Из буфера</string>
+    <string name="clipboard_no_image">В буфере нет картинки</string>
+    <!-- Шаблоны QR -->
+    <string name="qr_templates">Мои шаблоны</string>
+    <string name="qr_template_save">Сохранить как шаблон</string>
+    <string name="qr_template_name_hint">Название шаблона</string>
+    <string name="qr_template_saved">Шаблон сохранён</string>
+    <string name="qr_template_deleted">Шаблон удалён</string>
+    <string name="qr_template_delete">Удалить шаблон</string>
+    <string name="qr_template_confirm_delete">Удалить шаблон «%1$s»?</string>
 </resources>
