@@ -119,7 +119,6 @@
     <string name="settings_donate">通过 DonationAlerts 捐赠</string>
     <string name="settings_our_apps">我们的应用</string>
     <string name="settings_about">关于</string>
-    <string name="settings_about_desc">版本、作者、联系方式</string>
 
     <string name="lang_system">跟随系统</string>
     <string name="lang_russian">Русский</string>
