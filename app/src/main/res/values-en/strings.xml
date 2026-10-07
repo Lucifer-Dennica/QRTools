@@ -242,7 +242,7 @@
     <string name="pdf_saved">PDF saved to Downloads</string>
     <string name="pdf_failed">Failed to save PDF</string>
     <string name="pdf_share">Share PDF</string>
-    <!-- Business card -->
+    
     <string name="gen_vcard">Business card</string>
     <string name="field_vcard_firstname">First name</string>
     <string name="field_vcard_lastname">Last name</string>
@@ -255,4 +255,11 @@
     <string name="field_vcard_note">Note</string>
     <string name="widget_desc">Quick access to scanner</string>
     <string name="widget_scan">Scan</string>
+    <string name="settings_import_csv">Import from CSV</string>
+    <string name="import_success">Imported records: %1$d</string>
+    <string name="import_failed">Failed to import</string>
+    <string name="import_empty">File is empty or invalid format</string>
+    <string name="import_confirm_title">Import records?</string>
+    <string name="import_confirm_desc">Current history will be kept. New records will be added.</string>
+    <string name="import_confirm_yes">Import</string>
 </resources>
