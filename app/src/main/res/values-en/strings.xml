@@ -253,4 +253,6 @@
     <string name="field_vcard_website">Website</string>
     <string name="field_vcard_address">Address</string>
     <string name="field_vcard_note">Note</string>
+    <string name="widget_desc">Quick access to scanner</string>
+    <string name="widget_scan">Scan</string>
 </resources>
