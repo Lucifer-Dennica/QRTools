@@ -4,12 +4,6 @@ import android.content.Context
 import android.content.res.Configuration
 import java.util.Locale
 
-/**
- * Хелпер для смены языка.
- * Хранит выбор в SharedPreferences (синхронно — нужно для attachBaseContext).
- *
- * Коды: "system", "ru", "en", "zh"
- */
 object LocaleHelper {
 
     private const val PREFS = "qrtools_lang"
@@ -28,9 +22,7 @@ object LocaleHelper {
             .apply()
     }
 
-    /**
-     * Оборачивает контекст нужной локалью. Если "system" — возвращает как есть.
-     */
+    /** Оборачивает контекст нужной локалью. "system" — как есть. */
     fun wrap(context: Context): Context {
         val lang = getLang(context)
         if (lang == DEFAULT) return context
