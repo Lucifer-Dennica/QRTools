@@ -289,4 +289,17 @@
     <string name="batch_create_done">完成: %1$d / %2$d</string>
     <string name="batch_create_nothing">未能创建任何二维码</string>
     <string name="batch_create_open_folder">打开文件夹</string>
+
+    <string name="settings_swipes">滑动手势</string>
+    <string name="settings_swipes_desc">主屏幕手势</string>
+    <string name="swipe_left">向左滑动</string>
+    <string name="swipe_right">向右滑动</string>
+    <string name="swipe_up">向上滑动</string>
+    <string name="swipe_down">向下滑动</string>
+    <string name="swipe_off">已禁用</string>
+    <string name="swipe_scanner">打开扫描器</string>
+    <string name="swipe_generator">打开生成器</string>
+    <string name="swipe_history">打开历史记录</string>
+    <string name="swipe_favorites">打开收藏</string>
+    <string name="swipe_settings">打开设置</string>
 </resources>
