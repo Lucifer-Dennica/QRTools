@@ -25,6 +25,7 @@ import com.luciferdennica.qrtools.ui.screens.settings.BehaviorSettingsScreen
 import com.luciferdennica.qrtools.ui.screens.settings.DesignSettingsScreen
 import com.luciferdennica.qrtools.ui.screens.settings.HistorySettingsScreen
 import com.luciferdennica.qrtools.ui.screens.settings.SettingsScreen
+import com.luciferdennica.qrtools.ui.screens.settings.SwipeSettingsScreen
 
 object Routes {
     const val HOME = "home"
@@ -36,6 +37,7 @@ object Routes {
     const val SETTINGS = "settings"
     const val SETTINGS_DESIGN = "settings/design"
     const val SETTINGS_BEHAVIOR = "settings/behavior"
+    const val SETTINGS_SWIPES = "settings/swipes"
     const val SETTINGS_HISTORY = "settings/history"
     const val ABOUT = "about"
     const val RESULT = "result"
@@ -49,7 +51,6 @@ fun NavGraph(prefs: SettingsPrefs, historyRepo: HistoryRepository) {
     val context = LocalContext.current
     val app = context.applicationContext as App
 
-    // Открыть сканер при старте, если пришли из виджета
     LaunchedEffect(Unit) {
         if (app.openScannerOnStart) {
             app.openScannerOnStart = false
@@ -68,6 +69,7 @@ fun NavGraph(prefs: SettingsPrefs, historyRepo: HistoryRepository) {
         composable(Routes.SETTINGS) { SettingsScreen(nav) }
         composable(Routes.SETTINGS_DESIGN) { DesignSettingsScreen(nav, prefs) }
         composable(Routes.SETTINGS_BEHAVIOR) { BehaviorSettingsScreen(nav, prefs) }
+        composable(Routes.SETTINGS_SWIPES) { SwipeSettingsScreen(nav, prefs) }
         composable(Routes.SETTINGS_HISTORY) { HistorySettingsScreen(nav, prefs, historyRepo) }
 
         composable(Routes.ABOUT) { AboutScreen(nav) }
