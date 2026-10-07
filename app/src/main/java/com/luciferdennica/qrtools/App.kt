@@ -11,6 +11,9 @@ class App : Application() {
     val historyRepo by lazy { HistoryRepository(database.scanDao()) }
     val prefs by lazy { SettingsPrefs(this) }
 
+    /** Флаг: если true — при старте открыть сканер (пришло из виджета) */
+    var openScannerOnStart = false
+
     override fun onCreate() {
         super.onCreate()
         YandexAds.initialize(this) { }
