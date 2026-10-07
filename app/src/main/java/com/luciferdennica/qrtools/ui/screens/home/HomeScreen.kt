@@ -3,6 +3,8 @@ package com.luciferdennica.qrtools.ui.screens.home
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -42,17 +45,43 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.luciferdennica.qrtools.App
 import com.luciferdennica.qrtools.R
+import com.luciferdennica.qrtools.data.prefs.SwipeAction
 import com.luciferdennica.qrtools.ui.components.BannerAd
 import com.luciferdennica.qrtools.ui.nav.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(nav: NavController) {
+    val context = LocalContext.current
+    val app = context.applicationContext as App
+    val prefs = app.prefs
+
+    val swipeLeft by prefs.swipeLeft.collectAsState(initial = SwipeAction.OFF)
+    val swipeRight by prefs.swipeRight.collectAsState(initial = SwipeAction.OFF)
+    val swipeUp by prefs.swipeUp.collectAsState(initial = SwipeAction.OFF)
+    val swipeDown by prefs.swipeDown.collectAsState(initial = SwipeAction.OFF)
+
+    fun perform(action: SwipeAction) {
+        if (action == SwipeAction.OFF) return
+        val route = when (action) {
+            SwipeAction.SCANNER -> Routes.SCANNER
+            SwipeAction.GENERATOR -> Routes.GENERATOR
+            SwipeAction.HISTORY -> Routes.HISTORY
+            SwipeAction.FAVORITES -> Routes.FAVORITES
+            SwipeAction.SETTINGS -> Routes.SETTINGS
+            SwipeAction.OFF -> return
+        }
+        nav.navigate(route)
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -74,7 +103,39 @@ fun HomeScreen(nav: NavController) {
             )
         }
     ) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .pointerInput(swipeLeft, swipeRight, swipeUp, swipeDown) {
+                    var totalHorizontal = 0f
+                    var totalVertical = 0f
+                    val threshold = 120f
+
+                    detectHorizontalDragGestures(
+                        onDragEnd = {
+                            if (totalHorizontal > threshold) perform(swipeRight)
+                            else if (totalHorizontal < -threshold) perform(swipeLeft)
+                            totalHorizontal = 0f
+                        }
+                    ) { _, dragAmount ->
+                        totalHorizontal += dragAmount
+                    }
+                }
+                .pointerInput(swipeLeft, swipeRight, swipeUp, swipeDown) {
+                    var total = 0f
+                    val threshold = 120f
+                    detectVerticalDragGestures(
+                        onDragEnd = {
+                            if (total > threshold) perform(swipeDown)
+                            else if (total < -threshold) perform(swipeUp)
+                            total = 0f
+                        }
+                    ) { _, dragAmount ->
+                        total += dragAmount
+                    }
+                }
+        ) {
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -148,7 +209,6 @@ private fun GradientCard(
             )
             .padding(20.dp)
     ) {
-        // Иконка в левом полупрозрачном квадрате
         Box(
             modifier = Modifier
                 .align(Alignment.CenterStart)
@@ -165,7 +225,6 @@ private fun GradientCard(
             )
         }
 
-        // Текст
         Column(
             modifier = Modifier
                 .align(Alignment.CenterStart)
@@ -185,7 +244,6 @@ private fun GradientCard(
             )
         }
 
-        // Стрелка справа
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = null,
