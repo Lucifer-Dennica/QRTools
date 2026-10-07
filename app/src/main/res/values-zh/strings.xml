@@ -262,4 +262,20 @@
     <string name="import_confirm_title">导入记录？</string>
     <string name="import_confirm_desc">当前历史将保留。新记录将添加。</string>
     <string name="import_confirm_yes">导入</string>
+    
+    <string name="settings_qr_resolution">二维码分辨率</string>
+    <string name="resolution_hd">HD — 1080×1080</string>
+    <string name="resolution_2k">2K — 2048×2048</string>
+    <string name="resolution_4k">4K — 3840×3840</string>
+
+    <string name="from_clipboard">从剪贴板</string>
+    <string name="clipboard_no_image">剪贴板中没有图片</string>
+
+    <string name="qr_templates">我的模板</string>
+    <string name="qr_template_save">保存为模板</string>
+    <string name="qr_template_name_hint">模板名称</string>
+    <string name="qr_template_saved">模板已保存</string>
+    <string name="qr_template_deleted">模板已删除</string>
+    <string name="qr_template_delete">删除模板</string>
+    <string name="qr_template_confirm_delete">删除模板 "%1$s"？</string>
 </resources>
