@@ -225,4 +225,11 @@
     <string name="note_save">保存</string>
     <string name="note_remove">删除</string>
     <string name="note_saved">备注已保存</string>
+    
+    <string name="settings_save_history">保存扫描历史</string>
+    <string name="history_filter_all">全部</string>
+    <string name="pin">置顶</string>
+    <string name="unpin">取消置顶</string>
+    <string name="settings_clear_hidden">删除隐藏的扫描</string>
+    <string name="hidden_cleared">已删除隐藏的扫描</string>
 </resources>
