@@ -225,4 +225,11 @@
     <string name="note_save">Сохранить</string>
     <string name="note_remove">Удалить</string>
     <string name="note_saved">Заметка сохранена</string>
+    
+    <string name="settings_save_history">Сохранять историю сканирований</string>
+    <string name="history_filter_all">Все</string>
+    <string name="pin">Закрепить</string>
+    <string name="unpin">Открепить</string>
+    <string name="settings_clear_hidden">Удалить скрытые сканы</string>
+    <string name="hidden_cleared">Скрытые сканы удалены</string>
 </resources>
