@@ -118,7 +118,6 @@
     <string name="settings_donate">Über DonationAlerts spenden</string>
     <string name="settings_our_apps">Unsere Apps</string>
     <string name="settings_about">Über</string>
-    <string name="settings_about_desc">Version, Autor, Info</string>
 
     <string name="lang_system">System</string>
     <string name="lang_russian">Русский</string>
@@ -142,7 +141,7 @@
     <string name="about_contacts">Kontakte</string>
     <string name="about_support">Projekt unterstützen</string>
     <string name="about_donate_button">DonationAlerts</string>
-    <string name="about_version_full">Version: 1.1.0</string>
+    <string name="about_version_full">Version: 1.0.0</string>
     <string name="about_app_title">Über</string>
     <string name="about_app_desc">QR Tools — schneller Scanner und Generator für QR-Codes und Barcodes. Unterstützt alle gängigen Formate, Galerie-Scan, Verlauf, Favoriten, Datenexport und WLAN-Verbindung per QR.</string>
     <string name="about_development">Entwicklung</string>
@@ -200,6 +199,7 @@
     <string name="settings_design_desc">Design und App-Symbol</string>
     <string name="settings_behavior_desc">Ton, Vibration und Kopieren</string>
     <string name="settings_history_desc">Verlauf exportieren und löschen</string>
+    <string name="settings_about_desc">Version, Autor, Info</string>
 
     <string name="gen_vcard">Visitenkarte</string>
     <string name="field_vcard_firstname">Vorname</string>
@@ -300,16 +300,4 @@
     <string name="swipe_history">Verlauf öffnen</string>
     <string name="swipe_favorites">Favoriten öffnen</string>
     <string name="swipe_settings">Einstellungen öffnen</string>
-
-    <string name="settings_swipes_desc">Gestes de l\'écran d\'accueil</string>
-    <string name="swipe_left">Glisser à gauche</string>
-    <string name="swipe_right">Glisser à droite</string>
-    <string name="swipe_up">Glisser vers le haut</string>
-    <string name="swipe_down">Glisser vers le bas</string>
-    <string name="swipe_off">Désactivé</string>
-    <string name="swipe_scanner">Ouvrir le scanner</string>
-    <string name="swipe_generator">Ouvrir le générateur</string>
-    <string name="swipe_history">Ouvrir l\'historique</string>
-    <string name="swipe_favorites">Ouvrir les favoris</string>
-    <string name="swipe_settings">Ouvrir les paramètres</string>
 </resources>
