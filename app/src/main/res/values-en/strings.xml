@@ -278,4 +278,12 @@
     <string name="qr_template_deleted">Template deleted</string>
     <string name="qr_template_delete">Delete template</string>
     <string name="qr_template_confirm_delete">Delete template "%1$s"?</string>
+
+    <string name="batch_create">Batch from CSV</string>
+    <string name="batch_create_hint">One QR code per line. First line is header.</string>
+    <string name="batch_create_start">Create QR codes</string>
+    <string name="batch_create_progress">Processing %1$d of %2$d…</string>
+    <string name="batch_create_done">Done: %1$d of %2$d</string>
+    <string name="batch_create_nothing">Failed to create any QR</string>
+    <string name="batch_create_open_folder">Open folder</string>
 </resources>
