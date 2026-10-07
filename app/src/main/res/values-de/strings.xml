@@ -200,7 +200,6 @@
     <string name="settings_design_desc">Design und App-Symbol</string>
     <string name="settings_behavior_desc">Ton, Vibration und Kopieren</string>
     <string name="settings_history_desc">Verlauf exportieren und löschen</string>
-    <string name="settings_about_desc">Version, Autor, Info</string>
 
     <string name="gen_vcard">Visitenkarte</string>
     <string name="field_vcard_firstname">Vorname</string>
