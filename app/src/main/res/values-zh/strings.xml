@@ -202,4 +202,10 @@
     <string name="preset_forest">森林</string>
     <string name="preset_amethyst">紫水晶</string>
     <string name="preset_inverse">反色</string>
+    
+    <string name="settings_design">设计</string>
+    <string name="settings_design_desc">主题和应用图标</string>
+    <string name="settings_behavior_desc">声音、震动和复制</string>
+    <string name="settings_history_desc">导出和清除历史</string>
+    <string name="settings_about_desc">版本、作者、信息</string>
 </resources>
