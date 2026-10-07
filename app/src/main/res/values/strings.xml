@@ -253,4 +253,6 @@
     <string name="field_vcard_website">Сайт</string>
     <string name="field_vcard_address">Адрес</string>
     <string name="field_vcard_note">Заметка</string>
+    <string name="widget_desc">Быстрый доступ к сканеру</string>
+    <string name="widget_scan">Сканировать</string>
 </resources>
