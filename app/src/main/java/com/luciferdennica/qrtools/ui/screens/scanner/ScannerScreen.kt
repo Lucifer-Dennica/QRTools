@@ -2,8 +2,11 @@ package com.luciferdennica.qrtools.ui.screens.scanner
 
 import android.Manifest
 import android.app.Activity
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.net.Uri
@@ -11,6 +14,7 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,8 +25,10 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -30,12 +36,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -51,6 +59,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -64,6 +73,7 @@ import com.luciferdennica.qrtools.ads.AdsManager
 import com.luciferdennica.qrtools.data.prefs.SettingsPrefs
 import com.luciferdennica.qrtools.data.repo.HistoryRepository
 import com.luciferdennica.qrtools.scan.QrCodeAnalyzer
+import com.luciferdennica.qrtools.scan.ScanFromBitmap
 import com.luciferdennica.qrtools.ui.nav.Routes
 import com.luciferdennica.qrtools.util.TypeDetector
 import kotlinx.coroutines.launch
@@ -97,14 +107,48 @@ fun ScannerScreen(
         AdsManager.preloadInterstitial(context)
     }
 
-    // ОДНА кнопка — выбор 1 или нескольких
+    // Обработка картинки из буфера обмена
+    fun scanFromClipboard() {
+        val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = cm.primaryClip
+        if (clip == null || clip.itemCount == 0) {
+            Toast.makeText(context, context.getString(R.string.clipboard_no_image), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val item = clip.getItemAt(0)
+        val uri = item.uri
+        if (uri == null) {
+            Toast.makeText(context, context.getString(R.string.clipboard_no_image), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        scope.launch {
+            val bitmap = loadBitmapFromUri(context, uri)
+            if (bitmap == null) {
+                Toast.makeText(context, context.getString(R.string.clipboard_no_image), Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+            val barcode = ScanFromBitmap.decode(bitmap)
+            val raw = barcode?.rawValue
+            if (raw.isNullOrBlank()) {
+                Toast.makeText(context, context.getString(R.string.no_code_in_image), Toast.LENGTH_SHORT).show()
+            } else {
+                val type = TypeDetector.detect(raw, barcode.format.toString())
+                val saveHistory = prefs.getSaveHistoryOnce()
+                val id = repo.add(raw, barcode.format.toString(), type, saveHistory)
+                navigateAfterScan(nav, context, prefs, id)
+            }
+        }
+    }
+
+    // Выбор из галереи
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()
     ) { uris: List<Uri> ->
         if (uris.isEmpty()) return@rememberLauncherForActivityResult
 
         if (uris.size == 1) {
-            // Одиночный скан
             QrCodeAnalyzer.decodeFromUri(
                 context = context,
                 uri = uris.first(),
@@ -126,7 +170,6 @@ fun ScannerScreen(
                 }
             )
         } else {
-            // Пакетный скан
             batchProcessing = true
             scope.launch {
                 val saveHistory = prefs.getSaveHistoryOnce()
@@ -210,28 +253,64 @@ fun ScannerScreen(
                     }
                 )
 
-                // ОДНА непрозрачная кнопка
-                Button(
-                    onClick = { galleryLauncher.launch("image/*") },
+                // Нижние кнопки
+                Column(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth()
-                        .padding(24.dp),
-                    enabled = !batchProcessing
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Icon(
-                        Icons.Default.Image,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Text(
-                        "  " + if (batchProcessing) "…" else stringResource(R.string.batch_scan),
-                        style = MaterialTheme.typography.titleSmall
-                    )
+                    OutlinedButton(
+                        onClick = { scanFromClipboard() },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !batchProcessing
+                    ) {
+                        Icon(
+                            Icons.Default.ContentPaste,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Text(
+                            "  " + stringResource(R.string.from_clipboard),
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                    }
+
+                    Button(
+                        onClick = { galleryLauncher.launch("image/*") },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !batchProcessing
+                    ) {
+                        Icon(
+                            Icons.Default.Image,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Text(
+                            "  " + if (batchProcessing) "…" else stringResource(R.string.batch_scan),
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                    }
                 }
             }
         }
     }
+}
+
+private fun loadBitmapFromUri(context: Context, uri: Uri): Bitmap? {
+    return runCatching {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val source = ImageDecoder.createSource(context.contentResolver, uri)
+            ImageDecoder.decodeBitmap(source) { decoder, _, _ ->
+                decoder.isMutableRequired = false
+                decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+        }
+    }.getOrNull()
 }
 
 private fun <T> kotlinx.coroutines.flow.Flow<T>.valueOrNull(): T? {
@@ -354,9 +433,7 @@ private fun vibrate(context: Context) {
             @Suppress("DEPRECATION")
             context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
         }
-
         if (vibrator == null || !vibrator.hasVibrator()) return
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             vibrator.vibrate(VibrationEffect.createOneShot(100L, 255))
         } else {
