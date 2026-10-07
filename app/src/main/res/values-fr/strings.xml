@@ -200,7 +200,6 @@
     <string name="settings_design_desc">Thème et icône de l\'app</string>
     <string name="settings_behavior_desc">Son, vibration et copie</string>
     <string name="settings_history_desc">Export et suppression</string>
-    <string name="settings_about_desc">Version, auteur, info</string>
 
     <string name="gen_vcard">Carte de visite</string>
     <string name="field_vcard_firstname">Prénom</string>
