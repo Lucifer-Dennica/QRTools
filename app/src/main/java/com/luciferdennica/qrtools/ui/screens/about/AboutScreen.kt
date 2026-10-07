@@ -11,6 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Send
@@ -34,6 +35,7 @@ import androidx.navigation.NavController
 import com.luciferdennica.qrtools.R
 import com.luciferdennica.qrtools.util.IntentUtils
 
+private const val APPS_URL = "https://lucifer-dennica.github.io/apps.html"
 private const val SUPPORT_EMAIL = "denis22142qwe@gmail.com"
 private const val SUPPORT_TELEGRAM = "Lucifer_Denicca_22142"
 private const val DONATE_URL = "https://www.donationalerts.com/r/lucifer_dennica_1999"
@@ -66,7 +68,6 @@ fun AboutScreen(nav: NavController) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // ===== Название и версия =====
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -79,42 +80,70 @@ fun AboutScreen(nav: NavController) {
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text = "Версия: 1.0.0",
+                        text = stringResource(R.string.about_version_full),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
                 }
             }
 
-            // ===== Описание =====
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(Modifier.padding(16.dp)) {
                     Text(
-                        text = "О приложении",
+                        text = stringResource(R.string.about_app_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        text = "QR Tools — удобный сканер и генератор QR-кодов и штрихкодов. " +
-                                "Поддерживает все популярные форматы, чтение из галереи, " +
-                                "историю, избранное, экспорт данных и подключение к Wi-Fi по QR.",
+                        text = stringResource(R.string.about_app_desc),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
 
-            // ===== Разработка =====
+            // НОВАЯ СЕКЦИЯ — Наши приложения
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(Modifier.padding(16.dp)) {
                     Text(
-                        text = "Разработка",
+                        text = stringResource(R.string.about_our_apps),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.about_our_apps_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                    Spacer(Modifier.height(10.dp))
+                    OutlinedButton(
+                        onClick = { IntentUtils.openUrlSafe(context, APPS_URL) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.OpenInNew,
+                            contentDescription = null,
+                            modifier = Modifier.padding(end = 6.dp)
+                        )
+                        Text(stringResource(R.string.about_our_apps_button))
+                    }
+                }
+            }
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Text(
+                        text = stringResource(R.string.about_development),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -126,7 +155,6 @@ fun AboutScreen(nav: NavController) {
                 }
             }
 
-            // ===== Поддержать проект =====
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -147,12 +175,11 @@ fun AboutScreen(nav: NavController) {
                             contentDescription = null,
                             modifier = Modifier.padding(end = 6.dp)
                         )
-                        Text("DonationAlerts")
+                        Text(stringResource(R.string.about_donate_button))
                     }
                 }
             }
 
-            // ===== Контакты =====
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -167,11 +194,7 @@ fun AboutScreen(nav: NavController) {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedButton(
                             onClick = {
-                                IntentUtils.openEmail(
-                                    context,
-                                    SUPPORT_EMAIL,
-                                    "QR Tools — обратная связь"
-                                )
+                                IntentUtils.openEmail(context, SUPPORT_EMAIL, "QR Tools")
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -201,7 +224,7 @@ fun AboutScreen(nav: NavController) {
 
             Spacer(Modifier.height(12.dp))
             Text(
-                text = "© 2026 QR Tools. Все права защищены.",
+                text = stringResource(R.string.about_copyright),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
             )
