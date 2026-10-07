@@ -34,8 +34,14 @@ interface ScanDao {
     @Delete
     suspend fun delete(item: ScanEntity)
 
+    @Query("DELETE FROM scans WHERE id IN (:ids)")
+    suspend fun deleteByIds(ids: List<Long>)
+
     @Query("UPDATE scans SET isFavorite = :fav WHERE id = :id")
     suspend fun setFavorite(id: Long, fav: Boolean)
+
+    @Query("UPDATE scans SET note = :note WHERE id = :id")
+    suspend fun setNote(id: Long, note: String)
 
     @Query("DELETE FROM scans")
     suspend fun clearAll()
