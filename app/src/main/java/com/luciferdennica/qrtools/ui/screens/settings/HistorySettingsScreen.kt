@@ -1,6 +1,8 @@
 package com.luciferdennica.qrtools.ui.screens.settings
 
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,6 +40,7 @@ import com.luciferdennica.qrtools.data.prefs.SettingsPrefs
 import com.luciferdennica.qrtools.data.repo.HistoryRepository
 import com.luciferdennica.qrtools.ui.components.BannerAd
 import com.luciferdennica.qrtools.util.CsvExporter
+import com.luciferdennica.qrtools.util.CsvImporter
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,6 +53,21 @@ fun HistorySettingsScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var showClearDialog by remember { mutableStateOf(false) }
+    var showImportDialog by remember { mutableStateOf(false) }
+
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: android.net.Uri? ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            val count = CsvImporter.import(context, uri, repo)
+            val msg = when {
+                count < 0 -> context.getString(R.string.import_empty)
+                else -> context.getString(R.string.import_success, count)
+            }
+            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -114,6 +132,13 @@ fun HistorySettingsScreen(
                         }
 
                         OutlinedButton(
+                            onClick = { showImportDialog = true },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(stringResource(R.string.settings_import_csv))
+                        }
+
+                        OutlinedButton(
                             onClick = {
                                 scope.launch {
                                     repo.clearHidden()
@@ -165,6 +190,27 @@ fun HistorySettingsScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showClearDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    if (showImportDialog) {
+        AlertDialog(
+            onDismissRequest = { showImportDialog = false },
+            title = { Text(stringResource(R.string.import_confirm_title)) },
+            text = { Text(stringResource(R.string.import_confirm_desc)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showImportDialog = false
+                    importLauncher.launch("text/*")
+                }) {
+                    Text(stringResource(R.string.import_confirm_yes))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showImportDialog = false }) {
                     Text(stringResource(R.string.cancel))
                 }
             }
