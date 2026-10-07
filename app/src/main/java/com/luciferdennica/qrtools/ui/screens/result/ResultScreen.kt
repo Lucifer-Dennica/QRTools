@@ -2,9 +2,7 @@ package com.luciferdennica.qrtools.ui.screens.result
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -24,10 +22,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Wifi
@@ -151,14 +149,15 @@ private fun ResultContent(
             .padding(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        val typeTitle = runCatching { ScanType.valueOf(data.type).title }.getOrDefault(data.type)
+        val typeTitle = runCatching {
+            stringResource(ScanType.valueOf(data.type).titleRes)
+        }.getOrDefault(data.type)
         Text(
             text = typeTitle,
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.primary
         )
 
-        // Специальные карточки по типу
         when {
             data.type == ScanType.WIFI.name -> {
                 val wifi = WifiParser.parse(data.content)
@@ -168,7 +167,6 @@ private fun ResultContent(
                 val contact = VCardParser.parse(data.content)
                 if (contact != null) ContactCard(contact) else RawCard(data.content)
             }
-            // Open Food Facts для штрихкодов
             OpenFoodFacts.isFoodBarcode(data.format, data.content) -> {
                 RawCard(data.content)
                 OpenFoodFactsCard(data.content)
@@ -176,7 +174,6 @@ private fun ResultContent(
             else -> RawCard(data.content)
         }
 
-        // Кнопка «Открыть» для ссылок/телефонов/email
         if (data.type == ScanType.URL.name ||
             data.type == ScanType.EMAIL.name ||
             data.type == ScanType.PHONE.name
@@ -186,7 +183,7 @@ private fun ResultContent(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(
-                    imageVector = Icons.Default.OpenInNew,
+                    imageVector = Icons.AutoMirrored.Filled.OpenInNew,
                     contentDescription = null,
                     modifier = Modifier.size(20.dp)
                 )
@@ -271,10 +268,6 @@ private fun ResultContent(
         }
     }
 }
-
-// ========================================================
-// КАРТОЧКИ
-// ========================================================
 
 @Composable
 private fun RawCard(content: String) {
@@ -430,7 +423,7 @@ private fun WifiCard(data: WifiData) {
             HorizontalDivider()
             InfoRow(
                 label = stringResource(R.string.wifi_security),
-                value = WifiParser.securityLabel(data.security)
+                value = WifiParser.securityLabel(data.security, stringResource(R.string.wifi_open))
             )
             if (data.hidden) {
                 HorizontalDivider()
