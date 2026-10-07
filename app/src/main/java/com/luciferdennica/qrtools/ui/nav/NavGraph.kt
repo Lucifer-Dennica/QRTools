@@ -15,6 +15,7 @@ import com.luciferdennica.qrtools.data.prefs.SettingsPrefs
 import com.luciferdennica.qrtools.data.repo.HistoryRepository
 import com.luciferdennica.qrtools.ui.screens.about.AboutScreen
 import com.luciferdennica.qrtools.ui.screens.favorites.FavoritesScreen
+import com.luciferdennica.qrtools.ui.screens.generator.BatchGeneratorScreen
 import com.luciferdennica.qrtools.ui.screens.generator.GeneratorScreen
 import com.luciferdennica.qrtools.ui.screens.history.HistoryScreen
 import com.luciferdennica.qrtools.ui.screens.home.HomeScreen
@@ -29,6 +30,7 @@ object Routes {
     const val HOME = "home"
     const val SCANNER = "scanner"
     const val GENERATOR = "generator"
+    const val BATCH_GENERATOR = "batch_generator"
     const val HISTORY = "history"
     const val FAVORITES = "favorites"
     const val SETTINGS = "settings"
@@ -47,7 +49,7 @@ fun NavGraph(prefs: SettingsPrefs, historyRepo: HistoryRepository) {
     val context = LocalContext.current
     val app = context.applicationContext as App
 
-    // Если пришли из виджета — сразу открываем сканер
+    // Открыть сканер при старте, если пришли из виджета
     LaunchedEffect(Unit) {
         if (app.openScannerOnStart) {
             app.openScannerOnStart = false
@@ -59,6 +61,7 @@ fun NavGraph(prefs: SettingsPrefs, historyRepo: HistoryRepository) {
         composable(Routes.HOME) { HomeScreen(nav) }
         composable(Routes.SCANNER) { ScannerScreen(nav, historyRepo, prefs) }
         composable(Routes.GENERATOR) { GeneratorScreen(nav) }
+        composable(Routes.BATCH_GENERATOR) { BatchGeneratorScreen(nav) }
         composable(Routes.HISTORY) { HistoryScreen(nav, historyRepo, autoCopy) }
         composable(Routes.FAVORITES) { FavoritesScreen(nav, historyRepo) }
 
