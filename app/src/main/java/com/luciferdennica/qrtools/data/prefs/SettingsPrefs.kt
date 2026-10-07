@@ -25,6 +25,16 @@ class SettingsPrefs(private val context: Context) {
         private val KEY_VIBRO = booleanPreferencesKey("vibro")
         private val KEY_SCAN_COUNTER = intPreferencesKey("scan_counter")
         private val KEY_ICON = stringPreferencesKey("app_icon")
+        private val KEY_REVIEW_COUNTER = intPreferencesKey("review_counter")
+        private val KEY_REVIEW_DONT_ASK = booleanPreferencesKey("review_dont_ask")
+
+        // Последние введённые данные
+        private val KEY_LAST_WIFI_SSID = stringPreferencesKey("last_wifi_ssid")
+        private val KEY_LAST_WIFI_PASS = stringPreferencesKey("last_wifi_pass")
+        private val KEY_LAST_WIFI_SEC = stringPreferencesKey("last_wifi_sec")
+        private val KEY_LAST_SMS_PHONE = stringPreferencesKey("last_sms_phone")
+        private val KEY_LAST_URL = stringPreferencesKey("last_url")
+        private val KEY_LAST_TEXT = stringPreferencesKey("last_text")
     }
 
     val theme: Flow<ThemeMode> = context.dataStore.data.map {
@@ -62,5 +72,76 @@ class SettingsPrefs(private val context: Context) {
 
     suspend fun resetScanCounter() {
         context.dataStore.edit { it[KEY_SCAN_COUNTER] = 0 }
+    }
+
+    // ===== ОЦЕНКА ПРИЛОЖЕНИЯ =====
+
+    suspend fun shouldShowReviewDialog(): Boolean {
+        var shouldShow = false
+        context.dataStore.edit { prefs ->
+            val dontAsk = prefs[KEY_REVIEW_DONT_ASK] ?: false
+            if (dontAsk) {
+                shouldShow = false
+                return@edit
+            }
+            val cur = prefs[KEY_REVIEW_COUNTER] ?: 0
+            val next = cur + 1
+            prefs[KEY_REVIEW_COUNTER] = next
+
+            if (cur == 0 && next >= 10) {
+                shouldShow = true
+            } else if (cur >= 10 && next >= cur + 20) {
+                shouldShow = true
+            }
+        }
+        return shouldShow
+    }
+
+    suspend fun setReviewDontAsk() {
+        context.dataStore.edit { it[KEY_REVIEW_DONT_ASK] = true }
+    }
+
+    suspend fun resetReviewCounter() {
+        context.dataStore.edit { it[KEY_REVIEW_COUNTER] = 10 }
+    }
+
+    // ===== ПОСЛЕДНИЕ ВВЕДЁННЫЕ ДАННЫЕ =====
+
+    suspend fun getLastWifi(): Triple<String, String, String> {
+        val prefs = context.dataStore.data.first()
+        return Triple(
+            prefs[KEY_LAST_WIFI_SSID] ?: "",
+            prefs[KEY_LAST_WIFI_PASS] ?: "",
+            prefs[KEY_LAST_WIFI_SEC] ?: "WPA"
+        )
+    }
+
+    suspend fun setLastWifi(ssid: String, pass: String, sec: String) {
+        context.dataStore.edit {
+            it[KEY_LAST_WIFI_SSID] = ssid
+            it[KEY_LAST_WIFI_PASS] = pass
+            it[KEY_LAST_WIFI_SEC] = sec
+        }
+    }
+
+    suspend fun getLastSmsPhone(): String =
+        context.dataStore.data.first()[KEY_LAST_SMS_PHONE] ?: ""
+
+    suspend fun setLastSmsPhone(phone: String) {
+        context.dataStore.edit { it[KEY_LAST_SMS_PHONE] = phone }
+    }
+
+    suspend fun getLastUrl(): String =
+        context.dataStore.data.first()[KEY_LAST_URL] ?: ""
+
+    suspend fun setLastUrl(url: String) {
+        context.dataStore.edit { it[KEY_LAST_URL] = url }
+    }
+
+    suspend fun getLastText(): String =
+        context.dataStore.data.first()[KEY_LAST_TEXT] ?: ""
+
+    suspend fun setLastText(text: String) {
+        context.dataStore.edit { it[KEY_LAST_TEXT] = text }
     }
 }
