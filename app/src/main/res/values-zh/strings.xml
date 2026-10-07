@@ -239,4 +239,8 @@
     
     <string name="batch_scan">从相册</string>
     <string name="settings_rate_text">期待您在应用商店留下评价</string>
+    <string name="btn_save_pdf">保存为 PDF</string>
+    <string name="pdf_saved">PDF 已保存到下载</string>
+    <string name="pdf_failed">保存 PDF 失败</string>
+    <string name="pdf_share">分享 PDF</string>
 </resources>
