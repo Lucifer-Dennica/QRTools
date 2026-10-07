@@ -68,6 +68,7 @@ fun AboutScreen(nav: NavController) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            // Название + версия
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -87,6 +88,7 @@ fun AboutScreen(nav: NavController) {
                 }
             }
 
+            // Описание
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -105,7 +107,7 @@ fun AboutScreen(nav: NavController) {
                 }
             }
 
-            // НОВАЯ СЕКЦИЯ — Наши приложения
+            // Наши приложения
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -137,6 +139,7 @@ fun AboutScreen(nav: NavController) {
                 }
             }
 
+            // Разработка
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -155,6 +158,7 @@ fun AboutScreen(nav: NavController) {
                 }
             }
 
+            // Поддержать
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -180,6 +184,7 @@ fun AboutScreen(nav: NavController) {
                 }
             }
 
+            // Контакты
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
