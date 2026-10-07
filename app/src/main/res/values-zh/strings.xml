@@ -142,7 +142,7 @@
     <string name="about_contacts">联系方式</string>
     <string name="about_support">支持项目</string>
     <string name="about_donate_button">DonationAlerts</string>
-    <string name="about_version_full">版本: 1.0.0</string>
+    <string name="about_version_full">版本: 1.1.0</string>
     <string name="about_app_title">关于</string>
     <string name="about_app_desc">QR Tools — 快速便捷的二维码和条形码扫描与生成工具。支持所有主流格式、相册扫描、历史记录、收藏、数据导出以及通过二维码连接 Wi-Fi。</string>
     <string name="about_development">开发</string>
