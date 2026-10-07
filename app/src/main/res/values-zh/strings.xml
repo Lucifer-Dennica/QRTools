@@ -278,4 +278,12 @@
     <string name="qr_template_deleted">模板已删除</string>
     <string name="qr_template_delete">删除模板</string>
     <string name="qr_template_confirm_delete">删除模板 "%1$s"？</string>
+
+    <string name="batch_create">从 CSV 批量创建</string>
+    <string name="batch_create_hint">每行一个二维码。第一行为标题。</string>
+    <string name="batch_create_start">生成二维码</string>
+    <string name="batch_create_progress">处理中 %1$d / %2$d…</string>
+    <string name="batch_create_done">完成: %1$d / %2$d</string>
+    <string name="batch_create_nothing">未能创建任何二维码</string>
+    <string name="batch_create_open_folder">打开文件夹</string>
 </resources>
