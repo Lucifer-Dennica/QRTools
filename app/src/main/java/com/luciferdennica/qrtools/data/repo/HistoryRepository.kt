@@ -16,6 +16,7 @@ class HistoryRepository(private val dao: ScanDao) {
         dao.searchByType(type.name, query)
     suspend fun getById(id: Long): ScanEntity? = dao.getById(id)
 
+    /** Обычное добавление (с флагом сохранения в историю). */
     suspend fun add(
         content: String,
         format: String,
@@ -28,6 +29,25 @@ class HistoryRepository(private val dao: ScanDao) {
                 format = format,
                 type = type.name,
                 isHidden = !saveToHistory
+            )
+        )
+    }
+
+    /** Импорт записи из CSV с сохранением исходных даты и избранного. */
+    suspend fun importScan(
+        content: String,
+        format: String,
+        type: ScanType,
+        timestamp: Long,
+        isFavorite: Boolean
+    ): Long {
+        return dao.insert(
+            ScanEntity(
+                content = content,
+                format = format,
+                type = type.name,
+                isFavorite = isFavorite,
+                timestamp = timestamp
             )
         )
     }
