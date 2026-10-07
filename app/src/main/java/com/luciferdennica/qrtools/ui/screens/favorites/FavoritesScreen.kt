@@ -103,7 +103,9 @@ fun FavoritesScreen(nav: NavController, repo: HistoryRepository) {
 @Composable
 private fun FavRow(item: ScanEntity, onClick: () -> Unit, onRemove: () -> Unit) {
     val dateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
-    val typeTitle = runCatching { ScanType.valueOf(item.type).title }.getOrDefault(item.type)
+    val typeTitle = runCatching {
+        stringResource(ScanType.valueOf(item.type).titleRes)
+    }.getOrDefault(item.type)
     val accent = colorForType(item.type)
     val icon = iconForType(item.type)
     val displayTitle = ScanDisplay.shortTitle(item.content, item.type)
