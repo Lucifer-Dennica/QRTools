@@ -253,4 +253,6 @@
     <string name="field_vcard_website">网站</string>
     <string name="field_vcard_address">地址</string>
     <string name="field_vcard_note">备注</string>
+    <string name="widget_desc">快速访问扫描器</string>
+    <string name="widget_scan">扫描</string>
 </resources>
