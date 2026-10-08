@@ -17,7 +17,3 @@
 # ZXing
 -keep class com.google.zxing.** { *; }
 -dontwarn com.google.zxing.**
-
-# RuStore Review SDK
--keep class ru.rustore.sdk.review.** { *; }
--dontwarn ru.rustore.sdk.review.**
