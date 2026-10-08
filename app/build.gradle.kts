@@ -84,5 +84,5 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
 
     // RuStore Review SDK — оценка и отзыв из приложения
-    implementation("ru.rustore.sdk:review:1.0.0")
+    implementation("ru.rustore.sdk:review:1.1.0")
 }
