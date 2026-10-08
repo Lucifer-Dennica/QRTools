@@ -302,4 +302,10 @@
     <string name="swipe_history">Открыть историю</string>
     <string name="swipe_favorites">Открыть избранное</string>
     <string name="swipe_settings">Открыть настройки</string>
+    <!-- Review -->
+    <string name="review_dialog_title">Нравится QR Tools?</string>
+    <string name="review_dialog_message">Поделитесь впечатлением — это помогает нам становиться лучше</string>
+    <string name="review_dialog_yes">Оценить</string>
+    <string name="review_dialog_later">Не сейчас</string>
+    <string name="review_dialog_never">Больше не спрашивать</string>
 </resources>
