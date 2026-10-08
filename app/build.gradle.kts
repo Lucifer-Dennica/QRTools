@@ -78,11 +78,10 @@ dependencies {
     implementation("com.google.zxing:core:3.5.3")
     implementation("com.yandex.android:mobileads:8.5.0")
 
-    // Coil — загрузка изображений (для Open Food Facts)
     implementation("io.coil-kt:coil-compose:2.7.0")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
 
-    // RuStore Review SDK — оценка и отзыв из приложения
+    // RuStore Review SDK
     implementation("ru.rustore.sdk:review:10.5.1")
 }
