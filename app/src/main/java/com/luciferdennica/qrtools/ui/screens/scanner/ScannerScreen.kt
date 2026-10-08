@@ -28,6 +28,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -37,6 +38,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -44,6 +46,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -69,6 +72,7 @@ import com.luciferdennica.qrtools.ads.AdIds
 import com.luciferdennica.qrtools.ads.AdsManager
 import com.luciferdennica.qrtools.data.prefs.SettingsPrefs
 import com.luciferdennica.qrtools.data.repo.HistoryRepository
+import com.luciferdennica.qrtools.review.RuStoreReview
 import com.luciferdennica.qrtools.scan.QrCodeAnalyzer
 import com.luciferdennica.qrtools.scan.ScanFromBitmap
 import com.luciferdennica.qrtools.ui.nav.Routes
@@ -94,6 +98,7 @@ fun ScannerScreen(
     }
 
     var batchProcessing by remember { mutableStateOf(false) }
+    var showReviewDialog by remember { mutableStateOf(false) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -133,7 +138,7 @@ fun ScannerScreen(
                 val type = TypeDetector.detect(raw, barcode.format.toString())
                 val saveHistory = prefs.getSaveHistoryOnce()
                 val id = repo.add(raw, barcode.format.toString(), type, saveHistory)
-                navigateAfterScan(nav, context, prefs, id)
+                navigateAfterScan(nav, context, prefs, id) { showReviewDialog = true }
             }
         }
     }
@@ -154,7 +159,7 @@ fun ScannerScreen(
                             val type = TypeDetector.detect(raw, barcode.format.toString())
                             val saveHistory = prefs.getSaveHistoryOnce()
                             val id = repo.add(raw, barcode.format.toString(), type, saveHistory)
-                            navigateAfterScan(nav, context, prefs, id)
+                            navigateAfterScan(nav, context, prefs, id) { showReviewDialog = true }
                         }
                     } else {
                         Toast.makeText(context, context.getString(R.string.no_code_in_image), Toast.LENGTH_SHORT).show()
@@ -243,7 +248,7 @@ fun ScannerScreen(
                             val type = TypeDetector.detect(content, format)
                             val saveHistory = prefs.getSaveHistoryOnce()
                             val id = repo.add(content, format, type, saveHistory)
-                            navigateAfterScan(nav, context, prefs, id)
+                            navigateAfterScan(nav, context, prefs, id) { showReviewDialog = true }
                         }
                     }
                 )
@@ -290,6 +295,58 @@ fun ScannerScreen(
             }
         }
     }
+
+    // ===== Диалог предложения оценить приложение =====
+    if (showReviewDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showReviewDialog = false
+                scope.launch { prefs.setLastReviewTime(System.currentTimeMillis()) }
+            },
+            title = { Text(stringResource(R.string.review_dialog_title)) },
+            text = { Text(stringResource(R.string.review_dialog_message)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showReviewDialog = false
+                        scope.launch {
+                            prefs.setLastReviewTime(System.currentTimeMillis())
+                            prefs.setReviewDontAsk()
+                        }
+                        val activity = context as? Activity
+                        if (activity != null && RuStoreReview.isRuStoreAvailable(context)) {
+                            RuStoreReview.requestReview(activity)
+                        }
+                    }
+                ) {
+                    Text(stringResource(R.string.review_dialog_yes))
+                }
+            },
+            dismissButton = {
+                Row {
+                    TextButton(
+                        onClick = {
+                            showReviewDialog = false
+                            scope.launch {
+                                prefs.setLastReviewTime(System.currentTimeMillis())
+                                prefs.setReviewDontAsk()
+                            }
+                        }
+                    ) {
+                        Text(stringResource(R.string.review_dialog_never))
+                    }
+                    TextButton(
+                        onClick = {
+                            showReviewDialog = false
+                            scope.launch { prefs.setLastReviewTime(System.currentTimeMillis()) }
+                        }
+                    ) {
+                        Text(stringResource(R.string.review_dialog_later))
+                    }
+                }
+            }
+        )
+    }
 }
 
 private fun loadBitmapFromUri(context: Context, uri: Uri): Bitmap? {
@@ -315,9 +372,23 @@ private suspend fun navigateAfterScan(
     nav: NavController,
     context: Context,
     prefs: SettingsPrefs,
-    id: Long
+    id: Long,
+    onShowReview: () -> Unit = {}
 ) {
     val count = prefs.incrementScanCounter()
+
+    // Проверяем — пора ли показать диалог оценки.
+    // 1-й раз: после 10 сканов. 2-й и далее: раз в 30 дней.
+    val dontAsk = prefs.shouldShowReviewDialog()
+    val lastReview = prefs.getLastReviewTime()
+    val daysSinceLast = (System.currentTimeMillis() - lastReview) / (1000L * 60 * 60 * 24)
+
+    if (dontAsk) {
+        onShowReview()
+    } else if (count >= 50 && lastReview > 0L && daysSinceLast >= 30) {
+        onShowReview()
+    }
+
     val goNext = {
         nav.navigate(Routes.result(id)) {
             popUpTo(Routes.SCANNER) { inclusive = true }
