@@ -10,7 +10,7 @@ import ru.rustore.sdk.review.RuStoreReviewManagerFactory
  * Обёртка над RuStore Review SDK.
  *
  * Если будешь делать сборку для Huawei/Amazon — просто УДАЛИ этот файл
- * и все его вызовы в ScannerScreen и SettingsScreen (2 файла).
+ * и все его вызовы в ScannerScreen (1 файл).
  */
 object RuStoreReview {
 
@@ -30,30 +30,28 @@ object RuStoreReview {
             val manager: RuStoreReviewManager =
                 RuStoreReviewManagerFactory.create(activity)
 
-            manager.requestReviewFlow().addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val reviewInfo = task.result
-                    manager.launchReviewFlow(activity, reviewInfo)
-                        .addOnCompleteListener { launchTask ->
-                            if (launchTask.isSuccessful) {
-                                onSuccess()
-                            } else {
-                                Log.w(TAG, "launchReviewFlow failed", launchTask.exception)
-                                onError(launchTask.exception ?: Exception("Unknown"))
-                            }
+            manager.requestReviewFlow()
+                .addOnSuccessListener { reviewInfo ->
+                    manager.launchReviewFlow(reviewInfo)
+                        .addOnSuccessListener {
+                            onSuccess()
                         }
-                } else {
-                    Log.w(TAG, "requestReviewFlow failed", task.exception)
-                    onError(task.exception ?: Exception("Unknown"))
+                        .addOnFailureListener { e ->
+                            Log.w(TAG, "launchReviewFlow failed", e)
+                            onError(e)
+                        }
                 }
-            }
+                .addOnFailureListener { e ->
+                    Log.w(TAG, "requestReviewFlow failed", e)
+                    onError(e)
+                }
         } catch (e: Exception) {
             Log.e(TAG, "RuStore Review not available", e)
             onError(e)
         }
     }
 
-    /** Проверяет, что устройство использует RuStore (иначе нет смысла вызывать). */
+    /** Проверяет, установлен ли RuStore на устройстве. */
     fun isRuStoreAvailable(context: Context): Boolean {
         return try {
             context.packageManager.getPackageInfo("ru.vk.store", 0)
