@@ -81,7 +81,4 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.7.0")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
-
-    // RuStore Review SDK
-    implementation("ru.rustore.sdk:review:10.5.1")
 }
