@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -72,13 +73,15 @@ import com.luciferdennica.qrtools.ads.AdIds
 import com.luciferdennica.qrtools.ads.AdsManager
 import com.luciferdennica.qrtools.data.prefs.SettingsPrefs
 import com.luciferdennica.qrtools.data.repo.HistoryRepository
-import com.luciferdennica.qrtools.review.RuStoreReview
 import com.luciferdennica.qrtools.scan.QrCodeAnalyzer
 import com.luciferdennica.qrtools.scan.ScanFromBitmap
 import com.luciferdennica.qrtools.ui.nav.Routes
+import com.luciferdennica.qrtools.util.IntentUtils
 import com.luciferdennica.qrtools.util.TypeDetector
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
+
+private const val RUSTORE_URL = "https://www.rustore.ru/catalog/app/com.luciferdennica.qrtools"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -313,10 +316,8 @@ fun ScannerScreen(
                             prefs.setLastReviewTime(System.currentTimeMillis())
                             prefs.setReviewDontAsk()
                         }
-                        val activity = context as? Activity
-                        if (activity != null && RuStoreReview.isRuStoreAvailable(context)) {
-                            RuStoreReview.requestReview(activity)
-                        }
+                        // Открываем страницу RuStore в браузере (без SDK)
+                        IntentUtils.openUrlSafe(context, RUSTORE_URL)
                     }
                 ) {
                     Text(stringResource(R.string.review_dialog_yes))
@@ -377,8 +378,6 @@ private suspend fun navigateAfterScan(
 ) {
     val count = prefs.incrementScanCounter()
 
-    // Проверяем — пора ли показать диалог оценки.
-    // 1-й раз: после 10 сканов. 2-й и далее: раз в 30 дней.
     val dontAsk = prefs.shouldShowReviewDialog()
     val lastReview = prefs.getLastReviewTime()
     val daysSinceLast = (System.currentTimeMillis() - lastReview) / (1000L * 60 * 60 * 24)
