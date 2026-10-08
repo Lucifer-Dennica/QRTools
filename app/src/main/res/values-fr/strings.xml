@@ -300,4 +300,10 @@
     <string name="swipe_history">Ouvrir l\'historique</string>
     <string name="swipe_favorites">Ouvrir les favoris</string>
     <string name="swipe_settings">Ouvrir les paramètres</string>
+
+    <string name="review_dialog_title">Vous aimez QR Tools ?</string>
+    <string name="review_dialog_message">Partagez votre avis — cela nous aide à nous améliorer</string>
+    <string name="review_dialog_yes">Noter maintenant</string>
+    <string name="review_dialog_later">Pas maintenant</string>
+    <string name="review_dialog_never">Ne plus demander</string>
 </resources>
