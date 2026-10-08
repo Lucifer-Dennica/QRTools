@@ -2,7 +2,7 @@
 -keep class com.luciferdennica.qrtools.** { *; }
 -dontwarn kotlinx.**
 
-# Яндекс РСЯ (обязательно для работы рекламы в release)
+# Яндекс РСЯ
 -keep class com.yandex.mobile.ads.** { *; }
 -dontwarn com.yandex.mobile.ads.**
 
@@ -17,3 +17,7 @@
 # ZXing
 -keep class com.google.zxing.** { *; }
 -dontwarn com.google.zxing.**
+
+# RuStore Review SDK
+-keep class ru.rustore.sdk.review.** { *; }
+-dontwarn ru.rustore.sdk.review.**
