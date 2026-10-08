@@ -70,6 +70,8 @@ class SettingsPrefs(private val context: Context) {
         private val KEY_LAST_SMS_PHONE = stringPreferencesKey("last_sms_phone")
         private val KEY_LAST_URL = stringPreferencesKey("last_url")
         private val KEY_LAST_TEXT = stringPreferencesKey("last_text")
+
+        private val KEY_LAST_REVIEW_TIME = stringPreferencesKey("last_review_time")
     }
 
     val theme: Flow<ThemeMode> = context.dataStore.data.map {
@@ -169,6 +171,21 @@ class SettingsPrefs(private val context: Context) {
         context.dataStore.edit { it[KEY_REVIEW_COUNTER] = 10 }
     }
 
+    // ===== RuStore Review SDK =====
+
+    /** Сохраняет timestamp последнего запроса отзыва. */
+    suspend fun setLastReviewTime(millis: Long) {
+        context.dataStore.edit { it[KEY_LAST_REVIEW_TIME] = millis.toString() }
+    }
+
+    /** Возвращает timestamp последнего запроса отзыва (0 = не запрашивался). */
+    suspend fun getLastReviewTime(): Long {
+        val v = context.dataStore.data.first()[KEY_LAST_REVIEW_TIME] ?: "0"
+        return v.toLongOrNull() ?: 0L
+    }
+
+    // ===== Последние введённые данные =====
+
     suspend fun getLastWifi(): Triple<String, String, String> {
         val prefs = context.dataStore.data.first()
         return Triple(
@@ -206,6 +223,8 @@ class SettingsPrefs(private val context: Context) {
     suspend fun setLastText(text: String) {
         context.dataStore.edit { it[KEY_LAST_TEXT] = text }
     }
+
+    // ===== QR шаблоны =====
 
     suspend fun addQrTemplate(template: QrTemplate) {
         context.dataStore.edit { prefs ->
