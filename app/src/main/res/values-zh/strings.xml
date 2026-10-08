@@ -302,4 +302,10 @@
     <string name="swipe_history">打开历史记录</string>
     <string name="swipe_favorites">打开收藏</string>
     <string name="swipe_settings">打开设置</string>
+
+    <string name="review_dialog_title">喜欢 QR Tools 吗？</string>
+    <string name="review_dialog_message">分享您的反馈 — 帮助我们改进</string>
+    <string name="review_dialog_yes">立即评分</string>
+    <string name="review_dialog_later">稍后</string>
+    <string name="review_dialog_never">不再询问</string>
 </resources>
